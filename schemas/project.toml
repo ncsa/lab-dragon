@@ -1,0 +1,22 @@
+# IQUIST/NCSA
+# UIUC
+
+[annotations]
+organization = "IQUIST/NCSA"
+name = "project"
+version = "0.1"
+
+[definition]
+inherits_from = ["entity"]
+
+[defaults.fields]
+parent_class = "entity"
+
+[properties]
+linkable = "yes"
+structured = "no"
+nested = "yes"
+process = "no"
+storage = "no"
+versioned = "no"
+timestamped = "no"

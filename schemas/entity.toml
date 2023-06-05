@@ -1,0 +1,45 @@
+# IQUIST/NCSA
+# UIUC
+
+[annotations]
+# Information about the core elements of the entities
+organization = "IQUIST/NCSA"
+name = "entity"
+version = "0.1"
+
+[definition]
+inherits_from = ["class"]
+
+[definition.fields]
+# Fields that need to be satisfied alongside their data structures
+parent_link = "uuid"
+parent_class = "str"
+user = "str"
+description = "str"
+stored_content = "path"
+related_links = "array[uuid]"
+params = "array[tuple(str,value)]"
+
+
+[defaults]
+
+inherits_from = ["none"]
+
+[defaults.fields]
+# Default values for each of the fields
+parent_link = ""
+parent_class = ""
+user = ""
+description = ""
+stored_content = ""
+related_links = []
+params = []
+
+[properties]
+linkable = "maybe"
+structured = "maybe"
+nested = "maybe"
+process = "maybe"
+storage = "maybe"
+versioned = "maybe"
+timestamped = "maybe"
