@@ -1,0 +1,37 @@
+# IQUIST/NCSA
+# UIUC
+
+[annotations]
+organization = "IQUIST/NCSA"
+name = "hierarchy"
+version = "0.1"
+
+[definition]
+
+classes = [
+    "none", "entity", "project", "task", "step", "instance"
+]
+
+[entity]
+parent_class = ["none"]
+children_class = ["none"]
+
+[none]
+parent_class = ["none"]
+children_class = ["none", "project"]
+
+[project]
+parent_class = ["none", "project"]
+children_class = ["project", "task"]
+
+[task]
+parent_class = ["project", "task"]
+children_class = ["task", "step"]
+
+[step]
+parent_class = ["task"]
+children_class = ["instance"]
+
+[instance]
+parent_class = ["step"]
+children_class = ["none"]
