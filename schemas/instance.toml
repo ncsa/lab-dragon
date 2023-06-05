@@ -12,14 +12,14 @@ inherits_from = ["entity"]
 [definition.fields]
 start_time = "timestamp"
 end_time = "timestamp"
-versions = "value"
-
+version = "value"
+stored_content = "path"
 
 [defaults.fields]
 start_time = 0
 end_time = 0
 version = 0
-
+stored_content = ""
 
 [properties]
 linkable = "yes"

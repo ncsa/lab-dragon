@@ -12,28 +12,30 @@ inherits_from = ["class"]
 
 [definition.fields]
 # Fields that need to be satisfied alongside their data structures
+id = "uuid"
+name = "str"
 parent_link = "uuid"
 parent_class = "str"
 user = "str"
 description = "str"
-stored_content = "path"
 related_links = "array[uuid]"
 params = "array[tuple(str,value)]"
 
-
 [defaults]
-
 inherits_from = ["none"]
 
 [defaults.fields]
 # Default values for each of the fields
+id = ""
+name = ""
 parent_link = ""
 parent_class = ""
 user = ""
 description = ""
-stored_content = ""
+comments = []
 related_links = []
-params = []
+
+[params]
 
 [properties]
 linkable = "maybe"
