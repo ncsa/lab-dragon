@@ -9,20 +9,18 @@ def _generate(name = '',
              parent_link = '',
              user = 'default',
              description = '',
-             related_links = '',
-             params = ''):
-
-    timestamp = datetime.now().isoformat()
+             comments = [],
+             related_links = [],
+             params = []):
 
     doc = tomlkit.document()
     fields = tomlkit.table()
-    id = str(uuid.uuid4())
-    fields['id'] = id
-    fields['timestamp'] = timestamp
+    id_ = str(uuid.uuid4())
+    fields['id'] = id_
     if name != '':
         fields['name'] = name
     else:
-        fields['name'] = f'entity_{id}'
+        fields['name'] = f'entity_{id_}'
 
     fields['parent_link'] = parent_link
     fields['user'] = user

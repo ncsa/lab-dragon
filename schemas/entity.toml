@@ -18,6 +18,7 @@ parent_link = "uuid"
 parent_class = "str"
 user = "str"
 description = "str"
+comments = "array[str]"
 related_links = "array[uuid]"
 params = "array[tuple(str,value)]"
 
