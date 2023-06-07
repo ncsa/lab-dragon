@@ -13,12 +13,14 @@ inherits_from = "entity"
 
 [definition.fields]
 objective = "str"
+process = "str"
 start_time = "timestamp"
 end_time = "timestamp"
 
 
 [defaults.fields]
 objective = ""
+process = ""
 parent_class = "entity"
 start_time = 0
 end_time = 0
