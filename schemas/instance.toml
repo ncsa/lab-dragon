@@ -13,7 +13,7 @@ inherits_from = ["entity"]
 start_time = "timestamp"
 end_time = "timestamp"
 version = "value"
-stored_content = "path"
+stored_content = "array[path]"
 
 [defaults.fields]
 start_time = 0
