@@ -12,11 +12,13 @@ version = "0.1"
 inherits_from = "entity"
 
 [definition.fields]
+objective = "str"
 start_time = "timestamp"
 end_time = "timestamp"
 
 
 [defaults.fields]
+objective = ""
 parent_class = "entity"
 start_time = 0
 end_time = 0

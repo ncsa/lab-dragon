@@ -11,10 +11,14 @@ version = "0.1"
 inherits_from = "entity"
 
 [definition.fields]
+parent_class = "class"
+process = "process"
 start_time = "timestamp"
 end_time = "timestamp"
 
+
 [defaults.fields]
+process="str"
 parent_class = "entity"
 start_time = "timestamp"
 end_time = "timestamp"

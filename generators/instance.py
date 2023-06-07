@@ -35,6 +35,7 @@ def generate(name,
              filename,
              stored_content,
              version,
+             parent_class,
              *args, **kwargs):
 
     doc = generate_entity(name = name, *args, **kwargs)
@@ -43,6 +44,7 @@ def generate(name,
     doc["fields"]["start_time"] = start_time.isoformat()
     doc["fields"]["end_time"] = 0
     doc["fields"]["version"] = version
+    doc["fields"]["parent_class"] = parent_class
 
     content_path = Path(stored_content)
     file_list = []
@@ -70,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("filename", help="The name of the file to write the instance to")
     parser.add_argument("stored_content", help="The path to the stored content")
     parser.add_argument("--version", default=0, help="The version of the instance")
+    parser.add_argument("--parent_class", default="entity", help="The parent class of the instance")
     parser.add_argument("--parent_link", default="", help="The parent link of the instance")
     parser.add_argument("--user", default="", help="The user of the instance")
     parser.add_argument("--description", default='', help="The description of the instance")
@@ -82,6 +85,7 @@ if __name__ == "__main__":
     filename = args.filename
     stored_content = args.stored_content
     version = args.version
+    parent_class = args.parent_class
     parent_link = args.parent_link
     user = args.user
     description = args.description
@@ -93,6 +97,7 @@ if __name__ == "__main__":
                 filename,
                 stored_content,
                 version,
+                parent_class,
                 parent_link = parent_link,
                 user = user,
                 description = description,

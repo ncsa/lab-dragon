@@ -25,6 +25,7 @@ def _generate(name = '',
     fields['parent_link'] = parent_link
     fields['user'] = user
     fields['description'] = description
+    fields['comments'] = comments
     fields['related_links'] = related_links
     fields['params'] = params
     doc['fields'] = fields

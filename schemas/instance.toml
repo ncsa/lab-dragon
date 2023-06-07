@@ -10,6 +10,7 @@ version = "0.1"
 inherits_from = ["entity"]
 
 [definition.fields]
+parent_class = "class"
 start_time = "timestamp"
 end_time = "timestamp"
 version = "value"
@@ -20,6 +21,7 @@ start_time = 0
 end_time = 0
 version = 0
 stored_content = ""
+parent_class = "entity"
 
 [properties]
 linkable = "yes"
