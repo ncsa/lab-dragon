@@ -1,31 +1,32 @@
 # IQUIST/NCSA
 # UIUC
 
+# Annotations are read-only fields.
 [annotations]
 # Information about the core elements of the entities
 organization = "IQUIST/NCSA"
 name = "task"
 version = "0.1"
 
-
+# are we epxecting
 [definition]
-inherits_from = "entity"
+inherits_from = "entity"  # This is read only field.
 
-[definition.fields]
+[definition.fields] # Keys in the dictionary + the type
 objective = "str"
 process = "str"
 start_time = "timestamp"
 end_time = "timestamp"
 
 
-[defaults.fields]
+[defaults.fields] # Default values for the keys
 objective = ""
 process = ""
 parent_class = "entity"
 start_time = 0
 end_time = 0
 
-[properties]
+[properties] # Read only
 linkable = "yes"
 structured = "yes"
 nested = "yes"

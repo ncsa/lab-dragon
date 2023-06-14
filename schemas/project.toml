@@ -7,7 +7,7 @@ name = "project"
 version = "0.1"
 
 [definition]
-inherits_from = ["entity"]
+parent_class = ["entity"]
 
 [defaults.fields]
 parent_class = "entity"
