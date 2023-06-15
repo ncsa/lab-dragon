@@ -1,0 +1,32 @@
+import tomlkit
+from typing import List, Tuple, Dict
+from uuid import UUID
+{% for key, val in imports.items() -%}
+{{ val }} as {{ key }}
+{% endfor %}
+
+class {{class_name}}({{ inherits_from }}):
+    def __init__(self,
+                 {% for key, val in definition.items() -%}
+                     {{ key }}: {{ val }} = {{ defaults[key] }},
+                 {% endfor -%}
+    ):
+
+        {% for key in definition.keys() -%}
+            self.{{ key }} = {{ key }}
+        {% endfor %}
+
+
+    def to_TOML(self, path = None):
+        doc = tomlkit.document()
+        vals = tomlkit.table()
+        {% for key in definition.keys() -%}
+            vals['{{ key }}'] = str(self.{{ key }})
+        {% endfor %}
+        doc[self.name] = vals
+
+        if path is not None:
+            with open(path, 'w') as f:
+                f.write(doc.as_string())
+
+        return doc

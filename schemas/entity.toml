@@ -4,38 +4,41 @@
 [annotations]
 # Information about the core elements of the entities
 organization = "IQUIST/NCSA"
-name = "entity"
+name = "Entity"
 version = "0.1"
+inherits_from = "object"  # Can also be a list for multiple inheritance
 
 [definition]
-inherits_from = ["class"]
-
-[definition.fields]
 # Fields that need to be satisfied alongside their data structures
-id = "uuid"
+# Must be either imported classes or primitive types.
+ID = "UUID"
 name = "str"
-parent_link = "uuid"
+parent_link = "UUID"
 parent_class = "str"
 user = "str"
 description = "str"
-comments = "array[str]"
-related_links = "array[uuid]"
-params = "array[tuple(str,value)]"
+comments = "List[UUID]"
+related_links = "List[UUID]"
+params = "List[Tuple[str]]"
+
+# Imports is optional
+[imports]
+#Param = "parameters.Parameter"
+
 
 [defaults]
-inherits_from = ["none"]
-
-[defaults.fields]
 # Default values for each of the fields
-id = ""
-name = ""
-parent_link = ""
-parent_class = ""
-user = ""
-description = ""
+ID = ''
+name = ''
+parent_link = ''
+parent_class = ''
+user = ''
+description = ''
 comments = []
 related_links = []
+params= []
 
+# Params is optional
 [params]
 
 [properties]
