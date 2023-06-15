@@ -1,2 +1,8 @@
 # IDE
 .idea/
+
+*.egg-info/
+
+# Ignore the files created by the generators
+qdata/modules/*
+!qdata/modules/__init__.py

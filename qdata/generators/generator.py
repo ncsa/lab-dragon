@@ -4,7 +4,7 @@ from typing import Union
 from jinja2 import Template, Environment, FileSystemLoader
 import tomllib as toml
 
-SCHEMASDIR = Path('../schemas')  # This should be a configuration option
+SCHEMASDIR = Path('../../schemas')  # This should be a configuration option
 
 MODULESDIR = Path('../modules')
 
@@ -70,8 +70,8 @@ def parser(path: Union[Path, str]):
 
 if __name__ == '__main__':
 
-    config_path = Path('../schemas/task.toml')
-    template_file = Path('../templates/entity.jinja')
+    config_path = Path('../../schemas/entity.toml')
+    template_file = Path('../../templates/entity.jinja')
 
     with open(template_file, 'r') as f:
         template_content = f.read()
