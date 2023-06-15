@@ -4,9 +4,8 @@ from typing import Union
 from jinja2 import Template, Environment, FileSystemLoader
 import tomllib as toml
 
-SCHEMASDIR = Path('../../schemas')  # This should be a configuration option
+from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
 
-MODULESDIR = Path('../modules')
 
 def parser(path: Union[Path, str]):
     with open(path, 'rb') as f:
@@ -20,8 +19,6 @@ def parser(path: Union[Path, str]):
     inherits_from = data['annotations']['inherits_from']
 
     imports = {}
-    definition = {}
-    defaults = {}
     params = {}
 
     # For now we should only pass a single string for inheritance
@@ -31,26 +28,16 @@ def parser(path: Union[Path, str]):
             inh = inh + i + ', '
         inherits_from = inh
 
-    if inherits_from != 'object':
-        parent_path = SCHEMASDIR.joinpath(f'{inherits_from}.toml')
-        if not parent_path.is_file():
-            raise FileNotFoundError(f'Parent class {inherits_from} not found in {SCHEMASDIR}')
-        parent_vals = parser(parent_path)
-        imports.update(parent_vals['imports'])
-        definition.update(parent_vals['definition'])
-        defaults.update(parent_vals['defaults'])
-        params.update(parent_vals['params'])
-
-        imports[inherits_from] = f"from modules import {inherits_from.lower()}"
-
-    definition.update(data['definition'])
-    defaults.update(data['defaults'])
+    definition = data['definition']
+    defaults = data['defaults']
 
     if 'imports' in data:
         imports.update(data['imports'])
+    if inherits_from != 'object':
+        imports.update({inherits_from: f"from qdata.modules.{inherits_from.lower()} import {inherits_from}"})
 
     if 'params' in data:
-        params.update(data['params'])
+        params = data['params']
 
     for key, val in defaults.items():
         if val == '':
@@ -68,12 +55,11 @@ def parser(path: Union[Path, str]):
     return ret
 
 
-if __name__ == '__main__':
+def generate_class(config_path: Union[str, Path],
+                   template_path: Union[str, Path] = TEMPLATESDIR.joinpath("entity.jinja")):
 
-    config_path = Path('../../schemas/entity.toml')
-    template_file = Path('../../templates/entity.jinja')
 
-    with open(template_file, 'r') as f:
+    with open(template_path, 'r') as f:
         template_content = f.read()
 
     template = Template(template_content)
@@ -84,9 +70,12 @@ if __name__ == '__main__':
     print(f'\n\n==================== output ====================')
     print(output)
 
-    with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py')), 'w') as f:
+    with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
+        print(f'about to save the module in: {f.name}')
+
         f.write(output)
 
 
     print('++++++++++++++++++++ output ++++++++++++++++++++')
+
 

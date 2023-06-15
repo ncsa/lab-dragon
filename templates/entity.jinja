@@ -1,3 +1,8 @@
+# The following file has been created automatically based on a jinja template
+# Anything you modify to it, will get lost when the next time the template is
+# created. If you want to modify the class, please do so in the template
+
+
 import tomlkit
 from typing import List, Tuple, Dict
 from uuid import UUID
@@ -10,12 +15,12 @@ class {{class_name}}({{ inherits_from }}):
                  {% for key, val in definition.items() -%}
                      {{ key }}: {{ val }} = {{ defaults[key] }},
                  {% endfor -%}
+                 *args, **kwargs
     ):
-
+        super().__init__(*args, **kwargs)
         {% for key in definition.keys() -%}
             self.{{ key }} = {{ key }}
         {% endfor %}
-
 
     def to_TOML(self, path = None):
         doc = tomlkit.document()
