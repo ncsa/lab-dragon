@@ -8,7 +8,7 @@ name = "Entity"
 version = "0.1"
 inherits_from = "object"  # Can also be a list for multiple inheritance
 
-[definition]
+[definitions]
 # Fields that need to be satisfied alongside their data structures
 # Must be either imported classes or primitive types.
 ID = "UUID"

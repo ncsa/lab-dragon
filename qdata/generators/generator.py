@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from pathlib import Path
 from pprint import pprint
 from typing import Union
@@ -7,13 +9,14 @@ import tomllib as toml
 from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
 
 
+def create_timestamp():
+    timestamp = datetime.now(timezone.utc).astimezone().isoformat()
+    return timestamp
+
+
 def parser(path: Union[Path, str]):
     with open(path, 'rb') as f:
         data = toml.load(f)
-
-    print(f'==================== incoming TOML ====================')
-    pprint(data)
-    print('++++++++++++++++++++ incoming TOML ++++++++++++++++++++')
 
     class_name = data['annotations']['name']
     inherits_from = data['annotations']['inherits_from']
@@ -28,7 +31,7 @@ def parser(path: Union[Path, str]):
             inh = inh + i + ', '
         inherits_from = inh
 
-    definition = data['definition']
+    definition = data['definitions']
     defaults = data['defaults']
 
     if 'imports' in data:
@@ -49,9 +52,7 @@ def parser(path: Union[Path, str]):
                definition=definition,
                defaults=defaults,
                params=params,)
-    print(f'==================== outgoing Dictionary ====================')
-    pprint(ret)
-    print('++++++++++++++++++++ outgoing Dictionary ++++++++++++++++++++')
+
     return ret
 
 
@@ -67,15 +68,21 @@ def generate_class(config_path: Union[str, Path],
     vals_dict = parser(config_path)
     output = template.render(vals_dict)
 
-    print(f'\n\n==================== output ====================')
-    print(output)
-
     with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
-        print(f'about to save the module in: {f.name}')
-
         f.write(output)
 
 
-    print('++++++++++++++++++++ output ++++++++++++++++++++')
+def generate_all_classes():
+    for f in SCHEMASDIR.glob('*.toml'):
+        if 'hierarchy.toml' in f.name:
+            continue
+
+        print(f'doing {f}')
+        generate_class(f)
 
 
+def delete_all_modules():
+    for f in MODULESDIR.glob('*.py'):
+        if '__init__.py' in f.name:
+            continue
+        f.unlink()

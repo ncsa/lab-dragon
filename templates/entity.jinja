@@ -1,27 +1,44 @@
 # The following file has been created automatically based on a jinja template
 # Anything you modify to it, will get lost when the next time the template is
 # created. If you want to modify the class, please do so in the template
-
+#
+# Template has been rendered
 
 import tomlkit
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 from uuid import UUID
 {% for key, val in imports.items() -%}
 {{ val }} as {{ key }}
 {% endfor %}
 
+from qdata.generators.generator import create_timestamp
+
+
 class {{class_name}}({{ inherits_from }}):
     def __init__(self,
                  {% for key, val in definition.items() -%}
-                     {{ key }}: {{ val }} = {{ defaults[key] }},
+                 {% if 'time' in key -%}
+                 {{ key }}: str = None,
+                 {% else -%}
+                 {{ key }}: {{ val }} = {{ defaults[key] }},
+                 {% endif -%}
                  {% endfor -%}
                  *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
         {% for key in definition.keys() -%}
-            self.{{ key }} = {{ key }}
-        {% endfor %}
 
+        {% if 'time' in key -%}
+
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = create_timestamp()
+        else:
+            self.{{ key }} = {{ key }}
+
+        {% else -%}
+        self.{{ key }} = {{ key }}
+        {% endif -%}
+        {% endfor %}
     def to_TOML(self, path = None):
         doc = tomlkit.document()
         vals = tomlkit.table()

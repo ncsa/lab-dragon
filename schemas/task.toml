@@ -5,11 +5,11 @@
 [annotations]
 # Information about the core elements of the entities
 organization = "IQUIST/NCSA"
-name = "task"
+name = "Task"
 version = "0.1"
 inherits_from = "Entity"  # This is read only field.
 
-[definition] # Keys in the dictionary + the type
+[definitions] # Keys in the dictionary + the type
 objective = "str"
 process = "str"
 start_time = "str"

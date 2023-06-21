@@ -3,14 +3,13 @@
 
 [annotations]
 organization = "IQUIST/NCSA"
-name = "project"
+name = "Project"
 version = "0.1"
+inherits_from = "Entity"
 
-[definition]
-parent_class = ["entity"]
+[definitions]
 
-[defaults.fields]
-parent_class = "entity"
+[defaults]
 
 [properties]
 linkable = "yes"
