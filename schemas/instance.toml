@@ -8,7 +8,6 @@ version = "0.1"
 inherits_from = "Entity"
 
 [definitions]
-parent_class = "Optional[Entity]"
 start_time = "str"
 end_time = "str"
 version = "int"
@@ -19,7 +18,6 @@ start_time = ""
 end_time = ""
 version = 0
 stored_content = ""
-parent_class = "None"
 
 [imports]
 Path = "from pathlib import Path"

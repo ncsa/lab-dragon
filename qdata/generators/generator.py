@@ -1,3 +1,4 @@
+import importlib
 from datetime import datetime, timezone
 
 from pathlib import Path
@@ -7,7 +8,7 @@ from jinja2 import Template, Environment, FileSystemLoader
 import tomllib as toml
 
 from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
-
+from qdata import modules
 
 def create_timestamp():
     timestamp = datetime.now(timezone.utc).astimezone().isoformat()
@@ -59,7 +60,6 @@ def parser(path: Union[Path, str]):
 def generate_class(config_path: Union[str, Path],
                    template_path: Union[str, Path] = TEMPLATESDIR.joinpath("entity.jinja")):
 
-
     with open(template_path, 'r') as f:
         template_content = f.read()
 
@@ -71,13 +71,27 @@ def generate_class(config_path: Union[str, Path],
     with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
         f.write(output)
 
+# TODO: Have error catching this for when there are more than a single item
+def read_from_TOML(path: Union[str, Path]):
+    with open(str(path), 'rb') as f:
+        data = toml.load(f)
+
+    name = [key for key in data.keys()][0]
+
+    data = data[name]
+
+    module = importlib.import_module(f'qdata.modules.{data["type"].lower()}')
+    _class = getattr(module, data.pop('type'))
+
+    ins = _class(**data)
+    return ins
+
 
 def generate_all_classes():
     for f in SCHEMASDIR.glob('*.toml'):
         if 'hierarchy.toml' in f.name:
             continue
 
-        print(f'doing {f}')
         generate_class(f)
 
 

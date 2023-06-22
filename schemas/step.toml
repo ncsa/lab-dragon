@@ -9,15 +9,13 @@ version = "0.1"
 inherits_from = "Entity"
 
 [definitions]
-parent_class = "Optional[Entity]"
 process = "str"
-start_time = "timestamp"
-end_time = "timestamp"
+start_time = "str"
+end_time = "str"
 
 
 [defaults]
 process=""
-parent_class = "None"
 start_time = ""
 end_time = ""
 

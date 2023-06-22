@@ -4,9 +4,11 @@
 #
 # Template has been rendered
 
+import uuid
 import tomlkit
-from typing import List, Tuple, Dict, Optional
-from uuid import UUID
+
+from pathlib import Path
+from typing import List, Tuple, Dict, Optional, Union
 {% for key, val in imports.items() -%}
 {{ val }} as {{ key }}
 {% endfor %}
@@ -35,20 +37,39 @@ class {{class_name}}({{ inherits_from }}):
         else:
             self.{{ key }} = {{ key }}
 
+        {% elif "ID" in key -%}
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = str(uuid.uuid4())
+        else:
+            self.{{ key }} = {{ key }}
+
         {% else -%}
         self.{{ key }} = {{ key }}
         {% endif -%}
         {% endfor %}
-    def to_TOML(self, path = None):
-        doc = tomlkit.document()
-        vals = tomlkit.table()
+    def to_TOML(self, path: Optional[Union[str,Path]] = None):
+
+        if hasattr(super(), 'to_TOML'):
+            doc = super().to_TOML()
+            vals = doc[self.name]
+        else:
+            doc = tomlkit.document()
+            vals = tomlkit.table()
+
+        vals['type'] = self.__class__.__name__
         {% for key in definition.keys() -%}
-            vals['{{ key }}'] = str(self.{{ key }})
+            vals['{{ key }}'] = self.{{ key }}
         {% endfor %}
         doc[self.name] = vals
 
         if path is not None:
+            path = Path(path)
+            if path.is_dir():
+                path = path.joinpath(self.name + '.toml')
             with open(path, 'w') as f:
                 f.write(doc.as_string())
 
         return doc
+
+    def __str__(self):
+        return str(self.to_TOML())

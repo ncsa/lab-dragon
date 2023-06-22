@@ -11,14 +11,14 @@ inherits_from = "object"  # Can also be a list for multiple inheritance
 [definitions]
 # Fields that need to be satisfied alongside their data structures
 # Must be either imported classes or primitive types.
-ID = "UUID"
+ID = "str"
 name = "str"
-parent_link = "UUID"
+parent_link = "str"
 parent_class = "str"
 user = "str"
 description = "str"
-comments = "List[UUID]"
-related_links = "List[UUID]"
+comments = "List[str]"
+related_links = "List[str]"
 params = "List[Tuple[str]]"
 
 # Imports is optional
@@ -28,7 +28,7 @@ params = "List[Tuple[str]]"
 
 [defaults]
 # Default values for each of the fields
-ID = ''
+ID = "None"
 name = ''
 parent_link = ''
 parent_class = ''
