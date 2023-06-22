@@ -28,7 +28,7 @@ class {{class_name}}({{ inherits_from }}):
                  *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
-        {% for key in definition.keys() -%}
+        {% for key in sorted(definition.keys()) -%}
 
         {% if 'time' in key -%}
 
@@ -40,6 +40,12 @@ class {{class_name}}({{ inherits_from }}):
         {% elif "ID" in key -%}
         if {{ key }} is None or {{ key }} == '':
             self.{{ key }} = str(uuid.uuid4())
+        else:
+            self.{{ key }} = {{ key }}
+
+        {% elif 'name' in key -%}
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = self.ID
         else:
             self.{{ key }} = {{ key }}
 
