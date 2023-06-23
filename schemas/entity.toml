@@ -11,7 +11,7 @@ inherits_from = "object"  # Can also be a list for multiple inheritance
 [definitions]
 # Fields that need to be satisfied alongside their data structures
 # Must be either imported classes or primitive types.
-ID = "str"
+ID = "Optional[str]"
 name = "str"
 parent_link = "str"
 parent_class = "str"
