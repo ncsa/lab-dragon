@@ -10,7 +10,7 @@ from pprint import pprint
 
 import qdata
 import qdata.modules
-from qdata.generators.generator import generate_all_classes, read_from_TOML
+from qdata.generators.generator import read_from_TOML
 
 
 def generate_random_string(length):
@@ -76,5 +76,24 @@ def test_re_instantiation_of_classes(module_names):
         toml_path.unlink(missing_ok=True)
 
         assert instance == retrieved_instance
+
+
+def test_adding_non_existent_field():
+
+    ent_toml, ent = get_toml_module_and_class('entity')
+    pr_toml, pr = get_toml_module_and_class('project')
+
+    try:
+        entity = ent(random=1234)
+    except TypeError:
+        assert True
+
+    try:
+        project = pr(random=1234)
+    except TypeError:
+        assert True
+        return
+
+    assert False
 
 

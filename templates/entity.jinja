@@ -25,9 +25,13 @@ class {{class_name}}({{ inherits_from }}):
                  {{ key }}: {{ val }} = {{ defaults[key] }},
                  {% endif -%}
                  {% endfor -%}
+                 {% if class_name != 'Entity' -%}
                  *args, **kwargs
+                 {% endif -%}
     ):
+        {% if class_name != 'Entity' -%}
         super().__init__(*args, **kwargs)
+        {% endif -%}
         {% for key in definition.keys() -%}
 
         {% if 'time' in key -%}
