@@ -13,7 +13,7 @@ from typing import List, Tuple, Dict, Optional, Union
 {{ val }} as {{ key }}
 {% endfor %}
 
-from qdata.generators.generator import create_timestamp
+from qdata.generators.meta import create_timestamp
 
 
 class {{class_name}}({{ inherits_from }}):

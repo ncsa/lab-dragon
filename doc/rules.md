@@ -16,3 +16,5 @@ The file name should be the name of the class lowered.
 if the passed argument is `None` or `''`.
 - You cannot add a key called ID, this is reserved for the entity UUID generator.
 - Any Link is done by a string UUID.
+- In the comment section, the user can place a string that will be displayed in the document, or a path to a file.
+The supported data types are in the enum in generators.display module.

@@ -10,7 +10,7 @@ from pprint import pprint
 
 import qdata
 import qdata.modules
-from qdata.generators.generator import read_from_TOML
+from qdata.generators.meta import read_from_TOML
 
 
 def generate_random_string(length):

@@ -1,0 +1,43 @@
+# {{ name }}
+
+{% block header %}
+
+ID: {{ ID }}
+
+Type: {{ type }}
+
+Parent: {{ parent }}
+
+User: {{ user }}
+
+{% if description != "" -%}
+Description:
+{{ description }}
+{% endif -%}
+{% endblock %}
+
+----------------------------------------------
+
+{% block content %}
+# Content
+
+{% for key, val in comments.items() -%}
+{% if key == val %}
+{{ val }}
+{% else %}
+## {{ key }}
+{{ val }}
+{% endif %}
+{% endfor %}
+
+{% endblock %}
+
+----------------------------------------------
+
+{% block footer %}
+
+Parent: {{ parent }}
+
+Continuing: {{ children }}
+
+{% endblock %}
