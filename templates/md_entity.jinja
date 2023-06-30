@@ -16,10 +16,12 @@ Description:
 {% endif -%}
 {% endblock %}
 
-----------------------------------------------
-
 {% block content %}
+{% if comments|length > 0 %}
+
+---------------------------------------------
 # Content
+
 
 {% for key, val in comments.items() -%}
 {% if key == val %}
@@ -29,6 +31,7 @@ Description:
 {{ val }}
 {% endif %}
 {% endfor %}
+{% endif %}
 
 {% endblock %}
 

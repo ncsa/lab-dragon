@@ -1,0 +1,13 @@
+{% extends "md_entity.jinja" %}
+
+{% block header %}
+{{ super() }}
+Start time: {{ start_time }}
+
+End time: {{ end_time }}
+
+Objective of the task: {{ objective }}
+{% if process != '' %}
+Process: {{ process }}
+{% endif %}
+{% endblock %}
