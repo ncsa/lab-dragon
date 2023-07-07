@@ -66,8 +66,8 @@ if __name__ == "__main__":
     koala_project_path = Path(path, "Testing Koalas.toml")
     to_be_created.append((koala_project, koala_project_path))
 
-    top_project.add_children(panda_project_path)
-    top_project.add_children(koala_project_path)
+    top_project.add_child(panda_project_path)
+    top_project.add_child(koala_project_path)
 
     get_panda_task = Task(name="Get Panda",
                           description="Task representing a look for information about pandas",
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     get_panda_path = Path(path, "Get Panda.toml")
     to_be_created.append((get_panda_task, get_panda_path))
 
-    panda_project.add_children(get_panda_path)
+    panda_project.add_child(get_panda_path)
 
     look_for_panda_images_step = Step(name="Look for panda images",
                                       description='I am going to go to google to look for panda images',
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     look_for_panda_images_path = Path(path, "Look for panda images.toml")
     to_be_created.append((look_for_panda_images_step, look_for_panda_images_path))
 
-    get_panda_task.add_children(look_for_panda_images_path)
+    get_panda_task.add_child(look_for_panda_images_path)
 
     found_pandas_step = Step(name="Found Pandas",
                              description="I have found a lot of panda images here are a few that I found",
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     found_pandas_path = Path(path, "Found Pandas.toml")
     to_be_created.append((found_pandas_step, found_pandas_path))
 
-    get_panda_task.add_children(found_pandas_path)
+    get_panda_task.add_child(found_pandas_path)
 
     choose_panda_step = Step(name="Choose Panda",
                              description="I am going to choose a panda to use for my project",
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     choose_panda_path = Path(path, "Choose Panda.toml")
     to_be_created.append((choose_panda_step, choose_panda_path))
 
-    get_panda_task.add_children(choose_panda_path)
+    get_panda_task.add_child(choose_panda_path)
 
     name_panda_step = Step(name="Named The Panda",
                            description="you can't have a panda with no name",
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     name_panda_path = Path(path, "Named Panda.toml")
     to_be_created.append((name_panda_step, name_panda_path))
 
-    panda_project.add_children(name_panda_path)
+    panda_project.add_child(name_panda_path)
 
     get_koala_task = Task(name="Get Koala",
                           description="Task representing a look for information about Koalas",
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     get_koala_path = Path(path, "Get Koala.toml")
     to_be_created.append((get_koala_task, get_koala_path))
 
-    koala_project.add_children(get_koala_path)
+    koala_project.add_child(get_koala_path)
 
     look_for_koala_images_step = Step(name="Look for koala images",
                                       description='I am going to go to google to look for koala images',
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     look_for_koala_images_path = Path(path, "Look for koala images.toml")
     to_be_created.append((look_for_koala_images_step, look_for_koala_images_path))
 
-    get_koala_task.add_children(look_for_koala_images_path)
+    get_koala_task.add_child(look_for_koala_images_path)
 
     found_koalas_step = Step(name="Found koalas",
                              description="I have found a lot of koala images here are a few that I found",
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     found_koalas_path = Path(path, "Found koalas.toml")
     to_be_created.append((found_koalas_step, found_koalas_path))
 
-    get_koala_task.add_children(found_koalas_path)
+    get_koala_task.add_child(found_koalas_path)
 
     choose_koala_step = Step(name="Choose koala",
                              description="I am going to choose a koala to use for my project",
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     choose_koala_path = Path(path, "Choose koala.toml")
     to_be_created.append((choose_koala_step, choose_koala_path))
 
-    get_koala_task.add_children(choose_koala_path)
+    get_koala_task.add_child(choose_koala_path)
 
     name_koala_step = Step(name="Named The koala",
                            description="you can't have a koala with no name",
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     name_koala_path = Path(path, "Named koala.toml")
     to_be_created.append((name_koala_step, name_koala_path))
 
-    koala_project.add_children(name_koala_path)
+    koala_project.add_child(name_koala_path)
 
     for i, p in to_be_created:
         i.to_TOML(p)
