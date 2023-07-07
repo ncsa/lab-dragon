@@ -13,12 +13,11 @@ inherits_from = "object"  # Can also be a list for multiple inheritance
 # Must be either imported classes or primitive types.
 ID = "Optional[str]"
 name = "str"
-parent_link = "str"
-parent_class = "str"
+parent = "Union[str, Path]"
 user = "str"
 description = "str"
 comments = "List[str]"
-related_links = "List[str]"
+children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
 
 # Imports is optional
@@ -30,12 +29,11 @@ params = "List[Tuple[str]]"
 # Default values for each of the fields
 ID = "None"
 name = ''
-parent_link = ''
-parent_class = ''
+parent = ''
 user = ''
 description = ''
 comments = []
-related_links = []
+children = []
 params= []
 
 # Params is optional

@@ -53,7 +53,15 @@ class {{class_name}}({{ inherits_from }}):
         else:
             self.{{ key }} = {{ key }}
 
+        {% elif not defaults[key] is string and defaults[key] is iterable -%}
+        # If we don't save a copy of the list,
+        #   python ends up assigning the same object in memory to every Entity instance.
+        if isinstance({{ key }}, list) and len({{ key }}) != 0:
+            self.{{ key }} = {{ key }}
+        else:
+            self.{{ key }} = [].copy()
         {% else -%}
+
         self.{{ key }} = {{ key }}
         {% endif -%}
         {% endfor %}
@@ -68,7 +76,14 @@ class {{class_name}}({{ inherits_from }}):
 
         vals['type'] = self.__class__.__name__
         {% for key in definition.keys() -%}
-            vals['{{ key }}'] = self.{{ key }}
+        {% if 'children' in key -%}
+        # We want to save the str version of every child, not the object.
+        vals['{{ key }}'] = [str(child) for child in self.{{ key }}]
+        {% elif 'parent' in key -%}
+        vals['{{ key }}'] = str(self.{{ key }})
+        {% else -%}
+        vals['{{ key }}'] = self.{{ key }}
+        {% endif %}
         {% endfor %}
         doc[self.name] = vals
 
@@ -89,3 +104,10 @@ class {{class_name}}({{ inherits_from }}):
             return self.__dict__ == other.__dict__
         return False
 
+    {# Only add the add_children method for the Entity class and no other one. #}
+    {% if class_name == 'Entity' -%}
+    def add_child(self, child):
+        if not hasattr(self, 'children'):
+            self.children = []
+        self.children.append(child)
+    {% endif %}

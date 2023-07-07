@@ -27,15 +27,15 @@ class SupportedCommentType(Enum):
     png = auto()
 
     @classmethod
-    def classify(cls, path: Union[Path, str]) -> 'SupportedCommentType':
-        path = Path(path)
-        ext = path.suffix
-        if path.is_file():
+    def classify(cls, item: Union[Path, str]) -> 'SupportedCommentType':
+        item = Path(item)
+        ext = item.suffix
+        if item.is_file():
             try:
                 return cls[ext.lower()[1::]]
             except Exception as e:
                 raise ValueError(f'File type {ext} is not supported.')
-        elif path.is_dir():
+        elif item.is_dir():
             return SupportedCommentType.dir
         else:
             return SupportedCommentType.string
@@ -134,10 +134,11 @@ class EntityRenderer:
                "description": data['description']}
 
         # Fields with more complicated formatting
-        if data['parent_link'] == '':
+        if data['parent'] == '':
             ret["parent"] = None
         else:
-            ret["parent"] = data['parent_link']
+            data_path = Path(data['parent'])
+            ret["parent"] = f"[{data_path.stem}]({data_path.with_suffix('.md').absolute()})"
 
         comments = {}
         for com in data['comments']:
@@ -150,7 +151,13 @@ class EntityRenderer:
                 comments[key] = val
         ret["comments"] = comments
 
-        ret["children"] = data['related_links']
+        children = ""
+        for child in data['children']:
+            child_path = Path(child)
+            if child_path.suffix == '.toml':
+                children = children + f"[{child_path.stem}]({child_path.with_suffix('.md').absolute()}), "
+
+        ret["children"] = children
 
         return ret
 
@@ -184,7 +191,6 @@ class StepRenderer(EntityRenderer):
     def parser(cls, data: dict) -> dict:
         ret = super().parser(data)
 
-        ret["objective"] = data['objective']
         ret["process"] = ""
         ret["start_time"] = data['start_time']
         ret["end_time"] = data['end_time']
@@ -222,7 +228,7 @@ def generate_md(source: Union[Path, str],
 
     source = Path(source)
     if target is None:
-        os.getcwd()
+        target = os.getcwd()
     target = Path(target).joinpath(source.stem + ".md")
 
     with open(source, 'rb') as f:
@@ -239,6 +245,9 @@ def generate_md(source: Union[Path, str],
 
     vals_dict = renderer.parser(data)
     output = template.render(vals_dict)
+
+    if not target.exists():
+        target.touch()
 
     with open(target, 'w') as f:
         f.write(output)

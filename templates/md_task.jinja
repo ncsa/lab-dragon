@@ -5,9 +5,12 @@
 Start time: {{ start_time }}
 
 End time: {{ end_time }}
+{% if objective != "" -%}
 
 Objective of the task: {{ objective }}
+{% endif %}
 {% if process != '' %}
+
 Process: {{ process }}
 {% endif %}
 {% endblock %}
