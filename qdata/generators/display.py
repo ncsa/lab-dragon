@@ -234,7 +234,7 @@ def generate_md(source: Union[Path, str],
     with open(source, 'rb') as f:
         data = toml.load(f)
 
-    data = data[[x for x in data.keys()][0]]
+    data = data[next(iter(data))]
 
     env = Environment(loader=FileSystemLoader(TEMPLATESDIR))
 

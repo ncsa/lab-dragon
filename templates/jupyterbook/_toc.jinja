@@ -1,0 +1,16 @@
+{# Fields required for this template:
+
+- root: the root directory of the book
+- chapters: a list of chapter files to include in the book.
+
+#}
+
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: {{ root }}
+chapters:
+{% for chapter in chapters %}
+- file: {{ chapter }}
+{% endfor %}

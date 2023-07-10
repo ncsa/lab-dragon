@@ -1,6 +1,5 @@
-import os
-import argparse
 from pathlib import Path
+from typing import Union, Optional
 
 from qdata.generators.meta import generate_all_classes
 
@@ -24,9 +23,19 @@ def delete_directory_contents(directory_path):
 
 
 # TODO: When we have a better plan for how to handle the instance object, add the images into the instance object.
-if __name__ == "__main__":
+def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: bool = True) -> None:
+    """
+    Creates a standard notebook used for testing in the target path.
+
+    :param target: The location of the testing notebook. If this is None, it will create it in the env_generator
+     folder inside the testing folder of this project.
+    :param create_md: If True, it will also create the md representation of the TOML files. Defaults, to True.
+    """
     self_path = Path(__file__)
-    path = self_path.parent.joinpath("env_generator")
+    if target is None:
+        path = self_path.parent.joinpath("env_generator")
+    else:
+        path = Path(target)
 
     delete_directory_contents(path)
 
@@ -82,12 +91,12 @@ if __name__ == "__main__":
 
     panda_project.add_child(get_panda_path)
 
-    look_for_panda_images_step = Step(name="Look for panda images",
+    look_for_panda_images_step = Step(name="Look For Panda Images",
                                       description='I am going to go to google to look for panda images',
                                       user='testUser',
                                       comments=['Wow there are a lot of panda images online'],
                                       parent=get_panda_path, )
-    look_for_panda_images_path = Path(path, "Look for panda images.toml")
+    look_for_panda_images_path = Path(path, "Look For Panda Images.toml")
     to_be_created.append((look_for_panda_images_step, look_for_panda_images_path))
 
     get_panda_task.add_child(look_for_panda_images_path)
@@ -138,49 +147,54 @@ if __name__ == "__main__":
 
     koala_project.add_child(get_koala_path)
 
-    look_for_koala_images_step = Step(name="Look for koala images",
+    look_for_koala_images_step = Step(name="Look For Koala Images",
                                       description='I am going to go to google to look for koala images',
                                       user='testUser',
                                       comments=['Wow there are a lot of koala images online'],
                                       parent=get_koala_path, )
-    look_for_koala_images_path = Path(path, "Look for koala images.toml")
+    look_for_koala_images_path = Path(path, "Look For Koala Images.toml")
     to_be_created.append((look_for_koala_images_step, look_for_koala_images_path))
 
     get_koala_task.add_child(look_for_koala_images_path)
 
-    found_koalas_step = Step(name="Found koalas",
+    found_koalas_step = Step(name="Found Koalas",
                              description="I have found a lot of koala images here are a few that I found",
                              user='testUser',
                              comments=[str(self_path.parent.joinpath("testing_images", "koalas"))],
                              parent=get_koala_path, )
-    found_koalas_path = Path(path, "Found koalas.toml")
+    found_koalas_path = Path(path, "Found Koalas.toml")
     to_be_created.append((found_koalas_step, found_koalas_path))
 
     get_koala_task.add_child(found_koalas_path)
 
-    choose_koala_step = Step(name="Choose koala",
+    choose_koala_step = Step(name="Choose Koala",
                              description="I am going to choose a koala to use for my project",
                              user='testUser',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
                                  str(self_path.parent.joinpath("testing_images", "koalas", "creepy koala.jpg"))],
                              parent=get_koala_path, )
-    choose_koala_path = Path(path, "Choose koala.toml")
+    choose_koala_path = Path(path, "Choose Koala.toml")
     to_be_created.append((choose_koala_step, choose_koala_path))
 
     get_koala_task.add_child(choose_koala_path)
 
-    name_koala_step = Step(name="Named The koala",
+    name_koala_step = Step(name="Named The Koala",
                            description="you can't have a koala with no name",
                            user='testUser',
                            parent=koala_project_path,
                            comments=["The koala will be named Bart"]
                            )
-    name_koala_path = Path(path, "Named koala.toml")
+    name_koala_path = Path(path, "Named Koala.toml")
     to_be_created.append((name_koala_step, name_koala_path))
 
     koala_project.add_child(name_koala_path)
 
     for i, p in to_be_created:
         i.to_TOML(p)
-        generate_md(p, path)
+        if create_md:
+            generate_md(p, path)
+
+
+if __name__ == "__main__":
+    create_full_test_env()
