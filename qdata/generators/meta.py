@@ -101,8 +101,7 @@ def read_from_TOML(path: Union[str, Path]) -> object:
     with open(str(path), 'rb') as f:
         data = toml.load(f)
 
-    name = [key for key in data.keys()][0]
-    data = data[name]
+    data = data[next(iter(data))]
 
     module = importlib.import_module(f'qdata.modules.{data["type"].lower()}')
     _class = getattr(module, data.pop('type'))

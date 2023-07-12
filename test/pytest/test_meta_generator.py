@@ -33,7 +33,6 @@ def get_toml_module_and_class(item):
 
 
 def test_all_fields_in_generated_class(module_names):
-
     classes = module_names
 
     for cls in classes:
@@ -42,7 +41,6 @@ def test_all_fields_in_generated_class(module_names):
 
         instance = _class()
         for field in toml_doc['definitions']:
-            print(f'\n doing field: {field} with val: {toml_doc["definitions"][field]}')
             assert hasattr(instance, field)
 
 

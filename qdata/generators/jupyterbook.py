@@ -13,7 +13,22 @@ from qdata.generators.display import generate_md
 
 
 # FIXME: Right now we are generating the md files twice, we should figure out a way of doing it only once.
-def _generate_children_dict(root_path: Path, target: Path, indent) -> Optional[Union[dict, tuple]]:
+def _generate_children_dict(root_path: Path, target: Path, indent: int) -> Optional[Union[dict, tuple]]:
+    """
+    Helper recursive function that goes through the root path and all of its children to prepare the correct children dict
+    for notebook rendering. Also renders the md files necessary for the notebook in the target directory.
+
+    :param root_path: The path of the entity to check.
+    :param target: The target path of where the md files should be
+    created.
+    :param indent: Should start with 0. Gets increased as the recursive increases. Used for the renderer to
+    know how much this root_path should be indented in the _toc.yml file.
+    :return: Dictionary with a tuple as keys,
+    with the first item of the tuple being the target path of the md file, and second item the indentation level for
+    that item. The value is `None` if this item does not have any children, or a dictionary with the same rules,
+    indicating that this item contains children.
+
+    """
 
     with open(root_path, 'rb') as f:
         data = toml.load(f)
@@ -30,12 +45,22 @@ def _generate_children_dict(root_path: Path, target: Path, indent) -> Optional[U
     for child in children:
         child_md = generate_md(child, target)
         child_ret = _generate_children_dict(child, target, current_indent)
+        # The only the stem is needed since the source files are located in the same directory as the root.
         child_dict[(child_md.stem, current_indent)] = child_ret
 
     return child_dict
 
 
 def create_relation_dict(root_path: Path, target: Path) -> dict:
+    """
+    Goes through all of the children of root_path, and creates a dictionary identifying all the children. The root_path
+    will get rendered in the target directory but will not be located in the dictionary itself, since this is not
+    needed when rendering the _toc.yml file.
+
+    :param root_path: The path of the root entity.
+    :param target: The location of where the notebook should live.
+    :return: A nested dictionary with all of the children of the root_path entity.
+    """
     root_path_md = generate_md(root_path, target)
 
     child_dict = _generate_children_dict(root_path, target, indent=0)
@@ -44,14 +69,15 @@ def create_relation_dict(root_path: Path, target: Path) -> dict:
 
 def generate_book(root_path: Union[Path, str],
                   target_path: Union[Path, str],
-                  logo_path: Optional[Union[Path, str]] = None,):
+                  logo_path: Optional[Union[Path, str]] = None,) -> None:
     """
-    Creates a notebook from the root TOML file.
+    Generates a jupyter book from the root_path entity. This function will go through all of its chilren and render all
+    of them in the target directory as md files. It will create _config.yml, _toc.yml, and files in the target location
+    and render the jupyter book.
 
-    :param target_path:
-    :param logo_path:
-    :param root_path:
-    :return:
+    :param root_path: The path of the root entity for the notebook.
+    :param target_path: The location of where the notebook should live.
+    :param logo_path: The path to the logo of the notebook. If `None` the default logo will be used.
     """
 
     if logo_path is None:
@@ -89,5 +115,7 @@ def generate_book(root_path: Union[Path, str],
 
     with open(target_path.joinpath('_toc.yml'), 'w') as f:
         f.write(toc_output)
+
+
 
 

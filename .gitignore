@@ -18,3 +18,4 @@ __pycache__/
 # Ignore the files created by the generators
 qdata/modules/*
 !qdata/modules/__init__.py
+_build/
