@@ -34,19 +34,19 @@ def test_correctly_creating_dict(tmp_path):
     named_koala = md_path_creator(tmp_path, "Named Koala.toml")
 
     correct_dict = {
-        testing_project: {
-            testing_pandas: {
-                get_panda: {
-                    look_for_panda: None,
-                    found_pandas: None,
-                    choose_panda: None},
-                named_panda: None},
-            testing_koalas: {
-                get_koala: {
-                    look_for_koala: None,
-                    found_koalas: None,
-                    choose_koala: None},
-                named_koala: None}},
+        (testing_project, 0): {
+            (testing_pandas, 1): {
+                (get_panda, 2): {
+                    (look_for_panda, 3): None,
+                    (found_pandas, 3): None,
+                    (choose_panda, 3): None},
+                (named_panda, 2): None},
+            (testing_koalas, 1): {
+                (get_koala, 2): {
+                    (look_for_koala, 3): None,
+                    (found_koalas, 3): None,
+                    (choose_koala, 3): None},
+                (named_koala, 2): None}},
     }
 
     created_dict = create_relation_dict(testing_project_toml, tmp_path)
