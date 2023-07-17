@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union, Optional
 
 from qdata.generators.meta import generate_all_classes
+from qdata.generators.jupyterbook import generate_book
 
 from pathlib import Path
 
@@ -197,4 +198,9 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
 
 if __name__ == "__main__":
+
+    root_path = Path("./env_generator/Testing_Project.toml")
+    target_path = Path("./env_generator/jupyterbook/")
+
     create_full_test_env(create_md=False)
+    generate_book(root_path, target_path)

@@ -84,16 +84,16 @@ def generate_book(root_path: Union[Path, str],
     if logo_path is None:
         logo_path = QDATADIR.joinpath('resource', 'qubit_logo.png')
 
-    root_path = Path(root_path)
+    root_path = Path(root_path).absolute()
+
+    if not target_path.exists():
+        target_path.mkdir(exist_ok=True)
 
     if not target_path.is_dir():
         raise ValueError(f"Path {target_path} is not a directory.")
 
     if not root_path.exists():
         raise ValueError(f"Path {root_path} does not exist.")
-
-    if not target_path.exists():
-        target_path.mkdir(exist_ok=True)
 
     resource_path = target_path.joinpath('images')
     if not resource_path.exists():
