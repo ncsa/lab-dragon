@@ -1,9 +1,9 @@
 """
 From the root path is what all the general information for the book is going to get gathered.
 """
-
-from typing import Union, Optional
 from pathlib import Path
+from subprocess import call
+from typing import Union, Optional
 
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
@@ -13,7 +13,8 @@ from qdata.generators.display import generate_md
 
 
 # FIXME: Right now we are generating the md files twice, we should figure out a way of doing it only once.
-def _generate_children_dict(root_path: Path, target: Path, indent: int) -> Optional[Union[dict, tuple]]:
+def _generate_children_dict(root_path: Path, target: Path, indent: int, resource_path: Optional[Path] = None)\
+        -> Optional[Union[dict, tuple]]:
     """
     Helper recursive function that goes through the root path and all of its children to prepare the correct children dict
     for notebook rendering. Also renders the md files necessary for the notebook in the target directory.
@@ -43,15 +44,15 @@ def _generate_children_dict(root_path: Path, target: Path, indent: int) -> Optio
 
     child_dict = {}.copy()
     for child in children:
-        child_md = generate_md(child, target)
-        child_ret = _generate_children_dict(child, target, current_indent)
+        child_md = generate_md(child, target, images_path=resource_path)
+        child_ret = _generate_children_dict(child, target, current_indent, resource_path=resource_path)
         # The only the stem is needed since the source files are located in the same directory as the root.
         child_dict[(child_md.stem, current_indent)] = child_ret
 
     return child_dict
 
 
-def create_relation_dict(root_path: Path, target: Path) -> dict:
+def create_relation_dict(root_path: Path, target: Path, resource_path: Path) -> dict:
     """
     Goes through all of the children of root_path, and creates a dictionary identifying all the children. The root_path
     will get rendered in the target directory but will not be located in the dictionary itself, since this is not
@@ -61,9 +62,9 @@ def create_relation_dict(root_path: Path, target: Path) -> dict:
     :param target: The location of where the notebook should live.
     :return: A nested dictionary with all of the children of the root_path entity.
     """
-    root_path_md = generate_md(root_path, target)
+    root_path_md = generate_md(root_path, target, resource_path)
 
-    child_dict = _generate_children_dict(root_path, target, indent=0)
+    child_dict = _generate_children_dict(root_path, target, resource_path=resource_path, indent=0)
     return child_dict
 
 
@@ -88,11 +89,15 @@ def generate_book(root_path: Union[Path, str],
     if not target_path.is_dir():
         raise ValueError(f"Path {target_path} is not a directory.")
 
+    if not root_path.exists():
+        raise ValueError(f"Path {root_path} does not exist.")
+
     if not target_path.exists():
         target_path.mkdir(exist_ok=True)
 
-    if not root_path.exists():
-        raise ValueError(f"Path {root_path} does not exist.")
+    resource_path = target_path.joinpath('images')
+    if not resource_path.exists():
+        resource_path.mkdir(exist_ok=True)
 
     with open(root_path, 'rb') as f:
         data = toml.load(f)
@@ -100,7 +105,7 @@ def generate_book(root_path: Union[Path, str],
     data = data[next(iter(data))]
 
     config_dict = dict(tittle=data['name'], author=data['user'], logo_path=logo_path)
-    chapters = create_relation_dict(root_path, target_path)
+    chapters = create_relation_dict(root_path, target_path, resource_path=resource_path)
 
     env = Environment(loader=FileSystemLoader(TEMPLATESDIR.joinpath('jupyterbook')))
 
@@ -116,6 +121,6 @@ def generate_book(root_path: Union[Path, str],
     with open(target_path.joinpath('_toc.yml'), 'w') as f:
         f.write(toc_output)
 
-
+    status = call("jupyter-book build .", cwd=str(target_path), shell=True)
 
 

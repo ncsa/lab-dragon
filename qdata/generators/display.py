@@ -8,8 +8,9 @@ The parser function goes through that entity TOML data file and parses the infor
 render the template with.`
 """
 import os
+import shutil
 from enum import Enum, auto
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Optional
 from pathlib import Path
 
 import tomllib as toml
@@ -66,6 +67,9 @@ class EntityRenderer:
     # All renderers have to specify the path to the template they use for rendering.
     template = TEMPLATESDIR.joinpath("md_entity.jinja")
 
+    # If this is not None, image files will be copied to the image_path in a f
+    image_path: Optional[Path] = None
+
     @classmethod
     def format_comment(cls, comment: Union[Path, str]) -> Tuple[Union[str, List[str]], Union[str, List[str]]]:
         """
@@ -98,9 +102,16 @@ class EntityRenderer:
         # For any image type, we want to format the string for md to load the image.
         elif com_type == SupportedCommentType.jpg or com_type == SupportedCommentType.png:
             pic_path = Path(comment)
-            # FIXME: The path that this guy is printing should be the resource folder.
-            key = pic_path.stem
-            val = f"![{pic_path.stem}]({pic_path.absolute()})"
+            name = pic_path.stem.replace("_", " ")
+            if cls.image_path is None:
+                key = pic_path.stem
+                val = f"![{name}]({pic_path.absolute()})"
+            # If rendering to the notebook, the path is to the images folder.
+            else:
+                target_path = cls.image_path.joinpath(pic_path.name)
+                shutil.copy(pic_path, target_path)
+                key = pic_path.stem
+                val = f"![{name}](/images/{pic_path.name})"
 
         # For a directory, we assume that all the files inside it are images or comments that should be formatted.
         elif com_type == SupportedCommentType.dir:
@@ -127,7 +138,7 @@ class EntityRenderer:
         :return: The dictionary with the keys and vals that the jinja template needs.
         """
         # Basic fields
-        ret = {"name": data['name'],
+        ret = {"name": data['name'].replace("_", " "),
                "type": data['type'],
                "ID": data['ID'],
                "user": data['user'],
@@ -138,7 +149,11 @@ class EntityRenderer:
             ret["parent"] = None
         else:
             data_path = Path(data['parent'])
-            ret["parent"] = f"[{data_path.stem}]({data_path.with_suffix('.md').absolute()})"
+            name = data_path.stem.replace("_", " ")
+            if cls.image_path is None:
+                ret["parent"] = f"[{name}]({data_path.with_suffix('.md').absolute()})"
+            else:
+                ret["parent"] = f"[{name}](./{data_path.with_suffix('.md').name})"
 
         comments = {}
         for com in data['comments']:
@@ -155,7 +170,11 @@ class EntityRenderer:
         for child in data['children']:
             child_path = Path(child)
             if child_path.suffix == '.toml':
-                children = children + f"[{child_path.stem}]({child_path.with_suffix('.md').absolute()}), "
+                name = child_path.stem.replace("_", " ")
+                if cls.image_path is None:
+                    children = children + f"[{name}]({child_path.with_suffix('.md').absolute()}), "
+                else:
+                    children = children + f"[{name}](./{child_path.with_suffix('.md').name}), "
 
         ret["children"] = children
 
@@ -215,21 +234,30 @@ class AvailableRenderers(Enum):
 
 # TODO: Make sure you move the pictures to the resource folder. We can make it such that we read it from source,
 def generate_md(source: Union[Path, str],
-                target: Union[Path, str] = None,) -> Path:
+                target: Optional[Union[Path, str]] = None,
+                images_path: Optional[Union[Path, str]] = None,
+                ) -> Path:
 
     """
     Generates a markdown file from a TOML file. The name of the md file will be the same as the TOML file.
 
     :param source: Source of the TOML file.
     :param target: Directory where the markdown file will be saved.
-    :param template_path: Path to the jinja template.
+    :param images_path: Directory where the resources for the markdown file will be saved.
+        This is used when creating a md for a jupyterbook where all the resources should be located at a central
+        resource folder, with all the comment
+    links relative to the resource folder, even if the md is located somewhere else.
     :return: The path to the generated markdown file.
+
     """
 
     source = Path(source)
     if target is None:
         target = os.getcwd()
     target = Path(target).joinpath(source.stem + ".md")
+
+    if images_path is not None:
+        images_path = Path(images_path)
 
     with open(source, 'rb') as f:
         data = toml.load(f)
@@ -241,6 +269,7 @@ def generate_md(source: Union[Path, str],
     if not hasattr(AvailableRenderers, data['type']):
         raise ValueError(f"Type {data['type']} Does not have a renderer.")
     renderer = getattr(AvailableRenderers, data['type']).value
+    renderer.image_path = images_path
     template = env.get_template(renderer.template.name)
 
     vals_dict = renderer.parser(data)
