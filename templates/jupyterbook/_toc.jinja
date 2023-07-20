@@ -1,0 +1,28 @@
+{# Fields required for this template:
+
+- root: the root directory of the book
+- chapters: a list of chapter files to include in the book.
+
+You cannot pass a variable called indent to this template.
+#}
+
+{% set indent = "  " -%}
+
+{% macro chapter_structure(struct_dict) -%}
+{% for key, value in struct_dict.items() -%}
+{{ indent * key[1] }}- file: {{ key[0] }}
+{% if value is not none -%}
+{{ indent * (key[1] + 1) }}sections:
+{{ chapter_structure(value) }}
+{% endif -%}
+{% endfor -%}
+{% endmacro -%}
+
+
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: {{ root }}
+chapters:
+{{ chapter_structure(chapters) }}

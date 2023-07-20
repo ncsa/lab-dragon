@@ -9,12 +9,9 @@ version = "0.1"
 [definition]
 
 classes = [
-    "none", "entity", "project", "task", "step", "instance"
+    "none", "project", "task", "step", "instance"
 ]
 
-[entity]
-parent_class = ["none"]
-children_class = ["none"]
 
 [none]
 parent_class = ["none"]

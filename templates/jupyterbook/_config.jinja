@@ -1,0 +1,27 @@
+{# Fields required for this template:
+    * tittle: The title of the book
+    * author: The author of the book
+    * logo_path: The path to the logo of the book
+    * url: If a url is hosting this book, that url.
+
+#}
+
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: {{ tittle }}
+author: {{ author }}
+logo: {{ logo_path }}
+
+# Force re-execution of notebooks on each build.
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: force
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: book.tex
+
+
+master_doc: index

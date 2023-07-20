@@ -1,0 +1,21 @@
+# IDE
+.idea/
+
+*.egg-info/
+
+# Jupyter stuff
+.ipynb_checkpoints
+
+# Python stuff
+.mypy_cache
+*.pytest_cache
+__pycache__/
+
+# Mac stuff
+.DS_Store
+
+
+# Ignore the files created by the generators
+qdata/modules/*
+!qdata/modules/__init__.py
+_build/

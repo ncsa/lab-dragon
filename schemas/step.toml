@@ -4,20 +4,20 @@
 [annotations]
 # Information about the core elements of the entities
 organization = "IQUIST/NCSA"
-name = "step"
+name = "Step"
 version = "0.1"
+inherits_from = "Entity"
 
-[definition]
-inherits_from = "entity"
+[definitions]
+process = "str"
+start_time = "str"
+end_time = "str"
 
-[definition.fields]
-start_time = "timestamp"
-end_time = "timestamp"
 
-[defaults.fields]
-parent_class = "entity"
-start_time = "timestamp"
-end_time = "timestamp"
+[defaults]
+process=""
+start_time = ""
+end_time = ""
 
 [properties]
 linkable = "yes"

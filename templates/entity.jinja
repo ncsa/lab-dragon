@@ -1,0 +1,113 @@
+# The following file has been created automatically based on a jinja template
+# Anything you modify to it, will get lost when the next time the template is
+# created. If you want to modify the class, please do so in the template
+#
+# Template has been rendered
+
+import uuid
+import tomlkit
+
+from pathlib import Path
+from typing import List, Tuple, Dict, Optional, Union
+{% for key, val in imports.items() -%}
+{{ val }} as {{ key }}
+{% endfor %}
+
+from qdata.generators.meta import create_timestamp
+
+
+class {{class_name}}({{ inherits_from }}):
+    def __init__(self,
+                 {% for key, val in definition.items() -%}
+                 {% if 'time' in key -%}
+                 {{ key }}: str = None,
+                 {% else -%}
+                 {{ key }}: {{ val }} = {{ defaults[key] }},
+                 {% endif -%}
+                 {% endfor -%}
+                 {% if class_name != 'Entity' -%}
+                 *args, **kwargs
+                 {% endif -%}
+    ):
+        {% if class_name != 'Entity' -%}
+        super().__init__(*args, **kwargs)
+        {% endif -%}
+        {% for key in definition.keys() -%}
+
+        {% if 'time' in key -%}
+
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = create_timestamp()
+        else:
+            self.{{ key }} = {{ key }}
+
+        {% elif "ID" in key -%}
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = str(uuid.uuid4())
+        else:
+            self.{{ key }} = {{ key }}
+
+        {% elif 'name' in key -%}
+        if {{ key }} is None or {{ key }} == '':
+            self.{{ key }} = self.ID
+        else:
+            self.{{ key }} = {{ key }}
+
+        {% elif not defaults[key] is string and defaults[key] is iterable -%}
+        # If we don't save a copy of the list,
+        #   python ends up assigning the same object in memory to every Entity instance.
+        if isinstance({{ key }}, list) and len({{ key }}) != 0:
+            self.{{ key }} = {{ key }}
+        else:
+            self.{{ key }} = [].copy()
+        {% else -%}
+
+        self.{{ key }} = {{ key }}
+        {% endif -%}
+        {% endfor %}
+    def to_TOML(self, path: Optional[Union[str,Path]] = None):
+
+        if hasattr(super(), 'to_TOML'):
+            doc = super().to_TOML()
+            vals = doc[self.name]
+        else:
+            doc = tomlkit.document()
+            vals = tomlkit.table()
+
+        vals['type'] = self.__class__.__name__
+        {% for key in definition.keys() -%}
+        {% if 'children' in key -%}
+        # We want to save the str version of every child, not the object.
+        vals['{{ key }}'] = [str(child) for child in self.{{ key }}]
+        {% elif 'parent' in key -%}
+        vals['{{ key }}'] = str(self.{{ key }})
+        {% else -%}
+        vals['{{ key }}'] = self.{{ key }}
+        {% endif %}
+        {% endfor %}
+        doc[self.name] = vals
+
+        if path is not None:
+            path = Path(path)
+            if path.is_dir():
+                path = path.joinpath(self.name + '.toml')
+            with open(path, 'w') as f:
+                f.write(doc.as_string())
+
+        return doc
+
+    def __str__(self):
+        return str(self.to_TOML())
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    {# Only add the add_children method for the Entity class and no other one. #}
+    {% if class_name == 'Entity' -%}
+    def add_child(self, child):
+        if not hasattr(self, 'children'):
+            self.children = []
+        self.children.append(child)
+    {% endif %}

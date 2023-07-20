@@ -3,23 +3,24 @@
 
 [annotations]
 organization = "IQUIST/NCSA"
-name = "instance"
+name = "Instance"
 version = "0.1"
+inherits_from = "Entity"
 
-[definition]
-inherits_from = ["entity"]
+[definitions]
+start_time = "str"
+end_time = "str"
+version = "int"
+stored_content = "List[Path]"
 
-[definition.fields]
-start_time = "timestamp"
-end_time = "timestamp"
-version = "value"
-stored_content = "path"
-
-[defaults.fields]
-start_time = 0
-end_time = 0
+[defaults]
+start_time = ""
+end_time = ""
 version = 0
 stored_content = ""
+
+[imports]
+Path = "from pathlib import Path"
 
 [properties]
 linkable = "yes"
