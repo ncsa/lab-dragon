@@ -12,6 +12,10 @@ The file name should be the name of the class lowered.
 
 ## Rules
 
+- The imports for all the files are organized in the following manner:
+  - First all the native imports.
+  - Then all the imports from 3rd party dependencies
+  - Lastly all imports from this project.
 - Any filed that has the word time in the name, will be automatically timestamped
 if the passed argument is `None` or `''`.
 - You cannot add a key called ID, this is reserved for the entity UUID generator.
