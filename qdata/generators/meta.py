@@ -100,6 +100,7 @@ def generate_class(config_path: Union[str, Path],
     with open(str(APISCHEMAS.joinpath(f'{vals_dict["class_name"]}.yml'.lower())), 'w') as f:
         f.write(schema_output)
 
+
 # TODO: Have error catching this for when there are more than a single item
 def read_from_TOML(path: Union[str, Path]) -> object:
     """
