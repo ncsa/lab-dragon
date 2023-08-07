@@ -6,7 +6,7 @@ from typing import Union
 from jinja2 import Template
 import tomllib as toml
 
-from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
+from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
 from qdata import modules
 
 
@@ -71,24 +71,34 @@ def parser(path: Union[Path, str]) -> dict:
 
 # TODO: If we keep the jinja way of generating code, we need to be able to select custom parsers
 def generate_class(config_path: Union[str, Path],
-                   template_path: Union[str, Path] = TEMPLATESDIR.joinpath("entity.jinja")) -> None:
+                   module_template_path: Union[str, Path] = TEMPLATESDIR.joinpath("entity.jinja"),
+                   schema_template_path: Union[str, Path] = TEMPLATESDIR.joinpath("openAPI_schema.jinja")
+                   ) -> None:
     """
-    Generates a class using a Jinja template based on the TOML file provided.
+    Generates a class and openAPI schema using a Jinja module_template based on the TOML file provided.
 
     :param config_path: Path to the TOML config file.
-    :param template_path: Path to the jinja template file.
+    :param module_template_path: Path to the jinja module_template file.
+    :param schema_template_path: Path to the jinja file for openAPI schemas.
     """
-    with open(template_path, 'r') as f:
-        template_content = f.read()
+    with open(module_template_path, 'r') as f:
+        module_template_content = f.read()
 
-    template = Template(template_content)
+    with open(schema_template_path, 'r') as f:
+        schema_template_content = f.read()
+
+    module_template = Template(module_template_content)
+    schema_template = Template(schema_template_content, trim_blocks=True, lstrip_blocks=True)
 
     vals_dict = parser(config_path)
-    output = template.render(vals_dict)
+    module_output = module_template.render(vals_dict)
+    schema_output = schema_template.render(vals_dict)
 
     with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
-        f.write(output)
+        f.write(module_output)
 
+    with open(str(APISCHEMAS.joinpath(f'{vals_dict["class_name"]}.yml'.lower())), 'w') as f:
+        f.write(schema_output)
 
 # TODO: Have error catching this for when there are more than a single item
 def read_from_TOML(path: Union[str, Path]) -> object:
@@ -127,4 +137,7 @@ def delete_all_modules() -> None:
     for f in MODULESDIR.glob('*.py'):
         if '__init__.py' in f.name:
             continue
+        f.unlink()
+
+    for f in SCHEMASDIR.glob('*.yml'):
         f.unlink()

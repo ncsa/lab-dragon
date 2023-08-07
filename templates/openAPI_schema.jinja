@@ -1,0 +1,23 @@
+
+schemas:
+    {{ class_name }}:
+      type: "object"
+      {% if inherits_from != 'object' %}
+      - $ref: '#/components/schemas/{{ inherits_from }}'
+      {% endif %}
+      properties:
+      {% for key, val in definition.items() %}
+        {{ key }}:
+        {% if val == "str" or val[:9] == "Union[str" or val == "Optional[str]" %}
+          type: "string"
+        {% elif val == "int" or val[:8] == "Union[int" or val == "Optional[int]" %}
+          type: "integer"
+        {% elif val[:4] == "List" %}
+          type: "array"
+        {% endif %}
+        {% endfor %}
+
+
+
+
+
