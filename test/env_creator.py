@@ -4,8 +4,6 @@ from typing import Union, Optional
 from qdata.generators.meta import generate_all_classes
 from qdata.generators.jupyterbook import generate_book
 
-from pathlib import Path
-
 
 def delete_directory_contents(directory_path):
     # Create a Path object from the directory path

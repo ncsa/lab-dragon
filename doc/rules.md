@@ -22,3 +22,4 @@ if the passed argument is `None` or `''`.
 - Any Link is done by a string UUID.
 - In the comment section, the user can place a string that will be displayed in the document, or a path to a file.
 The supported data types are in the enum in generators.display module.
+- A comment cannot end with an extension of a supported file type.
