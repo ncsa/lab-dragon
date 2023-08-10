@@ -16,6 +16,7 @@ INDEX = {}
 
 PATHINDEX = {}
 
+# Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
 IMAGEINDEX = {}
 
 
@@ -23,9 +24,8 @@ def get_indices():
 
     index = json.dumps(str(INDEX))
     imageindex = json.dumps(str(IMAGEINDEX))
-    pathindex = json.dumps(str(PATHINDEX))
 
-    ret = {'index': index, 'imageindex': pathindex, 'pathindex': PATHINDEX}
+    ret = {'index': index, 'imageindex': imageindex, 'pathindex': PATHINDEX}
     return ret
 
 
@@ -143,6 +143,18 @@ def read_one(ID):
         return json.dumps(ent.to_TOML()[ent.name]), 201
     else:
         abort(404, f"Entity with ID {ID} not found")
+
+
+def read_image(ID, imageName):
+    """
+    API function that returns an image based on the ID of the entity and the name of the image
+    """
+
+    if ID + '--' + imageName in IMAGEINDEX:
+        image = IMAGEINDEX[ID + '--' + imageName]
+        return send_file(image)
+    else:
+        abort(404, f"Image with ID {ID} and name {imageName} not found")
 
 
 
