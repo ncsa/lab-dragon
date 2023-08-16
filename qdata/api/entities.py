@@ -157,5 +157,20 @@ def read_image(ID, imageName):
         abort(404, f"Image with ID {ID} and name {imageName} not found")
 
 
+def add_comment(ID, comment):
+
+    ent = INDEX[ID]
+    ent.comments.append(comment['text'])
+    path = None
+    for key, val in PATHINDEX.items():
+        if val == ID:
+            path = key
+            break
+
+    if path is None:
+        return abort(404, f"Could not find the original location of entity")
+
+    ent.to_TOML(path)
+    return make_response("Comment added", 201)
 
 

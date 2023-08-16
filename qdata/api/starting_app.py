@@ -2,9 +2,9 @@
 import connexion
 
 def set_cors_headers_on_response(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With'
-    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS'
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Headers'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = '*'
     return response
 
 

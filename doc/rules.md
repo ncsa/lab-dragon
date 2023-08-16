@@ -9,6 +9,8 @@ All of them are subject to change.
 - At the moment you cannot add any non native schemas
 - All generated classes must have a single class in the file. 
 The file name should be the name of the class lowered.
+- All comments in an entity should be unique. You can have the same comment in different entities but if you have 2 
+identical comments in the same entity they will not be shown.
 
 ## Rules
 
