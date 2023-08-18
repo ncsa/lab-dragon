@@ -8,14 +8,6 @@ from typing import Tuple
 
 from ..generators.meta import create_timestamp
 
-"""
-Tests that are still needed:
- - make sure that the sorting function works correctly
- - make sure that the comment type is correctly classified
- - what happens if there are multiple comments with the exact same timestamp?
- - adding multiple users is functioning correctly.
-"""
-
 
 class SupportedCommentType(Enum):
 
@@ -27,14 +19,17 @@ class SupportedCommentType(Enum):
 
     @classmethod
     def classify(cls, item: Union[Path, str]) -> int:
+        if len(item) > 256:
+            return SupportedCommentType.string.value
+
         item = Path(item)
         ext = item.suffix
-        if item.is_file():
-            try:
-                return cls[ext.lower()[1::]].value
-            except Exception as e:
-                raise ValueError(f'File type {ext} is not supported.')
-        elif item.is_dir():
+        try:
+            return cls[ext[1:]].value
+        except KeyError as e:
+            # if there is a KeyError it means it cannot find the extension so the comment is not treated as a file.
+            pass
+        if item.is_dir():
             return SupportedCommentType.dir.value
         else:
             return SupportedCommentType.string.value
@@ -68,6 +63,7 @@ class Comment:
         self.dates.append(time)
         self.authors.append(user)
         self.content.append(content)
+        self.com_type.append(SupportedCommentType.classify(content))
 
     # TODO: This might be obsolete since in theory the last index should always be the latest comment.
     #  I am not fully convinced that this is the case though.
@@ -79,6 +75,14 @@ class Comment:
         """
         most_recent_index = 0
         most_recent_time = None
+
+        dates_set = set(self.dates)
+
+        # Since this comment object should hold a single comment, there is almost no way a comment should be edited
+        # in the exact same time as it is created. This would mean that someone is trying to store multiple comments
+        # in the same object instead of multiple versions.
+        if len(self.dates) != len(dates_set):
+            raise ValueError("There are multiple comments with the same timestamp.")
 
         for index, time_str in enumerate(self.dates):
             try:

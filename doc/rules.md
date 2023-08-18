@@ -29,3 +29,7 @@ The supported data types are in the enum in generators.display module.
   * Content: This is the actual comment, it can be a string for a simple comment or a path pointing to a md or image file.
 - When creating the jupyterbook any whitespace in all of the paths involved with (the target path or any of the md files generated) will be replaced with an underscore (`_`).
 This means that any whitespaces at any other point other than file names will break links.
+- If you are passing as a comment a directory 
+to mean that all the items inside that directory should be placed in the comments.
+the directory has to be an absolute path. 
+WARNING unclear what the behaviour is if the path includes other parts that are outside the network drive.
