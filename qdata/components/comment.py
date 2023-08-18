@@ -10,6 +10,9 @@ from ..generators.meta import create_timestamp
 
 
 class SupportedCommentType(Enum):
+    """
+    Enum that holds the supported types of comments. This is used to classify the comment type.
+    """
 
     md = 1
     string = 2
@@ -19,6 +22,13 @@ class SupportedCommentType(Enum):
 
     @classmethod
     def classify(cls, item: Union[Path, str]) -> int:
+        """
+        Classifies the comment type based on the extension of the file. For a directory to be recognized, this needs to
+        be absolute and should actually exist wherever the notebook is being run.
+
+        :param item: The text of the comment we are classifying.
+        :return: The numerical value representing the comment type of the enum,
+        """
         if len(item) > 256:
             return SupportedCommentType.string.value
 
@@ -27,7 +37,7 @@ class SupportedCommentType(Enum):
         try:
             return cls[ext[1:]].value
         except KeyError as e:
-            # if there is a KeyError it means it cannot find the extension so the comment is not treated as a file.
+            # if there is a KeyError it means it cannot find the extension, so the comment is not treated as a file.
             pass
         if item.is_dir():
             return SupportedCommentType.dir.value
@@ -36,6 +46,30 @@ class SupportedCommentType(Enum):
 
 
 class Comment:
+    """
+    Class that holds all the versions of a _single_ comment. This is used to keep track of the history of a comment.
+    All comments and modification need to also include the user that made the comment or modification.
+    When the comment is created or modified, a timestamp is also stored as well as its comment classification.
+
+    To get the current version of the comment, the method `get_current_comment` should be used.
+    This method will return a tuple with the comment itself, the type, the author and the timestamp.
+
+    When reconstructing a Comment instance from a comment inside a file, simply put the recorded string in a JSON loads,
+    and pass the resulting dictionary to the constructor as kwargs.
+
+    A few fields are also present holding extra meta-data. These are:
+
+    - ID: The unique ID of the comment. This is assigned at creation.
+        Used to keep track of the same comment through a save file
+    - user: The original user that created the comment.
+        This should not be changed, since every modification also stores its author.
+    - created: The time when the comment was originally created.
+    - deleted: A boolean indicating if the comment has been deleted.
+        We should never delete a comment, but this will mark if the comment should be displayed or not.
+
+    :param content: The content of the comment. This can be a string or a path.
+    :param user: The user that created the comment.
+    """
     def __init__(self, content: Union[str, Path], user: str, **kwargs):
         if len(kwargs) != 0:
             self.ID = kwargs['ID']
@@ -58,7 +92,14 @@ class Comment:
             self.authors = [user]
             self.com_type = [SupportedCommentType.classify(content)]
 
-    def modify(self, content: Union[str, Path], user: str):
+    def modify(self, content: Union[str, Path], user: str) -> None:
+        """
+        Modify the comment. This will append the new comment to the list of comments and update the timestamp.
+        Passing the user is required.
+
+        :param content: The actual comment.
+        :param user: The user that wrote the comment
+        """
         time = create_timestamp()
         self.dates.append(time)
         self.authors.append(user)
@@ -67,7 +108,7 @@ class Comment:
 
     # TODO: This might be obsolete since in theory the last index should always be the latest comment.
     #  I am not fully convinced that this is the case though.
-    def last_comment_index(self):
+    def last_comment_index(self) -> int:
         """
         Function indicating the index of the last comment that was made.
 
@@ -95,7 +136,7 @@ class Comment:
 
         return most_recent_index
 
-    def last_comment(self) -> Tuple:
+    def last_comment(self) -> Tuple[str, int, str, str]:
         """
         Function returning the last comment that was made. The return object is a tuple containing in order:
         - The last comment.

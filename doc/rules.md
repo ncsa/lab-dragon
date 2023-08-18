@@ -21,7 +21,7 @@ if the argument passed is `None` or `''`.
 - You cannot add a key called ID, this is reserved for the entity UUID generator.
 - Any Link is done by a string UUID.
 - In the comment section, the user can place a string that will be displayed in the document, or a path to a file.
-The supported data types are in the enum in generators.display module.
+The supported data types are in the enum in generator.display module.
 - Each comment in an entity contains metadata associated with this comment. Comments contain the following fields:
   * UUID: This indicates that a comment is located in the entity and is used to store modifications to the same comment. All versions of the same comment will have the same UUID.
   * User: This indicates who created the comment. Different versions of a comment can have different users. There is no limit as to how many users can claim a comment.
