@@ -54,13 +54,16 @@ def _generate_children_dict(root_path: Path, target: Path, indent: int, resource
 
 def create_relation_dict(root_path: Path, target: Path, resource_path: Path) -> dict:
     """
-    Goes through all of the children of root_path, and creates a dictionary identifying all the children. The root_path
+    Goes through all the children of root_path, and creates a dictionary identifying all the children. The root_path
     will get rendered in the target directory but will not be located in the dictionary itself, since this is not
     needed when rendering the _toc.yml file.
 
     :param root_path: The path of the root entity.
     :param target: The location of where the notebook should live.
-    :return: A nested dictionary with all of the children of the root_path entity.
+    :param resource_path: The location of all the images and other resources.
+        It is important to pass this to some selection because it indicates the md generator that you want
+        the md files formatted for the jupyter-book.
+    :return: A nested dictionary with all the children of the root_path entity.
     """
     root_path_md = generate_md(root_path, target, resource_path)
 
