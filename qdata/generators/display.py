@@ -128,7 +128,9 @@ class EntityRenderer:
         if data['parent'] == '':
             ret["parent"] = None
         else:
-            data_path = Path(data['parent'])
+            # We replace the spaces in the parent name with underscores to make links work properly in a jupyterbook.
+            data_path = Path(data['parent'].replace(" ", "_"))
+            # But we don't want underscore in the pages themselves, so we replace them back to spaces.
             name = data_path.stem.replace("_", " ")
             if cls.image_path is None:
                 ret["parent"] = f"[{name}]({data_path.with_suffix('.md').absolute()})"
@@ -150,7 +152,7 @@ class EntityRenderer:
 
         children = ""
         for child in data['children']:
-            child_path = Path(child)
+            child_path = Path(child.replace(" ", "_"))
             if child_path.suffix == '.toml':
                 name = child_path.stem.replace("_", " ")
                 if cls.image_path is None:
@@ -236,7 +238,7 @@ def generate_md(source: Union[Path, str],
     source = Path(source)
     if target is None:
         target = os.getcwd()
-    target = Path(target.replace(" ", "_")).joinpath(source.stem + ".md")
+    target = Path(str(target).replace(" ", "_")).joinpath(source.stem.replace(" ", "_") + ".md")
 
     if images_path is not None:
         images_path = Path(images_path)

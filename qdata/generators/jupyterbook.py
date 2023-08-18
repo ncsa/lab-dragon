@@ -107,6 +107,9 @@ def generate_book(root_path: Union[Path, str],
     config_dict = dict(tittle=data['name'], author=data['user'], logo_path=logo_path)
     chapters = create_relation_dict(root_path, target_path, resource_path=resource_path)
 
+    # Replacing whitespace in root so that links work
+    root_path = Path(str(root_path).replace(' ', '_'))
+
     env = Environment(loader=FileSystemLoader(TEMPLATESDIR.joinpath('jupyterbook')))
 
     conf_template = env.get_template('_config.jinja')

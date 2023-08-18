@@ -117,7 +117,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                              user='testUser',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
-                                 str(self_path.parent.joinpath("testing_images", "pandas", "Giant panda.jpg"))],
+                                 str(self_path.parent.joinpath("testing_images", "pandas", "Giant_panda.jpg"))],
                              parent=get_panda_path, )
     choose_panda_path = Path(path, "Choose Panda.toml")
     to_be_created.append((choose_panda_step, choose_panda_path))
@@ -173,7 +173,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                              user='testUser',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
-                                 str(self_path.parent.joinpath("testing_images", "koalas", "creepy koala.jpg"))],
+                                 str(self_path.parent.joinpath("testing_images", "koalas", "creepy_koala.jpg"))],
                              parent=get_koala_path, )
     choose_koala_path = Path(path, "Choose Koala.toml")
     to_be_created.append((choose_koala_step, choose_koala_path))
