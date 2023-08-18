@@ -1,13 +1,13 @@
 import importlib
-from datetime import datetime, timezone
-
 from pathlib import Path
 from typing import Union
-from jinja2 import Template
-import tomllib as toml
+from datetime import datetime, timezone
 
-from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
+import tomllib as toml
+from jinja2 import Environment, FileSystemLoader
+
 from qdata import modules
+from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
 
 
 def create_timestamp() -> str:
@@ -81,10 +81,12 @@ def generate_class(config_path: Union[str, Path],
     with open(template_path, 'r') as f:
         template_content = f.read()
 
-    template = Template(template_content)
+    env = Environment(loader=FileSystemLoader(TEMPLATESDIR), extensions=['jinja2.ext.do'],)
+
+    ent_template = env.get_template('entity.jinja')
 
     vals_dict = parser(config_path)
-    output = template.render(vals_dict)
+    output = ent_template.render(vals_dict)
 
     with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
         f.write(output)

@@ -8,8 +8,9 @@ The parser function goes through that entity TOML data file and parses the infor
 render the template with.`
 """
 import os
+import json
 import shutil
-from enum import Enum, auto
+from enum import Enum
 from typing import Union, Tuple, List, Optional
 from pathlib import Path
 
@@ -17,29 +18,7 @@ import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
 from qdata import TEMPLATESDIR
-
-
-class SupportedCommentType(Enum):
-
-    md = auto()
-    string = auto()
-    dir = auto()
-    jpg = auto()
-    png = auto()
-
-    @classmethod
-    def classify(cls, item: Union[Path, str]) -> 'SupportedCommentType':
-        item = Path(item)
-        ext = item.suffix
-        if item.is_file():
-            try:
-                return cls[ext.lower()[1::]]
-            except Exception as e:
-                raise ValueError(f'File type {ext} is not supported.')
-        elif item.is_dir():
-            return SupportedCommentType.dir
-        else:
-            return SupportedCommentType.string
+from qdata.components.comment import SupportedCommentType, Comment
 
 
 def get_all_files(path: Union[Path, str]) -> list[Path]:
@@ -71,7 +50,7 @@ class EntityRenderer:
     image_path: Optional[Path] = None
 
     @classmethod
-    def format_comment(cls, comment: Union[Path, str]) -> Tuple[Union[str, List[str]], Union[str, List[str]]]:
+    def format_comment(cls, comment: Comment) -> Tuple[Union[str, List[str]], Union[str, List[str]]]:
         """
         Checks the type of comment, and formats the string value for it accordingly.
         If the comment is a markdown file, get the text from the file, and it will render a section with the file name
@@ -84,24 +63,24 @@ class EntityRenderer:
         """
 
         key, val = None, None
-        com_type = SupportedCommentType.classify(comment)
+        text, com_type, user, date = comment.last_comment()
 
         # For markdown bring the value of the md as string directly.
-        if com_type == SupportedCommentType.md:
-            md_path = Path(comment)
+        if SupportedCommentType(com_type) == SupportedCommentType.md:
+            md_path = Path(text)
             with open(md_path, 'r') as f:
                 md = f.read()
                 key = md_path.stem
                 val = md
 
         # For string, key and val are equal
-        elif com_type == SupportedCommentType.string:
-            key = comment
-            val = comment
+        elif SupportedCommentType(com_type) == SupportedCommentType.string:
+            key = text
+            val = text
 
         # For any image type, we want to format the string for md to load the image.
-        elif com_type == SupportedCommentType.jpg or com_type == SupportedCommentType.png:
-            pic_path = Path(comment)
+        elif SupportedCommentType(com_type) == SupportedCommentType.jpg or SupportedCommentType(com_type) == SupportedCommentType.png:
+            pic_path = Path(text)
             name = pic_path.stem.replace("_", " ")
             if cls.image_path is None:
                 key = pic_path.stem
@@ -114,11 +93,12 @@ class EntityRenderer:
                 val = f"![{name}](/images/{pic_path.name})"
 
         # For a directory, we assume that all the files inside it are images or comments that should be formatted.
-        elif com_type == SupportedCommentType.dir:
+        elif SupportedCommentType(com_type) == SupportedCommentType.dir:
             key = []
             val = []
-            for file in get_all_files(comment):
-                k, v = cls.format_comment(file)
+            for file in get_all_files(text):
+                new_com = Comment(file, user)
+                k, v = cls.format_comment(new_com)
                 if isinstance(k, list):
                     key.extend(k)
                     val.extend(v)
@@ -157,7 +137,9 @@ class EntityRenderer:
 
         comments = {}
         for com in data['comments']:
-            key, val = cls.format_comment(com)
+            # Parse the JSON representation of the comment into a dictionary and pass those as kwargs to a Comment constructor
+            parsed_com = Comment(**json.loads(com))
+            key, val = cls.format_comment(parsed_com)
             # If the comment is a directory, format_comment will return a list of keys and values.
             if isinstance(key, list):
                 for k, v in zip(key, val):
@@ -254,7 +236,7 @@ def generate_md(source: Union[Path, str],
     source = Path(source)
     if target is None:
         target = os.getcwd()
-    target = Path(target).joinpath(source.stem + ".md")
+    target = Path(target.replace(" ", "_")).joinpath(source.stem + ".md")
 
     if images_path is not None:
         images_path = Path(images_path)
