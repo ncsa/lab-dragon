@@ -62,7 +62,7 @@ def test_entity_in_md(tmp_path):
     create_entity(tmp_path)
 
     source_path = Path(tmp_path.joinpath("This is a testing Entity.toml"))
-    target_path = Path(tmp_path.joinpath("This is a testing Entity.md"))
+    target_path = Path(tmp_path.joinpath("This_is_a_testing_Entity.md"))
 
     check_vals(source_path, target_path, tmp_path)
 
@@ -76,6 +76,6 @@ def test_task_in_md(tmp_path):
     create_task(tmp_path)
 
     source_path = Path(tmp_path.joinpath("This is a testing Task.toml"))
-    target_path = Path(tmp_path.joinpath("This is a testing Task.md"))
+    target_path = Path(tmp_path.joinpath("This_is_a_testing_Task.md"))
 
     check_vals(source_path, target_path, tmp_path)

@@ -1,23 +1,13 @@
 import importlib
-from datetime import datetime, timezone
-
+import json
 from pathlib import Path
 from typing import Union
-from jinja2 import Template
+
 import tomllib as toml
+from jinja2 import Environment, FileSystemLoader
 
+from qdata.components.comment import Comment
 from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR
-from qdata import modules
-
-
-def create_timestamp() -> str:
-    """
-    Creates a timestamp in ISO 8601 format.
-
-    :return: Timestamp in ISO 8601 format.
-    """
-    timestamp = datetime.now(timezone.utc).astimezone().isoformat()
-    return timestamp
 
 
 def parser(path: Union[Path, str]) -> dict:
@@ -81,10 +71,12 @@ def generate_class(config_path: Union[str, Path],
     with open(template_path, 'r') as f:
         template_content = f.read()
 
-    template = Template(template_content)
+    env = Environment(loader=FileSystemLoader(TEMPLATESDIR), extensions=['jinja2.ext.do'],)
+
+    ent_template = env.get_template('entity.jinja')
 
     vals_dict = parser(config_path)
-    output = template.render(vals_dict)
+    output = ent_template.render(vals_dict)
 
     with open(str(MODULESDIR.joinpath(f'{vals_dict["class_name"]}.py'.lower())), 'w') as f:
         f.write(output)
@@ -105,6 +97,10 @@ def read_from_TOML(path: Union[str, Path]) -> object:
 
     module = importlib.import_module(f'qdata.modules.{data["type"].lower()}')
     _class = getattr(module, data.pop('type'))
+
+    if len(data['comments']) > 0:
+        new_comments = [Comment(**json.loads(x)) for x in data['comments']]
+        data['comments'] = new_comments
 
     ins = _class(**data)
     return ins

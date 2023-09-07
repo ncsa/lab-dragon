@@ -1,12 +1,13 @@
+"""
+When you are creating new classes that have mandatory fields you need to specify a default value in your tests. It is
+"""
 import os
-import time
 import string
 import random
 import importlib
 from pathlib import Path
 
 import tomllib as toml
-from pprint import pprint
 
 import qdata
 import qdata.modules
@@ -35,11 +36,13 @@ def get_toml_module_and_class(item):
 def test_all_fields_in_generated_class(module_names):
     classes = module_names
 
+    user = 'testUser'
     for cls in classes:
 
         toml_doc, _class = get_toml_module_and_class(cls)
 
-        instance = _class()
+        # user is a mandatory field in all entities
+        instance = _class(user=user)
         for field in toml_doc['definitions']:
             assert hasattr(instance, field)
 
@@ -47,11 +50,13 @@ def test_all_fields_in_generated_class(module_names):
 def test_re_instantiation_of_classes(module_names):
 
     classes = module_names
+    user = 'testUser'
 
     for cls in classes:
         toml_doc, _class = get_toml_module_and_class(cls)
 
         fields = {'name': generate_random_string(5)}
+        # Generate random content for the fields that need it. Skip the automatically generated ones.
         for field in toml_doc['definitions']:
             if 'time' in field:
                 continue
@@ -59,14 +64,16 @@ def test_re_instantiation_of_classes(module_names):
                 continue
             elif 'link' in field:
                 continue
-            elif 'List[str]' in toml_doc['definitions'][field]:
+            elif ('List[str]' in toml_doc['definitions'][field] or
+                  'List[Union[Comment, str]]' in toml_doc['definitions'][field]):
                 comments = []
                 for x in range(5):
                     comments.append(generate_random_string(5))
                 fields[field] = comments
             elif 'str' in toml_doc['definitions'][field]:
                 fields[field] = generate_random_string(8)
-
+        if user not in fields:
+            fields['user'] = user
         instance = _class(**fields)
         toml_path = Path(os.getcwd()).joinpath(fields['name'] + '.toml')
         instance.to_TOML(toml_path)

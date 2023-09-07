@@ -20,21 +20,21 @@ def test_correctly_creating_dict(tmp_path):
     create_full_test_env(tmp_path, True)
 
     correct_dict = {
-        ("Testing Pandas", 1): {
-            ("Get Panda", 2): {
-                ("Look For Panda Images", 3): None,
-                ("Found Pandas", 3): None,
-                ("Choose Panda", 3): None},
-            ("Named Panda", 2): None},
-        ("Testing Koalas", 1): {
-            ("Get Koala", 2): {
-                ("Look For Koala Images", 3): None,
-                ("Found Koalas", 3): None,
-                ("Choose Koala", 3): None},
-            ("Named Koala", 2): None}
+        ("Testing_Pandas", 1): {
+            ("Get_Panda", 2): {
+                ("Look_For_Panda_Images", 3): None,
+                ("Found_Pandas", 3): None,
+                ("Choose_Panda", 3): None},
+            ("Named_Panda", 2): None},
+        ("Testing_Koalas", 1): {
+            ("Get_Koala", 2): {
+                ("Look_For_Koala_Images", 3): None,
+                ("Found_Koalas", 3): None,
+                ("Choose_Koala", 3): None},
+            ("Named_Koala", 2): None}
     }
 
-    created_dict = create_relation_dict(testing_project_toml, tmp_path)
+    created_dict = create_relation_dict(testing_project_toml, tmp_path, tmp_path)
 
     assert correct_dict == created_dict
 

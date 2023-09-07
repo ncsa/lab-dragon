@@ -1,8 +1,21 @@
+{# Fields required for this template:
+
+- class_name: str. The name of the class to be created
+- inherits_from: str. The name of the class this class inherits from
+- definition: Dict[str, str]. A dictionary of the fields and their types.
+- defaults: Dict[str, str]. A dictionary of the fields and their default values. If no default value is specified, the field is required.
+- imports: Dict[str, str]. A dictionary of the imports to be added to the file. The key is the name of the import, the value is the import itself.
+
+#}
+
 # The following file has been created automatically based on a jinja template
 # Anything you modify to it, will get lost when the next time the template is
 # created. If you want to modify the class, please do so in the template
 #
 # Template has been rendered
+
+{# Dict of required keys-vals, these have no defaults so they need to be handled differently #}
+{% set required = {} %}
 
 import uuid
 import tomlkit
@@ -13,11 +26,22 @@ from typing import List, Tuple, Dict, Optional, Union
 {{ val }} as {{ key }}
 {% endfor %}
 
-from qdata.generators.meta import create_timestamp
+from qdata.utils import create_timestamp
+from qdata.components.comment import Comment
 
 
 class {{class_name}}({{ inherits_from }}):
     def __init__(self,
+                 {% for key, val in definition.items() -%}
+                 {# This is to check what items should not have default and need to come before any other argument #}
+                 {%- if key not in defaults -%}
+                 {{ key }}: {{ val }},
+                 {% do required.update({key: val}) -%}
+                 {% endif -%}
+                 {% endfor -%}
+                 {% for key in required.keys() -%}
+                 {% do definition.pop(key) -%}
+                 {% endfor -%}
                  {% for key, val in definition.items() -%}
                  {% if 'time' in key -%}
                  {{ key }}: str = None,
@@ -32,8 +56,10 @@ class {{class_name}}({{ inherits_from }}):
         {% if class_name != 'Entity' -%}
         super().__init__(*args, **kwargs)
         {% endif -%}
+        {% for key, val in required.items() -%}
+        self.{{ key }} = {{ key }}
+        {% endfor -%}
         {% for key in definition.keys() -%}
-
         {% if 'time' in key -%}
 
         if {{ key }} is None or {{ key }} == '':
@@ -52,6 +78,17 @@ class {{class_name}}({{ inherits_from }}):
             self.{{ key }} = self.ID
         else:
             self.{{ key }} = {{ key }}
+
+        {% elif 'comment' in key -%}
+        if isinstance({{ key }}, list) and len({{ key }}) != 0:
+            self.{{ key }} = []
+            for com in {{ key }}:
+                if isinstance(com, Comment):
+                    self.{{ key }}.append(com)
+                else:
+                    self.{{ key }}.append(Comment(com, user))
+        else:
+            self.{{ key }} = [].copy()
 
         {% elif not defaults[key] is string and defaults[key] is iterable -%}
         # If we don't save a copy of the list,
@@ -75,12 +112,18 @@ class {{class_name}}({{ inherits_from }}):
             vals = tomlkit.table()
 
         vals['type'] = self.__class__.__name__
+        {% for key, val in required.items() -%}
+        vals['{{ key }}'] = self.{{ key }}
+        {% endfor -%}
         {% for key in definition.keys() -%}
         {% if 'children' in key -%}
         # We want to save the str version of every child, not the object.
         vals['{{ key }}'] = [str(child) for child in self.{{ key }}]
         {% elif 'parent' in key -%}
         vals['{{ key }}'] = str(self.{{ key }})
+        {% elif 'comment' in key -%}
+        # Same as children, we want to save the str version of every comment, not the object.
+        vals['{{ key }}'] = [str(comment) for comment in self.{{ key }}]
         {% else -%}
         vals['{{ key }}'] = self.{{ key }}
         {% endif %}
@@ -110,4 +153,13 @@ class {{class_name}}({{ inherits_from }}):
         if not hasattr(self, 'children'):
             self.children = []
         self.children.append(child)
+
+    def add_comment(self, comment: Union[str, List[str]], user: Optional[str], uuid: Optional[str]):
+        """
+        Add a comment to the entity with the proper metadata. By specifying the user,
+        a comment can be written by a different user.
+
+        The structure
+        """
+        raise NotImplementedError
     {% endif %}

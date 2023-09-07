@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 import qdata
+from qdata.generators.meta import generate_all_classes, delete_all_modules
 
 
 def count_files(path):
@@ -13,7 +14,12 @@ def count_files(path):
 
 
 @pytest.fixture()
-def module_names():
+def refresh_modules():
+    delete_all_modules()
+    generate_all_classes()
+
+@pytest.fixture()
+def module_names(refresh_modules):
 
     nschemas = count_files(qdata.SCHEMASDIR)
     nmodules = count_files(qdata.MODULESDIR)
