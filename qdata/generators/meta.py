@@ -1,13 +1,13 @@
 import importlib
-from datetime import datetime, timezone
-
 from pathlib import Path
 from typing import Union
-from jinja2 import Template
-import tomllib as toml
+from datetime import datetime, timezone
 
-from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
+import tomllib as toml
+from jinja2 import Environment, FileSystemLoader
+
 from qdata import modules
+from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
 
 
 def create_timestamp() -> str:
@@ -87,8 +87,13 @@ def generate_class(config_path: Union[str, Path],
     with open(schema_template_path, 'r') as f:
         schema_template_content = f.read()
 
-    module_template = Template(module_template_content)
-    schema_template = Template(schema_template_content, trim_blocks=True, lstrip_blocks=True)
+    env = Environment(loader=FileSystemLoader(TEMPLATESDIR), extensions=['jinja2.ext.do'], )
+
+    module_template = env.get_template(module_template_path)
+    # FIXME: the code when creating the template from scratch is:
+    #  schema_template = Template(schema_template_content, trim_blocks=True, lstrip_blocks=True
+    #  See if the arguments are needed there or somewhere else
+    schema_template = env.get_template(schema_template_path)
 
     vals_dict = parser(config_path)
     module_output = module_template.render(vals_dict)

@@ -8,6 +8,8 @@ name = "Entity"
 version = "0.1"
 inherits_from = "object"  # Can also be a list for multiple inheritance
 
+# FIXME: How do I represent the comments structure? Since I do want to just accept a list of comments with the metadata being handled automatically.
+#  How do you specify that?
 [definitions]
 # Fields that need to be satisfied alongside their data structures
 # Must be either imported classes or primitive types.
@@ -16,13 +18,13 @@ name = "str"
 parent = "Union[str, Path]"
 user = "str"
 description = "str"
-comments = "List[str]"
+comments = "List[Union[Comment, str]]"
 children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
 
 # Imports is optional
 [imports]
-#Param = "parameters.Parameter"
+#Param = "components.Parameter"
 
 
 [defaults]
@@ -30,7 +32,6 @@ params = "List[Tuple[str]]"
 ID = "None"
 name = ''
 parent = ''
-user = ''
 description = ''
 comments = []
 children = []
