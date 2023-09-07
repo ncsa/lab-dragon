@@ -29,10 +29,15 @@ class SupportedCommentType(Enum):
         :param item: The text of the comment we are classifying.
         :return: The numerical value representing the comment type of the enum,
         """
-        if len(item) > 256:
-            return SupportedCommentType.string.value
 
-        item = Path(item)
+        # If the item is not a path, check if it's longer than 256 characters.
+        # If it is, it is a string.
+        # If it is not, convert it to a path to see if it has an extension.
+        if not isinstance(item, Path):
+            if len(item) > 256:
+                return SupportedCommentType.string.value
+
+            item = Path(item)
         ext = item.suffix
         try:
             return cls[ext[1:]].value

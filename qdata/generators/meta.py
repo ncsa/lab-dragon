@@ -89,11 +89,14 @@ def generate_class(config_path: Union[str, Path],
 
     env = Environment(loader=FileSystemLoader(TEMPLATESDIR), extensions=['jinja2.ext.do'], )
 
-    module_template = env.get_template(module_template_path)
-    # FIXME: the code when creating the template from scratch is:
-    #  schema_template = Template(schema_template_content, trim_blocks=True, lstrip_blocks=True
-    #  See if the arguments are needed there or somewhere else
-    schema_template = env.get_template(schema_template_path)
+    # TODO: Fix so that this is not an issue
+    # Module template was written before I knew of the lstrip_blocks and trim_blocks options
+    module_template = env.get_template(module_template_path.name)
+
+    env.lstrip_blocks = True
+    env.trim_blocks = True
+    # Schema template needs to have whitespace removed
+    schema_template = env.get_template(schema_template_path.name)
 
     vals_dict = parser(config_path)
     module_output = module_template.render(vals_dict)
