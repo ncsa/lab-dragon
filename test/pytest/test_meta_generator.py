@@ -56,6 +56,7 @@ def test_re_instantiation_of_classes(module_names):
         toml_doc, _class = get_toml_module_and_class(cls)
 
         fields = {'name': generate_random_string(5)}
+        # Generate random content for the fields that need it. Skip the automatically generated ones.
         for field in toml_doc['definitions']:
             if 'time' in field:
                 continue
@@ -63,7 +64,8 @@ def test_re_instantiation_of_classes(module_names):
                 continue
             elif 'link' in field:
                 continue
-            elif 'List[str]' in toml_doc['definitions'][field]:
+            elif ('List[str]' in toml_doc['definitions'][field] or
+                  'List[Union[Comment, str]]' in toml_doc['definitions'][field]):
                 comments = []
                 for x in range(5):
                     comments.append(generate_random_string(5))
