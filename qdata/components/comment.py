@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union
 from typing import Tuple
 
-from ..generators.meta import create_timestamp
+from ..utils import create_timestamp
 
 
 class SupportedCommentType(Enum):
@@ -156,4 +156,9 @@ class Comment:
 
     def __str__(self):
         ret = self.__dict__.copy()
-        return json.dumps(ret, indent=4)
+        return json.dumps(ret)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False

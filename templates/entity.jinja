@@ -26,7 +26,7 @@ from typing import List, Tuple, Dict, Optional, Union
 {{ val }} as {{ key }}
 {% endfor %}
 
-from qdata.generators.meta import create_timestamp
+from qdata.utils import create_timestamp
 from qdata.components.comment import Comment
 
 
@@ -82,8 +82,11 @@ class {{class_name}}({{ inherits_from }}):
         {% elif 'comment' in key -%}
         if isinstance({{ key }}, list) and len({{ key }}) != 0:
             self.{{ key }} = []
-            for comment in {{ key }}:
-                self.comments.append(Comment(comment, user))
+            for com in {{ key }}:
+                if isinstance(com, Comment):
+                    self.{{ key }}.append(com)
+                else:
+                    self.{{ key }}.append(Comment(com, user))
         else:
             self.{{ key }} = [].copy()
 

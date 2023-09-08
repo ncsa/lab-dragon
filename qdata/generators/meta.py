@@ -1,23 +1,13 @@
 import importlib
+import json
 from pathlib import Path
 from typing import Union
-from datetime import datetime, timezone
 
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
-from qdata import modules
+from qdata.components.comment import Comment
 from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
-
-
-def create_timestamp() -> str:
-    """
-    Creates a timestamp in ISO 8601 format.
-
-    :return: Timestamp in ISO 8601 format.
-    """
-    timestamp = datetime.now(timezone.utc).astimezone().isoformat()
-    return timestamp
 
 
 def parser(path: Union[Path, str]) -> dict:
@@ -124,6 +114,10 @@ def read_from_TOML(path: Union[str, Path]) -> object:
 
     module = importlib.import_module(f'qdata.modules.{data["type"].lower()}')
     _class = getattr(module, data.pop('type'))
+
+    if len(data['comments']) > 0:
+        new_comments = [Comment(**json.loads(x)) for x in data['comments']]
+        data['comments'] = new_comments
 
     ins = _class(**data)
     return ins

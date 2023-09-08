@@ -1,6 +1,6 @@
 import time
 
-from qdata.generators.meta import create_timestamp
+from qdata.utils import create_timestamp
 from qdata.components.comment import Comment, SupportedCommentType
 
 user = 'test_user'
