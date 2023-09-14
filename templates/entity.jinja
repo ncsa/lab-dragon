@@ -27,7 +27,7 @@ from typing import List, Tuple, Dict, Optional, Union
 {% endfor %}
 
 from qdata.utils import create_timestamp
-from qdata.components.comment import Comment
+from qdata.components.comment import Comment, SupportedCommentType
 
 
 class {{class_name}}({{ inherits_from }}):
@@ -83,10 +83,7 @@ class {{class_name}}({{ inherits_from }}):
         if isinstance({{ key }}, list) and len({{ key }}) != 0:
             self.{{ key }} = []
             for com in {{ key }}:
-                if isinstance(com, Comment):
-                    self.{{ key }}.append(com)
-                else:
-                    self.{{ key }}.append(Comment(com, user))
+                self.add_comment(com)
         else:
             self.{{ key }} = [].copy()
 
@@ -154,12 +151,56 @@ class {{class_name}}({{ inherits_from }}):
             self.children = []
         self.children.append(child)
 
-    def add_comment(self, comment: Union[str, List[str]], user: Optional[str], uuid: Optional[str]):
+    def add_comment(self, comment: Union[str, Comment, List[Comment], List[str]], user: Optional[str] = None) -> None:
         """
-        Add a comment to the entity with the proper metadata. By specifying the user,
-        a comment can be written by a different user.
+        Add a comment to the entity. If a directory is passed, this function will go through the directory and add a
+        comment to every supported file in it in alphabetical order. It will **NOT** go through subdirectories.
+        Whenever it iterates through a list (either if it is passed a list or goes through all of the files in a
+        directory) it will call itself to add individual comments.
 
-        The structure
+        :param comment: If passed a string to indicate the comment, it will create a new `Comment` object with that
+            string as the comment. If its passed a list of strings, it will create a new comment for each of those strings.
+            If passed a `Comment` object, it will add that comment to the entity. If passed a list of `Comment` objects,
+            it will add each of those comments to the entity.
+        :param user: The user that is adding the comment.
+            If not passed, it will default to the use who created this entity.
         """
-        raise NotImplementedError
+
+        # Function inside function because its very specific to adding comments and should not be called from anywhere else
+        def add_directory(path: Path) -> None:
+            files = [file for file in path.iterdir() if file.is_file()]
+            supported_items = SupportedCommentType.__members__.keys()
+            for file in sorted(files):
+                if file.is_dir():
+                    continue
+                if file.suffix[1:] in supported_items:
+                    self.add_comment(Comment(file, user))
+                else:
+                    continue
+
+        if user is None:
+            user = self.user
+
+        if isinstance(comment, list):
+            for com in comment:
+                if isinstance(com, Comment):
+                    self.comments.append(com)
+                else:
+                    self.add_comment(com, user)
+        else:
+            if isinstance(comment, Comment):
+                self.comments.append(comment)
+            elif isinstance(comment, str):
+                try:
+                    path = Path(comment)
+                    if path.is_dir():
+                        add_directory(path)
+                    else:
+                        self.comments.append(Comment(comment, user))
+                # Comment may be too long to convert to path
+                except OSError:
+                    self.comments.append(Comment(comment, user))
+            else:
+                raise TypeError(f"Comment must be a string or a Comment object, not {type(comment)}")
+
     {% endif %}

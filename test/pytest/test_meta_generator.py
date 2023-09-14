@@ -83,6 +83,22 @@ def test_re_instantiation_of_classes(module_names):
         assert instance == retrieved_instance
 
 
+def test_handling_directories_in_comments():
+    ent_toml, ent = get_toml_module_and_class('entity')
+
+    fields = {'name': generate_random_string(5),
+              'user': 'testUser',
+              'comments': ["../testing_images/pandas"],}
+    instance = ent(**fields)
+    toml_path = Path(os.getcwd()).joinpath(fields['name'] + '.toml')
+    instance.to_TOML(toml_path)
+    retrieved_instance = read_from_TOML(toml_path)
+    toml_path.unlink(missing_ok=True)
+
+    assert instance.comments == retrieved_instance.comments
+    assert len(retrieved_instance.comments) == 3
+
+
 def test_adding_non_existent_field():
 
     ent_toml, ent = get_toml_module_and_class('entity')

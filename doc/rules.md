@@ -31,8 +31,11 @@ The supported data types are in the enum in generator.display module.
   * Content: This is the actual comment, it can be a string for a simple comment or a path pointing to a md or image file.
 - When creating the jupyterbook any whitespace in all of the paths involved with (the target path or any of the md files generated) will be replaced with an underscore (`_`).
 This means that any whitespaces at any other point other than file names will break links.
-- If you are passing as a comment a directory 
-to mean that all the items inside that directory should be placed in the comments.
-the directory has to be an absolute path. 
+- When passing a directory as a comment:
+  * The path must be an absolute path.
+  * When creating the comment, the entity will detect that is a path and create a new comment for each file that is in the directory.
+  * This is **NOT** recursive, so if there are subdirectories, they will be ignored.
+  * TOML files containing entities cannot have directories as comments. they must have explicit comments to all wanted files.
+- **DO NOT** add comments directly to the entity. This will break the entity and the entity will not be able to be loaded. use add comment method instead
 WARNING unclear what the behaviour is if the path includes other parts that are outside the network drive.
 - A comment cannot end with an extension of a supported file type.

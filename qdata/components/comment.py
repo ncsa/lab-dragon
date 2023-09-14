@@ -16,7 +16,6 @@ class SupportedCommentType(Enum):
 
     md = 1
     string = 2
-    dir = 3
     jpg = 4
     png = 5
 
@@ -44,10 +43,8 @@ class SupportedCommentType(Enum):
         except KeyError as e:
             # if there is a KeyError it means it cannot find the extension, so the comment is not treated as a file.
             pass
-        if item.is_dir():
-            return SupportedCommentType.dir.value
-        else:
-            return SupportedCommentType.string.value
+
+        return SupportedCommentType.string.value
 
 
 class Comment:
