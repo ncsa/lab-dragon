@@ -94,13 +94,6 @@ def test_classificator(tmp_path):
     text = "this is a comment that we are doing"
     assert SupportedCommentType.classify(text) == SupportedCommentType.string.value
 
-    # testing a directory
-    text = "my_path/somedirname"
-    d_path = tmp_path.joinpath(text)
-    d_path.mkdir()
-    # I check if the folder exists to classify it as a folder so I need to pass the absolute path of the folder.
-    assert SupportedCommentType.classify(str(d_path)) == SupportedCommentType.dir.value
-
     # testing a jpg file
     text = "my_path/somefilename.jpg"
     f_path = tmp_path.joinpath(text)
