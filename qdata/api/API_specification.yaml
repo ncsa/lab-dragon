@@ -74,6 +74,12 @@ paths:
       summary: "Read the entity with the given ID"
       parameters:
         - $ref: "#/components/parameters/ID"
+        - in: query
+          name: "name_only"
+          schema:
+            type: "boolean"
+          description: "If true, only the name of the entity is returned"
+
       responses:
         "200":
             description: "Successfully read entity"

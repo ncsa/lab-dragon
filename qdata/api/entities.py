@@ -131,7 +131,7 @@ def read_all():
     return ret
 
 
-def read_one(ID):
+def read_one(ID, name_only=False):
     """
     API function that returns an entity based on its ID
     """
@@ -141,6 +141,10 @@ def read_one(ID):
 
     if ID in INDEX:
         ent = INDEX[ID]
+
+        if name_only:
+            return ent.name
+
         return json.dumps(ent.to_TOML()[ent.name]), 201
     else:
         abort(404, f"Entity with ID {ID} not found")
