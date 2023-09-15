@@ -1,10 +1,14 @@
 'use client'
 import { useState } from 'react';
+import Link from 'next/link';
+
+const BASE_URL = 'http://localhost:3000/entities/';
 
 
 export default function SidebarItem({item}) {
     const name = item.name;
     const type = item.type;
+    const id = item.id;
 
     const [open, setOpen] = useState(false);
         if (item.children.length > 0){
@@ -12,8 +16,9 @@ export default function SidebarItem({item}) {
             <div className={open ? "sidebar-item open": "sidebar-item"}>
                 <div className="sidebar-item-title">
                     <span>
-                        <i className={type}></i>
-                        {name}
+                        <Link href={ BASE_URL + id || "#"} className="sidebar-item plain">
+                            {name}
+                        </Link>
                     </span>
                     <i
                         className="bi-chevron-down toggle-btn"
@@ -30,8 +35,9 @@ export default function SidebarItem({item}) {
             <div className="sidebar-item">
                 <div className="sidebar-item-title">
                     <span>
-                        <i className={type}></i>
-                        {name}
+                        <Link href={ BASE_URL + id || "#"} className="sidebar-item plain">
+                            {name}
+                        </Link>
                     </span>
                 </div>
             </div>

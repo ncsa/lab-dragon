@@ -70,3 +70,17 @@ body {
 .sidebar-item.open > .sidebar-item-content{
     height: auto;
 }
+
+.sidebar-item.plain{
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1em;
+}
+.sidebar-item.plain:hover{
+    text-decoration: underline;
+}
+.sidebar-item.plain i{
+    display: inline-block;
+    width: 1.7em;
+}
