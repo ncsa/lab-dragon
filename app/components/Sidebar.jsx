@@ -1,13 +1,23 @@
 import SidebarItem from "./SidebarItem";
 
+async function getSidebarItems() {
+    const response = await fetch("http://localhost:8000/api/entities" , {
+            next: {
+                revalidate: 0
+            }
+        })
 
-export default function Sidebar() {
-    console.log("Here comes the sidebar")
+    return response.json()
+}
+
+
+export default async function Sidebar() {
+    const entities = await getSidebarItems()
+
     return (
-        <aside>
-            <SidebarItem text="First" icon= "bi-gear-fill"/>
-            <SidebarItem text="Second" icon="bi-folder"/>
-            <SidebarItem text="Third" icon="bi-journal"/>
-        </aside>
+        <div className="sidebar">
+            { entities.map((item, index) => <SidebarItem key={index} item={item} />)}
+        </div>
+
     )
 }

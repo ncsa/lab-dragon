@@ -1,29 +1,40 @@
-"use client"
-
+'use client'
 import { useState } from 'react';
 
 
-export default function SidebarItem(props) {
-    const text = props.text;
-    const icon = props.icon;
+export default function SidebarItem({item}) {
+    const name = item.name;
+    const type = item.type;
 
     const [open, setOpen] = useState(false);
-
-
-    return (
-        <div className={open ? "sidebar-item open": "sidebar-item"}>
-            <div className="sidebar-item-title">
-                <span>
-                    <i className={icon}></i>
-                    {text}
-                </span>
-                <i
-                    className="bi-chevron-down toggle-btn"
-                    onClick={() => setOpen(!open)}></i>
+        if (item.children.length > 0){
+        return (
+            <div className={open ? "sidebar-item open": "sidebar-item"}>
+                <div className="sidebar-item-title">
+                    <span>
+                        <i className={type}></i>
+                        {name}
+                    </span>
+                    <i
+                        className="bi-chevron-down toggle-btn"
+                        onClick={() => setOpen(!open)}></i>
+                </div>
+                <div className="sidebar-item-content">
+                    { item.children.map((child, index) => <SidebarItem key={index} item={child} />)}
+                </div>
             </div>
-            <div className="sidebar-item-content">
-                Hello I am content
+        )
+    }else{
+
+        return (
+            <div className="sidebar-item">
+                <div className="sidebar-item-title">
+                    <span>
+                        <i className={type}></i>
+                        {name}
+                    </span>
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 }

@@ -16,7 +16,7 @@ body {
     display: flex;
 }
 
-aside{
+.sidebar{
     color: aliceblue;
     width: 300px;
     height: 100vh;
@@ -30,7 +30,7 @@ aside{
     padding: 0.5em;
     /*font-size: 1.2em;*/
     display: block;
-
+    border-radius: 5px;
     /*This will let the hover effect have a slight animation. Probably not needed*/
     /*transition: background-color 0.1s;*/
 }
@@ -56,7 +56,7 @@ aside{
     transition: transform 0.3s ease;
 }
 
-.sidebar-item.open .sidebar-item-title .toggle-btn{
+.sidebar-item.open > .sidebar-item-title .toggle-btn{
     transform: rotate(180deg)
 }
 
@@ -67,6 +67,6 @@ aside{
 
 }
 
-.sidebar-item.open .sidebar-item-content{
+.sidebar-item.open > .sidebar-item-content{
     height: auto;
 }
