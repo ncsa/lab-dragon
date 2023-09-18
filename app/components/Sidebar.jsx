@@ -1,14 +1,7 @@
+
+import {getSidebarItems} from "@/app/lib/api_calls";
 import SidebarItem from "./SidebarItem";
 
-async function getSidebarItems() {
-    const response = await fetch("http://localhost:8000/api/entities" , {
-            next: {
-                revalidate: 0
-            }
-        })
-
-    return response.json()
-}
 
 
 export default async function Sidebar() {

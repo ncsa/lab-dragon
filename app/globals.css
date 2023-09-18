@@ -8,6 +8,13 @@
     box-sizing: border-box;
 }
 
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 2.5rem;
+}
+
 body {
     display: flex;
 }
@@ -83,4 +90,41 @@ body {
 .sidebar-item.plain i{
     display: inline-block;
     width: 1.7em;
+}
+
+.entity-tittle{
+    font-size: 4.2em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-bottom: 1px solid #ccc;
+}
+
+.entity-header{
+    font-size: 1.2em;
+    padding: 0.5em;
+    border-bottom: 1px solid #ccc;
+}
+
+.entity-footer{
+    font-size: 1.2em;
+    padding: 0.5em;
+    border-top: 1px solid #ccc;
+}
+
+.entity-link {
+    color: blue;
+    /*text-decoration: none;*/
+    /*text-transform: uppercase;*/
+}
+
+.entity-link:hover {
+    text-decoration: underline;
+}
+
+.entity-link:active {
+    color: black;
+}
+
+.entity-link:visited {
+    color: purple;
 }
