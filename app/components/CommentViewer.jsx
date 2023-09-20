@@ -1,7 +1,7 @@
 "use client"
 import {Image} from 'next/image'
 
-import {BASE_API} from "@/app/lib/api_calls";
+export const BASE_API = "http://localhost:8000/api/"
 
 function Comment({comment, entID}) {
     console.log(" HERE COMES ENT ID")
@@ -16,7 +16,7 @@ function Comment({comment, entID}) {
 
 
     return (
-        <div>
+        <div className="comment">
             { (type[0] == 4 || type[0] == 5) ? <img src={BASE_API+"entities/"+entID+"/"+comID} alt="Image is loading" /> : <p>{content[0]}</p> }
         </div>
     )

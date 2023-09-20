@@ -25,10 +25,12 @@ body {
 
 .sidebar{
     color: aliceblue;
-    width: 300px;
+    max-width: 20%;
     height: 100vh;
     background-color: #1a202c;
-
+    flex-grow: 1;
+    position: sticky;
+    top: 0;
     /* Makes it such that you can scroll in the sidebar */
     overflow: auto;
 }
@@ -102,12 +104,13 @@ body {
 .entity-header{
     font-size: 1.2em;
     padding: 0.5em;
+    margin-bottom: 0.5em;
     border-bottom: 1px solid #ccc;
 }
 
 .entity-footer{
     font-size: 1.2em;
-    padding: 0.5em;
+    padding: 0.2em;
     border-top: 1px solid #ccc;
 }
 
@@ -128,3 +131,12 @@ body {
 .entity-link:visited {
     color: purple;
 }
+
+
+/*!* comments css *!*/
+
+.comment img{
+    text-align: center;
+    white-space: nowrap;
+}
+
