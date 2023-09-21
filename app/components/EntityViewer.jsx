@@ -11,7 +11,6 @@ export async function getEntityName(id) {
         cache: 'no-store'
     })
     if (!response.ok) {
-        console.log("ERROR")
         throw new Error(response.statusText)
     }
 
@@ -20,8 +19,6 @@ export async function getEntityName(id) {
 }
 
 export default function EntityViewer({ entity }) {
-    console.log("I am getting entity right now right here")
-    console.log(entity)
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
 

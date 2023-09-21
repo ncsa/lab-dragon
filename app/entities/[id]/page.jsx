@@ -14,19 +14,40 @@ export async function getEntity(id, only_name = false) {
     return response.json()
 }
 
+function parseEntity(entity) {
+    const parsedEnt = JSON.parse(entity)
+    const parsedComments = parsedEnt.comments.map(comment => JSON.parse(comment))
+    parsedEnt.comments = parsedComments
+    return parsedEnt
+}
+
 export default function Entities( {params} ) {
     const id = params.id;
     const [entity, setEntity] = useState(null);
+    const [children, setChildren] = useState(null);
 
     useEffect(() => {
         getEntity(id).then(data => {
-            setEntity(JSON.parse(data));
+            setEntity(parseEntity(data));
         });
     }, [id]);
+
+    console.log('HERE COMES THE PARSED ENTITY:')
+    console.log(entity)
+
+    useEffect(() => {
+        // The children === null avoids an infinite loop
+        if (entity && entity.children && children === null) {
+            Promise.all(entity.children.map(childId => getEntity(childId))).then(childEntities => setChildren(childEntities.map(childEnt => parseEntity(childEnt))));
+        }
+    }, [entity, children]);
 
     if (!entity) {
         return <div>Loading...</div>;
     }
+
+    console.log("HERE COME THE BIG AN IMPORTANT CHILDREN BABY")
+    console.log(children)
 
     return (
         <div>
