@@ -5,7 +5,6 @@ import EntityViewer from "@/app/components/EntityViewer";
 export const BASE_API = "http://localhost:8000/api/";
 
 export async function getEntity(id, only_name = false) {
-    console.log("about to search for: " + id + " only_name: " + only_name)
 
     let response = await fetch(BASE_API+"entities/" + id, {
         cache: 'no-store'
@@ -32,9 +31,6 @@ export default function Entities( {params} ) {
         });
     }, [id]);
 
-    console.log('HERE COMES THE PARSED ENTITY:')
-    console.log(entity)
-
     useEffect(() => {
         // The children === null avoids an infinite loop
         if (entity && entity.children && children === null) {
@@ -46,12 +42,9 @@ export default function Entities( {params} ) {
         return <div>Loading...</div>;
     }
 
-    console.log("HERE COME THE BIG AN IMPORTANT CHILDREN BABY")
-    console.log(children)
-
     return (
         <div>
-            <EntityViewer entity={entity} />
+            <EntityViewer entity={entity} children={children} />
         </div>
     )
 }

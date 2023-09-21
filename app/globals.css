@@ -142,3 +142,28 @@ body {
     margin-top: 5px;
 }
 
+/* SmallEntityViewer css */
+.small-entity{
+    background-color: aliceblue;
+    border-top: 2px dashed grey;
+    border-bottom: 2px dotted grey;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.small-entity h3{
+    color: blue;
+    font-size: 1.5em;
+    font-weight: 700;
+    line-height: 1.2em;
+    margin-bottom: 0em;
+    border-bottom: none;
+}
+
+.small-entity h3:hover{
+    text-decoration: underline;
+}
+
+.small-entity h3:visited{
+    color: purple;
+}
