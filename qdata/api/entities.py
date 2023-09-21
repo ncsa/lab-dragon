@@ -118,7 +118,7 @@ def read_all():
     # Create the return dictionary
     ret = [read_child_entity(ROOTPATH)]
 
-    # We replace the parent after we are done going through all identities to make sure that
+    # We replace the parent and children after we are done going through all identities to make sure that
     # the parent is already in the index, there might be edge cases where a lower entity in the tree has a parent
     # somewhere else (probably more important once we start allowing branching)
 
@@ -127,6 +127,12 @@ def read_all():
         path = Path(val.parent)
         if path.is_file():
             val.parent = PATHINDEX[str(path)]
+
+        # Update the children of the parent
+        for child in val.children:
+            path = Path(child)
+            if path.is_file():
+                val.children[val.children.index(child)] = PATHINDEX[str(path)]
 
     return ret
 
@@ -160,6 +166,33 @@ def read_image(ID, imageName):
         return send_file(image)
     else:
         abort(404, f"Image with ID {ID} and name {imageName} not found")
+
+
+def read_comment(ID, commentID):
+    """
+    API function that looks at the comment ID of the entity with ID and returns the comment
+
+    :param ID:
+    :param commentID:
+    :return:
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    ids = [c.ID for c in ent.comments]
+    if commentID not in ids:
+        abort(404, f"Comment with ID {commentID} not found")
+    ind = ids.index(commentID)
+    if ind == -1:
+        abort(404, f"Comment with ID {commentID} not found")
+    comment = ent.comments[ind]
+    content, media_type, author, date = comment.last_comment()
+    if media_type == SupportedCommentType.jpg.value or media_type == SupportedCommentType.png.value:
+        return send_file(content)
+    else:
+        return json.dumps(content), 201
 
 
 def add_comment(ID, comment):

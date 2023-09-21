@@ -55,6 +55,14 @@ components:
       schema:
         type: "string"
 
+    commentID:
+        name: "commentID"
+        description: "ID of the comment to get"
+        in: path
+        required: true
+        schema:
+            type: "string"
+
 paths:
   /entities:
     get:
@@ -106,6 +114,21 @@ paths:
             schema:
               x-body-name: "comment"
               $ref: "#/components/schemas/Comment"
+
+  /entities/{ID}/{commentID}:
+    get:
+      operationId: "entities.read_comment"
+      tags:
+        - Entities
+      summary: "Read the comment with the given ID, mainly used to get entity images"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/commentID"
+      responses:
+        "200":
+          description: "Successfully read comment"
+        "404":
+          description: "Comment not found"
 
   /entities/{ID}/{imageName}:
     get:
