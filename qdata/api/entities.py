@@ -68,33 +68,6 @@ def read_child_entity(entity_path: Path):
     if entity_path not in PATHINDEX:
         PATHINDEX[str(entity_path)] = ent.ID
 
-    # remove_comments = []
-    # add_comments = []
-    # for comment in ent.comments:
-    #     c = Path(comment)
-    #     if c.is_dir():
-    #         remove_comments.append(comment)
-    #         for media_file in c.iterdir():
-    #             if media_file.is_file():
-    #                 if MediaTypes.is_supported(media_file):
-    #                     if ent.ID + '--' + media_file.name not in IMAGEINDEX:
-    #                         IMAGEINDEX[ent.ID + '--' + media_file.name] = media_file
-    #             add_comments.append(media_file.name)
-    #
-    #     elif c.is_file():
-    #         if MediaTypes.is_supported(c):
-    #             if not ent.ID + '--' + c.name in IMAGEINDEX:
-    #                 IMAGEINDEX[ent.ID + '--' + c.name] = c
-    #         remove_comments.append(comment)
-    #         add_comments.append(c.name)
-    #
-    # for comment in remove_comments:
-    #     ent.comments.remove(comment)
-    #
-    # for comment in add_comments:
-    #     ent.comments.append(comment)
-
-
     child_list = []
     if len(ent.children) > 0:
         for child in ent.children:
