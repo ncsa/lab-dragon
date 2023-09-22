@@ -9,7 +9,7 @@ export default function SmallEntityViewer({entity}) {
     return (
         <div className="small-entity">
             <h3 className="entity-tittle">
-                <Link href={BASE_URL + entity.ID}>{entity.name}</Link>
+                <Link className="entiy-tittle" href={BASE_URL + entity.ID}>{entity.name}</Link>
             </h3>
 
             <CommentViewer comments={entity.comments} entID={entity.ID}/>

@@ -167,3 +167,30 @@ body {
 .small-entity h3:visited{
     color: purple;
 }
+
+
+.comment table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+.comment table thead {
+    background-color: #1a202c;
+    color: #fff;
+}
+
+.comment table thead th {
+    padding: 10px;
+    text-align: left;
+}
+
+.comment table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.comment table tbody td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
