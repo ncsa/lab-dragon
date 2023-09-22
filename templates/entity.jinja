@@ -27,7 +27,8 @@ from typing import List, Tuple, Dict, Optional, Union
 {% endfor %}
 
 from qdata.utils import create_timestamp
-from qdata.components.comment import Comment, SupportedCommentType
+from qdata.components import Comment, SupportedCommentType, Table
+
 
 
 class {{class_name}}({{ inherits_from }}):
@@ -151,7 +152,7 @@ class {{class_name}}({{ inherits_from }}):
             self.children = []
         self.children.append(child)
 
-    def add_comment(self, comment: Union[str, Comment, List[Comment], List[str]], user: Optional[str] = None) -> None:
+    def add_comment(self, comment: Union[str, Comment, Table, List[Table], List[Comment], List[str]], user: Optional[str] = None) -> None:
         """
         Add a comment to the entity. If a directory is passed, this function will go through the directory and add a
         comment to every supported file in it in alphabetical order. It will **NOT** go through subdirectories.
@@ -200,7 +201,9 @@ class {{class_name}}({{ inherits_from }}):
                 # Comment may be too long to convert to path
                 except OSError:
                     self.comments.append(Comment(comment, user))
+            elif isinstance(comment, Table):
+                self.comments.append(Comment(comment, user))
             else:
-                raise TypeError(f"Comment must be a string or a Comment object, not {type(comment)}")
+                raise TypeError(f"Comment must be a string, Table object, or a Comment object, not {type(comment)}")
 
     {% endif %}

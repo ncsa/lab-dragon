@@ -63,11 +63,11 @@ class EntityRenderer:
         """
 
         key, val = None, None
-        text, com_type, user, date = comment.last_comment()
+        content, com_type, user, date = comment.last_comment()
 
         # For markdown bring the value of the md as string directly.
         if SupportedCommentType(com_type) == SupportedCommentType.md:
-            md_path = Path(text)
+            md_path = Path(content)
             with open(md_path, 'r') as f:
                 md = f.read()
                 key = md_path.stem
@@ -75,12 +75,12 @@ class EntityRenderer:
 
         # For string, key and val are equal
         elif SupportedCommentType(com_type) == SupportedCommentType.string:
-            key = text
-            val = text
+            key = content
+            val = content
 
         # For any image type, we want to format the string for md to load the image.
         elif SupportedCommentType(com_type) == SupportedCommentType.jpg or SupportedCommentType(com_type) == SupportedCommentType.png:
-            pic_path = Path(text)
+            pic_path = Path(content)
             name = pic_path.stem.replace("_", " ")
             if cls.image_path is None:
                 key = pic_path.stem
@@ -92,19 +92,9 @@ class EntityRenderer:
                 key = pic_path.stem
                 val = f"![{name}](/images/{pic_path.name})"
 
-        # For a directory, we assume that all the files inside it are images or comments that should be formatted.
-        elif SupportedCommentType(com_type) == SupportedCommentType.dir:
-            key = []
-            val = []
-            for file in get_all_files(text):
-                new_com = Comment(file, user)
-                k, v = cls.format_comment(new_com)
-                if isinstance(k, list):
-                    key.extend(k)
-                    val.extend(v)
-                else:
-                    key.append(k)
-                    val.append(v)
+        elif SupportedCommentType(com_type) == SupportedCommentType.table:
+            key = ""
+            val = content.to_markdown()
 
         return key, val
 

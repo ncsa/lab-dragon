@@ -1,12 +1,13 @@
 import json
 import uuid
-from datetime import datetime
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
-from typing import Union
-from typing import Tuple
+from datetime import datetime
+from typing import Union, Tuple, List
+
 
 from ..utils import create_timestamp
+from .table import Table
 
 
 class SupportedCommentType(Enum):
@@ -18,16 +19,19 @@ class SupportedCommentType(Enum):
     string = 2
     jpg = 4
     png = 5
+    table = 6
 
     @classmethod
     def classify(cls, item: Union[Path, str]) -> int:
         """
-        Classifies the comment type based on the extension of the file. For a directory to be recognized, this needs to
-        be absolute and should actually exist wherever the notebook is being run.
+        Classifies the comment type based on the extension of the file.
 
         :param item: The text of the comment we are classifying.
         :return: The numerical value representing the comment type of the enum,
         """
+
+        if isinstance(item, Table):
+            return SupportedCommentType.table.value
 
         # If the item is not a path, check if it's longer than 256 characters.
         # If it is, it is a string.
@@ -72,16 +76,21 @@ class Comment:
     :param content: The content of the comment. This can be a string or a path.
     :param user: The user that created the comment.
     """
-    def __init__(self, content: Union[str, Path], user: str, **kwargs):
+    def __init__(self, content: Union[List[Union[str, Path, Table]], Union[str, Path, Table]], user: str, **kwargs):
         if len(kwargs) != 0:
             self.ID = kwargs['ID']
             self.user = user
             self.created = kwargs['created']
             self.deleted = kwargs['deleted']
-            self.content = content
             self.dates = kwargs['dates']
             self.authors = kwargs['authors']
             self.com_type = kwargs['com_type']
+            self.content = content
+            # If the text is a dictionary, convert it into a table object
+            table_indices = [index for index, value in enumerate(self.com_type) if value == 6]
+            if len(table_indices) != 0:
+                for i in table_indices:
+                    self.content[i] = Table(**content[i])
 
         else:
             self.ID = str(uuid.uuid4())
@@ -89,12 +98,12 @@ class Comment:
             time = create_timestamp()
             self.created = time
             self.deleted = False
-            self.content = [str(content)]
+            self.content = [content if isinstance(content, Table) else str(content)]
             self.dates = [time]
             self.authors = [user]
             self.com_type = [SupportedCommentType.classify(content)]
 
-    def modify(self, content: Union[str, Path], user: str) -> None:
+    def modify(self, content: Union[str, Path, Table], user: str) -> None:
         """
         Modify the comment. This will append the new comment to the list of comments and update the timestamp.
         Passing the user is required.

@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Union, Optional
 
+from qdata.components.table import Table
 from qdata.generators.meta import generate_all_classes
 from qdata.generators.jupyterbook import generate_book
 
@@ -56,20 +57,24 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
     top_project_path = Path(path, "Testing Project.toml")
     to_be_created.append((top_project, top_project_path))
 
+    testing_table_panda = Table(panda_types=["cute", "fuzzy", "black and white"], panda_colors=["black", "white", "purple"], panda_size=["small", "medium", "large"])
+
     panda_project = Project(name="Testing Pandas",
                             description="This is the pandas project.",
                             user='testUser',
                             parent=top_project_path,
-                            comments=['This project is about pandas, we will get a panda online a qualify the panda']
+                            comments=['This project is about pandas, we will get a panda online a qualify the panda', testing_table_panda]
                             )
     panda_project_path = Path(path, "Testing Pandas.toml")
     to_be_created.append((panda_project, panda_project_path))
+
+    testing_table_koala = Table(koala_types=["cute", "chubby", "creepy"], koala_colors=["black", "white", "purple"], koala_size=["small", "medium", "large"])
 
     koala_project = Project(name="Testing Koalas",
                             description="This is the koalas project.",
                             user='testUser',
                             parent=top_project_path,
-                            comments=['This project is about koalas, we will get a koala online a qualify the koala']
+                            comments=['This project is about koalas, we will get a koala online a qualify the koala', testing_table_koala]
                             )
     koala_project_path = Path(path, "Testing Koalas.toml")
     to_be_created.append((koala_project, koala_project_path))
