@@ -1,7 +1,7 @@
 import time
 
 from qdata.utils import create_timestamp
-from qdata.components.comment import Comment, SupportedCommentType
+from qdata.components import Comment, SupportedCommentType, Table
 
 user = 'test_user'
 user2 = 'test_user2'
@@ -94,13 +94,6 @@ def test_classificator(tmp_path):
     text = "this is a comment that we are doing"
     assert SupportedCommentType.classify(text) == SupportedCommentType.string.value
 
-    # testing a directory
-    text = "my_path/somedirname"
-    d_path = tmp_path.joinpath(text)
-    d_path.mkdir()
-    # I check if the folder exists to classify it as a folder so I need to pass the absolute path of the folder.
-    assert SupportedCommentType.classify(str(d_path)) == SupportedCommentType.dir.value
-
     # testing a jpg file
     text = "my_path/somefilename.jpg"
     f_path = tmp_path.joinpath(text)
@@ -117,7 +110,9 @@ def test_classificator(tmp_path):
     text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     assert SupportedCommentType.classify(text) == SupportedCommentType.string.value
 
-
+    # testing a table
+    content = Table(column1=[1, 2, 3], column2=[4, 5, 6])
+    assert SupportedCommentType.classify(content) == SupportedCommentType.table.value
 
 
 

@@ -18,7 +18,7 @@ name = "str"
 parent = "Union[str, Path]"
 user = "str"
 description = "str"
-comments = "List[Union[Comment, str]]"
+comments = "List[Union[Comment, Table, str]]"
 children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
 

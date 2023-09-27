@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: "Lab Manager API"
+  description: "An API designed to interact with a lab notebook."
+  version: 1.0.0
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Entity:
+      type: "object"
+      required:
+        - ID
+      properties:
+        ID:
+          type: "string"
+        name:
+          type: "string"
+        parent:
+          type: "string"
+        user:
+          type: "string"
+        description:
+          type: "string"
+        comments:
+          type: "array"
+        children:
+          type: "array"
+
+    Comment:
+      type: "object"
+      required:
+        - text
+      properties:
+        text:
+          type: "string"
+          description: "Text of the comment"
+
+
+  parameters:
+    ID:
+      name: "ID"
+      description: "ID of the entity to get"
+      in: path
+      required: true
+      schema:
+        type: "string"
+
+    imageName:
+      name: "imageName"
+      description: "Name of the image to get"
+      in: path
+      required: true
+      schema:
+        type: "string"
+
+    commentID:
+        name: "commentID"
+        description: "ID of the comment to get"
+        in: path
+        required: true
+        schema:
+            type: "string"
+
+paths:
+  /entities:
+    get:
+      operationId: "entities.read_all"
+      tags:
+        - Entities
+      summary: "Creates the complete structure of the whole lab notebook."
+      responses:
+        "200":
+          description: "Successfully created lab entries"
+
+  /entities/{ID}:
+    get:
+      operationId: "entities.read_one"
+      tags:
+        - Entities
+      summary: "Read the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - in: query
+          name: "name_only"
+          schema:
+            type: "boolean"
+          description: "If true, only the name of the entity is returned"
+
+      responses:
+        "200":
+            description: "Successfully read entity"
+        "404":
+            description: "Entity not found"
+
+    put:
+      operationId: "entities.add_comment"
+      tags:
+        - Entities
+      summary: "Add a comment to the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+            description: "Successfully added comment"
+        "404":
+            description: "Entity not found"
+      requestBody:
+        description: "Comment to add"
+        required: true
+        content:
+          application/json:
+            schema:
+              x-body-name: "comment"
+              $ref: "#/components/schemas/Comment"
+
+  /entities/{ID}/{commentID}:
+    get:
+      operationId: "entities.read_comment"
+      tags:
+        - Entities
+      summary: "Read the comment with the given ID, mainly used to get entity images"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/commentID"
+      responses:
+        "200":
+          description: "Successfully read comment"
+        "404":
+          description: "Comment not found"
+
+  /entities/{ID}/{imageName}:
+    get:
+      operationId: "entities.read_image"
+      tags:
+        - Entities
+      summary: "Returns the image of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/imageName"
+      responses:
+        "200":
+            description: "Successfully read entity image"
+        "404":
+            description: "Image not found"
+
+  /testing:
+    get:
+      operationId: "entities.get_indices"
+      tags:
+        - Testing
+      summary: "Returns all indices for testing purposes"
+      responses:
+        "200":
+          description: "Call used exclusively for testing purposes. Returns all indices so they can be inspected"
+
+
