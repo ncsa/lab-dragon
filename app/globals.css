@@ -139,12 +139,11 @@ body {
     text-align: center;
     white-space: nowrap;
     margin-top: 5px;
-    margin-top: 5px;
 }
 
 /* SmallEntityViewer css */
 .small-entity{
-    background-color: aliceblue;
+    background-color: lightgrey;
     border-top: 2px dashed grey;
     border-bottom: 2px dotted grey;
     margin-bottom: 5px;
@@ -152,11 +151,12 @@ body {
 }
 
 .small-entity h3{
-    color: blue;
-    font-size: 1.5em;
+    /*color: blue;*/
+    text-decoration: none;
+    font-size: 1.1em;
     font-weight: 700;
     line-height: 1.2em;
-    margin-bottom: 0em;
+    margin-bottom: 0;
     border-bottom: none;
 }
 
