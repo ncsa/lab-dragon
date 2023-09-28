@@ -94,6 +94,35 @@ body {
     width: 1.7em;
 }
 
+.sidebar button{
+    position: sticky;
+    bottom: 20px;
+    left: 25%;
+    right: 25%;
+    background-color: #b5270e; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    z-index: 1000; 
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.sidebar button:hover{
+    background-color: #8a1c09;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.sidebar button:active{
+    transform: scale(0.95);
+    border: 2px solid #ccc;
+}
+
 .entity-tittle{
     font-size: 4.2em;
     font-weight: 700;
