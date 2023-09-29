@@ -16,8 +16,7 @@ export async function getEntityName(id) {
         throw new Error(response.statusText)
     }
 
-    const data = await response.json()
-    return data
+    return await response.json()
 }
 
 export default function EntityViewer({ entity, children}) {
@@ -70,7 +69,7 @@ export default function EntityViewer({ entity, children}) {
 
             <h2 className="entity-footer">
                 <p><b><u>CONTINUE</u></b></p>
-                { entity.children && entity.children.map((child, index) => <p key={index}><Link className="entity-link" href={ BASE_URL + child }> {childrenNames ? childrenNames[index] : ''} </Link></p>)}
+                { entity.children && entity.children.map((child, index) => <p key={child.ID}><Link className="entity-link" href={ BASE_URL + child }> {childrenNames ? childrenNames[index] : ''} </Link></p>)}
             </h2>
         </div>
     )

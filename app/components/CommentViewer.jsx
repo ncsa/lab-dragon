@@ -7,7 +7,7 @@ export default function CommentViewer({comments, entID}) {
     return (
         <div>
             { Object.keys(comments).map((key) => {
-                return (<Comment comment={comments[key]} entID={entID} />)
+                return (<Comment key={comments[key].ID} comment={comments[key]} entID={entID} />)
             })}
         </div>
     )
