@@ -34,7 +34,8 @@ export default function EntityInput({closeFunction, populateSideBar}) {
     const [parentsOptions, setParentsOptions] = useState([]);
 
     // Figure out what the default parent should be
-    const currentPathSliced = usePathname().slice(-36);
+    const currentPath = usePathname();
+    const currentPathSliced = currentPath.slice(-36);
     const defaultParent = isUUID(currentPathSliced) ? currentPathSliced : "";
 
     // Variables holding the form values
@@ -46,13 +47,17 @@ export default function EntityInput({closeFunction, populateSideBar}) {
 
     useEffect(() => {
         getUsers().then(data => {
-            setUserOptions(JSON.parse(data));
+            const parsed = JSON.parse(data);
+            setUserOptions(parsed);
+            setUser(parsed[0])
         });
     }, []);
 
     useEffect(() => {
         getTypes().then(data => {
-            setTypesOptions(JSON.parse(data));
+            const parsed = JSON.parse(data);
+            setTypesOptions(parsed);
+            setType(parsed[0])
         });
     }, []); 
 
@@ -64,15 +69,11 @@ export default function EntityInput({closeFunction, populateSideBar}) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("I have got the following event")
-        console.log(e)
         setIsLoading(true);
 
         const newEntity = {
             name, user, type, parent
         }
-        console.log("I am about to send the following entity")
-        console.log(newEntity)
         const response = await fetch(BASE_API + "entities", {
             method: "POST",
             headers: {
@@ -86,13 +87,12 @@ export default function EntityInput({closeFunction, populateSideBar}) {
             router.refresh();
             closeFunction();
         } else if (response.status === 400) {
-            alert("Invalid entity");
+            response.text().then(text => alert(`Something went wrong: ${JSON.parse(text)['detail']}`));
             closeFunction();
         } else {
             alert("Something went wrong");
             closeFunction();
         }
-
     }
 
     return (
