@@ -107,7 +107,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     found_pandas_step = Step(name="Found Pandas",
                              description="I have found a lot of panda images here are a few that I found",
-                             user='testUser',
+                             user='testUser2',
                              comments=[str(self_path.parent.joinpath("testing_images", "pandas"))],
                              parent=get_panda_path, )
     found_pandas_path = Path(path, "Found Pandas.toml")
@@ -117,7 +117,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     choose_panda_step = Step(name="Choose Panda",
                              description="I am going to choose a panda to use for my project",
-                             user='testUser',
+                             user='testUser2',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
                                  str(self_path.parent.joinpath("testing_images", "pandas", "Giant_panda.jpg"))],
@@ -129,7 +129,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     name_panda_step = Step(name="Named The Panda",
                            description="you can't have a panda with no name",
-                           user='testUser',
+                           user='testUser2',
                            parent=panda_project_path,
                            comments=["The panda will be named Homer"]
                            )
@@ -140,7 +140,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     get_koala_task = Task(name="Get Koala",
                           description="Task representing a look for information about Koalas",
-                          user='testUser',
+                          user='testUser3',
                           comments=['I wonder what Koalas images I can find online',
                                     "we want to find Koalas because they are very cute"],
                           parent=koala_project_path,
@@ -163,7 +163,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     found_koalas_step = Step(name="Found Koalas",
                              description="I have found a lot of koala images here are a few that I found",
-                             user='testUser',
+                             user='testUser3',
                              comments=[str(self_path.parent.joinpath("testing_images", "koalas"))],
                              parent=get_koala_path, )
     found_koalas_path = Path(path, "Found Koalas.toml")
@@ -173,7 +173,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     choose_koala_step = Step(name="Choose Koala",
                              description="I am going to choose a koala to use for my project",
-                             user='testUser',
+                             user='testUser3',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
                                  str(self_path.parent.joinpath("testing_images", "koalas", "creepy_koala.jpg"))],
@@ -185,7 +185,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     name_koala_step = Step(name="Named The Koala",
                            description="you can't have a koala with no name",
-                           user='testUser',
+                           user='testUser3',
                            parent=koala_project_path,
                            comments=["The koala will be named Bart"]
                            )

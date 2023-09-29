@@ -74,6 +74,34 @@ paths:
         "200":
           description: "Successfully created lab entries"
 
+    post:
+      summary: "Adds a new entity to the lab notebook"
+      operationId: "entities.add_entity"
+      tags:
+        - Entities
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                  user:
+                    type: "string"
+                  type:
+                    type: "string"
+                  parent:
+                    type: "string"
+
+      responses:
+        "200":
+          description: "Successfully added entity"
+        "400":
+          description: "Invalid entity"
+        "404":
+          description: "Parent not found"
+
   /entities/{ID}:
     get:
       operationId: "entities.read_one"
@@ -144,6 +172,36 @@ paths:
             description: "Successfully read entity image"
         "404":
             description: "Image not found"
+
+  /properties/users:
+    get:
+      operationId: "entities.get_users"
+      tags:
+        - Properties
+      summary: "Returns all users present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read users"
+
+  /properties/types:
+    get:
+      operationId: "entities.get_types"
+      tags:
+        - Properties
+      summary: "Returns all types present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read types"
+
+  /properties/parents:
+    get:
+      operationId: "entities.get_possible_parents"
+      tags:
+        - Properties
+      summary: "Returns all the possible parents in the notebook"
+      responses:
+        "200":
+          description: "Successfully read parents"
 
   /testing:
     get:

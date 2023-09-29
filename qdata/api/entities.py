@@ -1,11 +1,14 @@
 import json
-from enum import Enum, auto
+import copy
 from pathlib import Path
+from typing import Optional
+from enum import Enum, auto
 
 from flask import abort, make_response, send_file
 
 from qdata.modules.task import Task
 from qdata.modules.step import Step
+from qdata.modules.entity import Entity
 from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
@@ -13,12 +16,21 @@ from qdata.components.comment import SupportedCommentType, Comment
 
 ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 
+# List of classes that can contain children. Only Project and Task can contain children for now.
+PARENT_TYPES = ["Project", "Task"]
+ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+# Holds all of the entity types that exists in the notebook
+ENTITY_TYPES = set()
+
 INDEX = {}
 
 PATHINDEX = {}
 
 # Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
 IMAGEINDEX = {}
+
+# Holds all of the users that exists in the notebook
+USERS = set()
 
 
 def get_indices():
@@ -28,6 +40,30 @@ def get_indices():
 
     ret = {'index': index, 'imageindex': imageindex, 'pathindex': PATHINDEX}
     return ret
+
+
+def create_path_entity_copy(ent: Entity, index: Optional[dict] = None) -> Entity:
+    """
+    Returns a copy of the passed entity with any mention to a UUID replaced with the paths of the TOML files for that
+    entity. This is used to convert from working with paths to working with UUID
+
+    :param ent: The entity you want a copy with the UUIDs replaced with paths :param index: A reverse of the
+     PATHINDEX dictionary. This is used to convert from UUID to paths If not passed, it will be created on demand. The
+     intention of having it optional is to avoid having to compute it every time this function is called if this
+     function gets called multiple times for a single operation. :return:
+    """
+    if index is None:
+        index = {value: key for key, value in PATHINDEX.items()}
+
+    copy_ent = copy.deepcopy(ent)
+    if ent.parent in index:
+        copy_ent.parent = index[ent.parent]
+
+    children_paths = []
+    for child in copy_ent.children:
+        children_paths.append(index[child])
+    copy_ent.children = children_paths
+    return copy_ent
 
 
 class MediaTypes(Enum):
@@ -67,6 +103,12 @@ def read_child_entity(entity_path: Path):
 
     if entity_path not in PATHINDEX:
         PATHINDEX[str(entity_path)] = ent.ID
+
+    # Add the user to the user index
+    USERS.add(ent.user)
+
+    # Add the entity type to the entity type index
+    ENTITY_TYPES.add(ent.__class__.__name__)
 
     child_list = []
     if len(ent.children) > 0:
@@ -185,3 +227,75 @@ def add_comment(ID, comment):
     return make_response("Comment added", 201)
 
 
+def add_entity(**kwargs):
+    """
+    Creates an entity through the API call. It will add the entity to the parent and create the new TOML file
+     immediately.
+
+    :param kwargs: Dictionary with a single item with key 'body' and value a dictionary with the keys:
+        * name: Name of the entity
+        * type: Type of the entity
+        * parent: ID of the parent entity
+        * user: User that created the entity
+    """
+    body = kwargs['body']
+    if "name" not in body or body['name'] == "":
+        abort(400, "Name of entity is required")
+    if "type" not in body or body['type'] == "":
+        abort(400, "Type of entity is required")
+    if "parent" not in body or body['parent'] == "":
+        abort(400, "Parent of entity is required")
+    if "user" not in body or body['user'] == "":
+        abort(400, "User of entity is required")
+
+    swapped_path_index = {value: key for key, value in PATHINDEX.items()}
+
+    cls = ALL_TYPES[body['type']]
+    ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
+    parent = INDEX[body['parent']]
+    # Because the children do not have a path yet, you need to make a path copy before adding the child
+    parent_copy = create_path_entity_copy(parent, swapped_path_index)
+
+    # Add the child ID to the parent entity in memory.
+    parent.children.append(ent.ID)
+
+    INDEX[ent.ID] = ent
+
+    # Create copy of the entity with paths to create the TOML file.
+    ent_copy = create_path_entity_copy(ent, swapped_path_index)
+
+    parent_path = Path(swapped_path_index[parent.ID])
+    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
+    parent_copy.add_child(ent_path)
+    parent_copy.to_TOML(parent_path)
+    ent_copy.to_TOML(ent_path)
+
+    return make_response("Entity added", 201)
+
+
+def get_users():
+    """
+    API function that returns the list of users
+    :return: json representation of a list of all the users in the system.
+    """
+    return json.dumps(list(USERS)), 201
+
+
+def get_types():
+    return json.dumps(list(ENTITY_TYPES)), 201
+
+
+def get_possible_parents():
+    """
+    API function that returns a dictionary of all the entities
+    that can have children with the keys being the ID of the entity and the value its name.
+    This is used for the select item to display all the possible parents for new entities.
+    :return: json representation of a list of all the possible parents for a given entity
+    """
+    ret = {}
+    for k, v in INDEX.items():
+        if v.__class__.__name__ in PARENT_TYPES:
+            ret[k] = v.name
+    return json.dumps(ret), 201
+
+read_all()
