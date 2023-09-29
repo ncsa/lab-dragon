@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import EntityViewer from "@/app/components/EntityViewer";
+import CommentCreator from "@/app/components/CommentCreator";
 
 export const BASE_API = "http://localhost:8000/api/";
 
@@ -25,10 +26,14 @@ export default function Entities( {params} ) {
     const [entity, setEntity] = useState(null);
     const [children, setChildren] = useState(null);
 
-    useEffect(() => {
+    function reloadEntity() {
         getEntity(id).then(data => {
             setEntity(parseEntity(data));
         });
+    }
+
+    useEffect(() => {
+        reloadEntity();
     }, [id]);
 
     useEffect(() => {
@@ -45,6 +50,8 @@ export default function Entities( {params} ) {
     return (
         <div>
             <EntityViewer entity={entity} children={children} />
+        
+            <CommentCreator entID={entity.ID} reloader={reloadEntity}/>
         </div>
     )
 }

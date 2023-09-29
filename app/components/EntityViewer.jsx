@@ -65,12 +65,6 @@ export default function EntityViewer({ entity, children}) {
 
                 }
             </div>
-
-
-            <h2 className="entity-footer">
-                <p><b><u>CONTINUE</u></b></p>
-                { entity.children && entity.children.map((child, index) => <p key={child.ID}><Link className="entity-link" href={ BASE_URL + child }> {childrenNames ? childrenNames[index] : ''} </Link></p>)}
-            </h2>
         </div>
     )
 }
