@@ -252,6 +252,17 @@ button:active{
     display: inline-block;
 }
 
+.entity-popup form input{
+    border: 1px solid black;
+}
+
+.entity-popup form input:hover{
+    outline: 2px solid cornflowerblue;
+}
+
+.entity-popup form select:hover{
+    outline: 2px solid cornflowerblue;
+}
 
 /* add comment section */
 
@@ -267,6 +278,10 @@ button:active{
     height: 100px;
     resize: both;
     border: 2px solid black;
+}
+
+.CommentCreator textarea:hover{
+    outline: 2px solid cornflowerblue;
 }
 
 .CommentCreator button {
