@@ -19,7 +19,7 @@ export async function getEntityName(id) {
     return await response.json()
 }
 
-export default function EntityViewer({ entity, children}) {
+export default function EntityViewer({ entity, displayChildren }) {
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
     let combinedArray = null;
@@ -38,8 +38,8 @@ export default function EntityViewer({ entity, children}) {
         }
     }, [entity.parent, entity.children]);
 
-    if (entity !== null && children !== null) {
-        combinedArray = [...entity.comments, ...children];
+    if (entity !== null && displayChildren !== null) {
+        combinedArray = [...entity.comments, ...displayChildren];
         combinedArray.sort((a, b) => {
             const timeA = a.created ? new Date(a.created) : new Date(a.start_time);
             const timeB = b.created ? new Date(b.created) : new Date(b.start_time);

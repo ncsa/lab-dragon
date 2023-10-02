@@ -49,9 +49,12 @@ export default function Entities( {params} ) {
 
     return (
         <div>
-            <EntityViewer entity={entity} children={children} />
-        
+            <div>
+            <EntityViewer entity={entity} displayChildren={children} />
+            </div>
+            <div>
             <CommentCreator entID={entity.ID} reloader={reloadEntity}/>
+            </div>
         </div>
     )
 }

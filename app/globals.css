@@ -243,7 +243,7 @@ button:active{
 }
 
 .entity-popup .content{
-    background-color: turquoise;
+    background-color: white;
     display: inline-block;
     z-index: 1;
 }
