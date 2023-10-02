@@ -31,9 +31,9 @@ components:
     Comment:
       type: "object"
       required:
-        - text
+        - content
       properties:
-        text:
+        content:
           type: "string"
           description: "Text of the comment"
 
@@ -126,9 +126,15 @@ paths:
       operationId: "entities.add_comment"
       tags:
         - Entities
+        - Comments
       summary: "Add a comment to the entity with the given ID"
       parameters:
         - $ref: "#/components/parameters/ID"
+        - in: query
+          name: "username"
+          schema:
+            type: "string"
+          description: "Username of the user adding the comment, if left empty the user of the entity is used"
       responses:
         "200":
             description: "Successfully added comment"
@@ -148,6 +154,7 @@ paths:
       operationId: "entities.read_comment"
       tags:
         - Entities
+        - Comments
       summary: "Read the comment with the given ID, mainly used to get entity images"
       parameters:
         - $ref: "#/components/parameters/ID"

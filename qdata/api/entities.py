@@ -24,7 +24,10 @@ ENTITY_TYPES = set()
 
 INDEX = {}
 
-PATHINDEX = {}
+# Holds as keys the paths to the TOML files and as values the UUID of the entity
+PATH_TO_UUID_INDEX = {}
+# Holds as keys the UUIDs of entities and as values the path to the TOML files
+UUID_TO_PATH_INDEX = {}
 
 # Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
 IMAGEINDEX = {}
@@ -38,30 +41,27 @@ def get_indices():
     index = json.dumps(str(INDEX))
     imageindex = json.dumps(str(IMAGEINDEX))
 
-    ret = {'index': index, 'imageindex': imageindex, 'pathindex': PATHINDEX}
+    ret = {'index': index, 'imageindex': imageindex, 'PATH_TO_UUID_INDEX': PATH_TO_UUID_INDEX}
     return ret
 
 
-def create_path_entity_copy(ent: Entity, index: Optional[dict] = None) -> Entity:
+def create_path_entity_copy(ent: Entity) -> Entity:
     """
     Returns a copy of the passed entity with any mention to a UUID replaced with the paths of the TOML files for that
     entity. This is used to convert from working with paths to working with UUID
 
     :param ent: The entity you want a copy with the UUIDs replaced with paths :param index: A reverse of the
-     PATHINDEX dictionary. This is used to convert from UUID to paths If not passed, it will be created on demand. The
+     PATH_TO_UUID_INDEX dictionary. This is used to convert from UUID to paths If not passed, it will be created on demand. The
      intention of having it optional is to avoid having to compute it every time this function is called if this
      function gets called multiple times for a single operation. :return:
     """
-    if index is None:
-        index = {value: key for key, value in PATHINDEX.items()}
-
     copy_ent = copy.deepcopy(ent)
-    if ent.parent in index:
-        copy_ent.parent = index[ent.parent]
+    if ent.parent in UUID_TO_PATH_INDEX:
+        copy_ent.parent = UUID_TO_PATH_INDEX[ent.parent]
 
     children_paths = []
     for child in copy_ent.children:
-        children_paths.append(index[child])
+        children_paths.append(UUID_TO_PATH_INDEX[child])
     copy_ent.children = children_paths
     return copy_ent
 
@@ -86,11 +86,11 @@ class MediaTypes(Enum):
 def _reset_indices():
     global INDEX
     global IMAGEINDEX
-    global PATHINDEX
+    global PATH_TO_UUID_INDEX
 
     INDEX = {}
     IMAGEINDEX = {}
-    PATHINDEX = {}
+    PATH_TO_UUID_INDEX = {}
 
 
 # TODO: This reshuffling of comments is breaking the order in which comments are displayed in the UI.
@@ -101,8 +101,11 @@ def read_child_entity(entity_path: Path):
     if ent.ID not in INDEX:
         INDEX[ent.ID] = ent
 
-    if entity_path not in PATHINDEX:
-        PATHINDEX[str(entity_path)] = ent.ID
+    if entity_path not in PATH_TO_UUID_INDEX:
+        PATH_TO_UUID_INDEX[str(entity_path)] = ent.ID
+
+    if ent.ID not in UUID_TO_PATH_INDEX:
+        UUID_TO_PATH_INDEX[ent.ID] = str(entity_path)
 
     # Add the user to the user index
     USERS.add(ent.user)
@@ -141,13 +144,13 @@ def read_all():
     for key, val in INDEX.items():
         path = Path(val.parent)
         if path.is_file():
-            val.parent = PATHINDEX[str(path)]
+            val.parent = PATH_TO_UUID_INDEX[str(path)]
 
         # Update the children of the parent
         for child in val.children:
             path = Path(child)
             if path.is_file():
-                val.children[val.children.index(child)] = PATHINDEX[str(path)]
+                val.children[val.children.index(child)] = PATH_TO_UUID_INDEX[str(path)]
 
     return ret
 
@@ -210,20 +213,30 @@ def read_comment(ID, commentID):
         return json.dumps(content), 201
 
 
-def add_comment(ID, comment):
+def add_comment(ID, comment, username: Optional[str] = None):
+    """
+    Adds a comment to the indicated entity. It does not handle images or tables yet.
+
+    :param ID: The id of the entity the comment should be added to. :param comment: The text of the comment itself.
+    :param username: Optional argument. If passed, the author of the comment will be that username instead of the
+     user of the entity.
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
 
     ent = INDEX[ID]
-    ent.comments.append(comment['text'])
-    path = None
-    for key, val in PATHINDEX.items():
-        if val == ID:
-            path = key
-            break
+    if username is None:
+        username = ent.user
+    content = comment['content']
 
-    if path is None:
-        return abort(404, f"Could not find the original location of entity")
+    ent.add_comment(content, username)
 
-    ent.to_TOML(path)
+    # After adding the comment update the file location
+    ent_path = Path(UUID_TO_PATH_INDEX[ID])
+    copy_ent = create_path_entity_copy(ent)
+    copy_ent.to_TOML(ent_path)
+
     return make_response("Comment added", 201)
 
 
@@ -248,13 +261,11 @@ def add_entity(**kwargs):
     if "user" not in body or body['user'] == "":
         abort(400, "User of entity is required")
 
-    swapped_path_index = {value: key for key, value in PATHINDEX.items()}
-
     cls = ALL_TYPES[body['type']]
     ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
     parent = INDEX[body['parent']]
     # Because the children do not have a path yet, you need to make a path copy before adding the child
-    parent_copy = create_path_entity_copy(parent, swapped_path_index)
+    parent_copy = create_path_entity_copy(parent)
 
     # Add the child ID to the parent entity in memory.
     parent.children.append(ent.ID)
@@ -262,9 +273,9 @@ def add_entity(**kwargs):
     INDEX[ent.ID] = ent
 
     # Create copy of the entity with paths to create the TOML file.
-    ent_copy = create_path_entity_copy(ent, swapped_path_index)
+    ent_copy = create_path_entity_copy(ent)
 
-    parent_path = Path(swapped_path_index[parent.ID])
+    parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
     ent_path = parent_path.parent.joinpath(ent.name + '.toml')
     parent_copy.add_child(ent_path)
     parent_copy.to_TOML(parent_path)
