@@ -1,7 +1,7 @@
 import json
 import copy
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 from enum import Enum, auto
 
 from flask import abort, make_response, send_file
@@ -93,25 +93,35 @@ def _reset_indices():
     PATH_TO_UUID_INDEX = {}
 
 
-# TODO: This reshuffling of comments is breaking the order in which comments are displayed in the UI.
-#  Order should be maintained even when expanding folders.
+def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
+    """
+    Adds an entity to all the necessary memory indices.
+
+    :param entity: The entity which is being added to the index.
+    :param entity_path: The path on disk to the TOML file that contains the entity.
+    """
+
+    if entity.ID not in INDEX:
+        INDEX[entity.ID] = entity
+
+    if entity_path not in PATH_TO_UUID_INDEX:
+        PATH_TO_UUID_INDEX[str(entity_path)] = entity.ID
+
+    if entity.ID not in UUID_TO_PATH_INDEX:
+        UUID_TO_PATH_INDEX[entity.ID] = str(entity_path)
+
+    # Add the user to the user index
+    USERS.add(entity.user)
+
+    # Add the entity type to the entity type index
+    ENTITY_TYPES.add(entity.__class__.__name__)
+
+
 def read_child_entity(entity_path: Path):
 
     ent = read_from_TOML(entity_path)
-    if ent.ID not in INDEX:
-        INDEX[ent.ID] = ent
 
-    if entity_path not in PATH_TO_UUID_INDEX:
-        PATH_TO_UUID_INDEX[str(entity_path)] = ent.ID
-
-    if ent.ID not in UUID_TO_PATH_INDEX:
-        UUID_TO_PATH_INDEX[ent.ID] = str(entity_path)
-
-    # Add the user to the user index
-    USERS.add(ent.user)
-
-    # Add the entity type to the entity type index
-    ENTITY_TYPES.add(ent.__class__.__name__)
+    add_ent_to_index(ent, entity_path)
 
     child_list = []
     if len(ent.children) > 0:
@@ -264,19 +274,20 @@ def add_entity(**kwargs):
     cls = ALL_TYPES[body['type']]
     ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
     parent = INDEX[body['parent']]
+    parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
+    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
+
     # Because the children do not have a path yet, you need to make a path copy before adding the child
     parent_copy = create_path_entity_copy(parent)
+
+    add_ent_to_index(ent, ent_path)
 
     # Add the child ID to the parent entity in memory.
     parent.children.append(ent.ID)
 
-    INDEX[ent.ID] = ent
-
     # Create copy of the entity with paths to create the TOML file.
     ent_copy = create_path_entity_copy(ent)
 
-    parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
-    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
     parent_copy.add_child(ent_path)
     parent_copy.to_TOML(parent_path)
     ent_copy.to_TOML(ent_path)
