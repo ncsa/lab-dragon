@@ -63,15 +63,11 @@ button:active{
 
 .sidebar-item{
     padding: 0.5em;
-    /*font-size: 1.2em;*/
     display: block;
     border-radius: 5px;
-    /*This will let the hover effect have a slight animation. Probably not needed*/
-    /*transition: background-color 0.1s;*/
 }
 
 .sidebar-item:hover{
-    /*background-color: lightgrey;*/
     background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -149,8 +145,6 @@ button:active{
 
 .entity-link {
     color: blue;
-    /*text-decoration: none;*/
-    /*text-transform: uppercase;*/
 }
 
 .entity-link:hover {
@@ -264,30 +258,30 @@ button:active{
     outline: 2px solid cornflowerblue;
 }
 
-/* add comment section */
+/* add content section */
 
-.CommentCreator {
+.addition-section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     margin: 0.5em;
     border-top: 1px solid #ccc;
 }
 
-.CommentCreator textarea{
+.addition-section textarea{
     width: 100%;
     height: 100px;
     resize: both;
     border: 2px solid black;
 }
 
-.CommentCreator textarea:hover{
+.addition-section textarea:hover{
     outline: 2px solid cornflowerblue;
 }
 
-.CommentCreator button {
+.addition-section button {
     background-color: #b5270e;
 }
 
-.CommentCreator button:hover{
+.addition-section button:hover{
     background-color: #8a1c09;
 }
