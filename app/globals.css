@@ -123,7 +123,7 @@ button:active{
     right: 25%;
 }
 
-.entity-tittle{
+.tittle{
     font-size: 4.2em;
     font-weight: 700;
     padding: 0.5em;
@@ -177,7 +177,7 @@ button:active{
     margin-top: 5px;
 }
 
-.small-entity h3{
+.small-entity .small-entity-tittle h3{
     /*color: blue;*/
     text-decoration: none;
     font-size: 1.1em;
@@ -185,16 +185,41 @@ button:active{
     line-height: 1.2em;
     margin-bottom: 0;
     border-bottom: none;
+    display: inline-flex;
+    align-items: center;
 }
 
-.small-entity h3:hover{
+.small-entity .small-entity-tittle .Link-text:hover{
     text-decoration: underline;
 }
 
-.small-entity h3:visited{
+.small-entity .small-entity-tittle h3:visited{
     color: purple;
 }
 
+.small-entity .small-entity-tittle i{
+    padding-right: 0.5em;
+    padding-left: -10px;
+}
+
+.small-entity .small-entity-tittle .small-entity-options{
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+}
+
+.small-entity .small-entity-tittle .small-entity-options span{
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    border: 1px solid black;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+}
+
+.small-entity .small-entity-tittle .small-entity-options:hover{
+    text-decoration: none;
+}
 
 .comment table {
     width: 100%;

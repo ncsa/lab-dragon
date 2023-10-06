@@ -49,7 +49,7 @@ export default function EntityViewer({ entity, displayChildren }) {
 
     return (
         <div>
-            <h1 className="entity-tittle">{entity.name}</h1>
+            <h1 className="tittle">{entity.name}</h1>
 
             <h2 className="entity-header">
                 { entity.parent && <p><b>Parent</b>: <Link className="entity-link" href={ BASE_URL + entity.parent }> {parentName} </Link></p>}
