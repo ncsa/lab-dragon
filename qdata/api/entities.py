@@ -1,7 +1,7 @@
 import json
 import copy
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 from enum import Enum, auto
 
 from flask import abort, make_response, send_file
@@ -223,11 +223,49 @@ def read_comment(ID, commentID):
         return json.dumps(content), 201
 
 
+def _get_rank_and_num_children(ent: Entity) -> Tuple[int, int]:
+    """
+    Recursive helper function. Returns the rank of the entity and the total number of children it has.
+
+    :param ent: The current entity that we are going over.
+    :return: The number of entities that are child of ent as well as the rank of this entity.
+    """
+    rank = 0
+    num_children = 0
+    for child_id in ent.children:
+        if child_id in INDEX:
+            num_children += 1
+            child = INDEX[child_id]
+            child_rank, child_num_children = _get_rank_and_num_children(child)
+            rank = max(rank, child_rank + 1)
+            num_children += child_num_children
+
+    return rank, num_children
+
+
+def read_entity_info(ID):
+    """
+    For now, this function only figures out the "rank" and the total number of children it has.
+    By "rank" we mean how many levels deep the children go, multiple siblings do not add to this number.
+
+    :param ID:
+    :return:
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    rank, num_children = _get_rank_and_num_children(ent)
+    return make_response(json.dumps({"rank": rank, "num_children": num_children}), 201)
+
+
 def add_comment(ID, comment, username: Optional[str] = None):
     """
     Adds a comment to the indicated entity. It does not handle images or tables yet.
 
-    :param ID: The id of the entity the comment should be added to. :param comment: The text of the comment itself.
+    :param ID: The id of the entity the comment should be added to.
+    :param comment: The text of the comment itself.
     :param username: Optional argument. If passed, the author of the comment will be that username instead of the
      user of the entity.
     """

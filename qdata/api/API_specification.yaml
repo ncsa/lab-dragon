@@ -165,6 +165,21 @@ paths:
         "404":
           description: "Comment not found"
 
+  /entities/{ID}/info:
+    get:
+      operationId: "entities.read_entity_info"
+      tags:
+          - Entities
+          - Info
+      summary: "Returns the rank and number of children this entity has."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
   /entities/{ID}/{imageName}:
     get:
       operationId: "entities.read_image"
