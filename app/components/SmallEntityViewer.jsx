@@ -20,15 +20,46 @@ export async function getInfo(id) {
     return await response.json()
 }
 
+export async function getTree(id) {
+    let response = await fetch(BASE_API+"entities/" + id + "/tree", {
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    return await response.json()
+}
+
+
 export default function SmallEntityViewer({entity}) {
 
     const [numChildren, setNumChildren] = useState(null);
     const [rank, setRank] = useState(null);
+    const [tree, setTree] = useState(null);
+    const [showTree, setShowTree] = useState(false);
+    const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 });
+
+    const handleMouseEnter = (event) => {
+        setShowTree(true);
+        setHintPosition({ x: event.clientX, y: event.clientY });
+    };
+
+    const handleMouseLeave = () => {
+        setShowTree(false);
+    };
+
 
     useEffect(() => {
         getInfo(entity.ID).then(data => {
             setNumChildren(data.num_children);
             setRank(data.rank);
+        });
+    })
+
+    useEffect(() => {
+        getTree(entity.ID).then(data => {
+            setTree(data);
         });
     })
 
@@ -45,11 +76,23 @@ export default function SmallEntityViewer({entity}) {
 
     return (
         <div className={`small-entity ${entity.type}`}>
+            {showTree && <div className="tree" style={{
+                position: 'fixed',
+                top: hintPosition.y,
+                left: hintPosition.x
+            }}>
+                Number of children: {numChildren}, Rank: {rank} <br/>
+                {tree}
+            </div>}
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon}/>
                     <Link className={"Link-text"} href={BASE_URL + entity.ID}>{entity.name}</Link>
-                    <div className="small-entity-options">
+                    <div 
+                        className="small-entity-options"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        >
                         <span>{numChildren}</span>
                         <span>{rank}</span>
                     </div>

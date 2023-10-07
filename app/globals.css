@@ -35,6 +35,7 @@ button{
     margin: 4px 2px;
     cursor: pointer;
     z-index: 1; 
+    border-radius: 10px;
     transition: transform 0.1s, box-shadow 0.1s;
 }
 
@@ -169,12 +170,38 @@ button:active{
 }
 
 /* SmallEntityViewer css */
+
 .small-entity{
     background-color: lightgrey;
-    border-top: 2px dashed grey;
-    border-bottom: 2px dotted grey;
-    margin-bottom: 5px;
+    border-top: 4px dashed grey;
+    border-bottom: 4px dotted grey;
+    margin-bottom: 15px;
     margin-top: 5px;
+}
+
+.small-entity.Project{
+    background-color: lightgrey;
+}
+
+.small-entity.Task{
+    background-color: lightpink;
+}
+
+.small-entity.Step{
+    background-color: lightsalmon;
+}
+
+.small-entity .tree{
+    position: fixed;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    white-space: pre-wrap;
 }
 
 .small-entity .small-entity-tittle h3{
@@ -198,8 +225,9 @@ button:active{
 }
 
 .small-entity .small-entity-tittle i{
+    font-size: 1.7em;
     padding-right: 0.5em;
-    padding-left: -10px;
+    padding-left: 10px;
 }
 
 .small-entity .small-entity-tittle .small-entity-options{
@@ -242,6 +270,10 @@ button:active{
     background-color: #f2f2f2;
 }
 
+.comment table tbody tr:nth-child(odd) {
+    background-color: rgb(254, 223, 192);
+}
+
 .comment table tbody td {
     padding: 10px;
     border: 1px solid #ddd;
@@ -265,10 +297,21 @@ button:active{
     background-color: white;
     display: inline-block;
     z-index: 1;
+    padding: 20px; /* Add extra space around the content */
+    border-radius: 10px; /* Round the corners */
+    box-sizing: border-box;
 }
 
 .entity-popup.form {
     display: inline-block;
+}
+
+.entity-popup h1 {
+    padding-bottom: 10px;
+}
+
+ul > li {
+    margin-bottom: 2px;
 }
 
 .entity-popup form input{
