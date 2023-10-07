@@ -14,7 +14,10 @@ from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 
-ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
+
+
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
 PARENT_TYPES = ["Project", "Task"]
@@ -221,6 +224,79 @@ def read_comment(ID, commentID):
         return send_file(content)
     else:
         return json.dumps(content), 201
+
+
+def generate_tree(ID: str, deepness: int = 7):
+    """
+    Deepness is the number of levels of children that are included in the tree.
+    as well as how many children per level are returning.
+
+    :param ent: The entity to generate the tree from
+    :param deepness: How many items and levels (rank) to include in the tree.
+    """
+    new_node = "├── "
+    last_node = "└── "
+    empty_node = "    "
+    vertical_node = "│   "
+    incomplete_node = "└ ⋯ "
+
+    def populate_tree(ent, deepness, parent_tree, level=0):
+        if level == deepness:
+            return parent_tree
+
+        parent_tree[ent.name] = {}
+        for i, child in enumerate(ent.children):
+            if i == deepness:
+                break
+            populate_tree(INDEX[child], deepness, parent_tree[ent.name], level+1)
+
+        if len(parent_tree[ent.name]) == len(ent.children):
+            parent_tree[ent.name]["__complete__"] = True
+        else:
+            parent_tree[ent.name]["__complete__"] = False
+        return parent_tree
+
+    def make_tree(data, ret_="", fill_indent=0, empty_indent=0):
+        n_keys = len(list(data.keys()))
+        lines = ret_.split("\n")
+
+        # you need to change from fill indent to empty indent in the last row
+        # so that lines that head to nowhere don't appear
+        if len(lines) >= 2 and last_node in lines[-2]:
+            empty_indent += 1
+            fill_indent -= 1
+
+        if fill_indent + empty_indent == 0:
+            keys = list(data.keys())
+            ret_ += keys[0] + "\n"
+            ret_ = make_tree(data[keys[0]], ret_, fill_indent, empty_indent + 1)
+        else:
+            for i, (key, value) in enumerate(data.items()):
+                if key == "__complete__":
+                    if value:
+                        continue
+                    else:
+                        new_addition = empty_node * empty_indent + fill_indent * vertical_node + incomplete_node + "\n"
+                        ret_ += new_addition
+                    continue
+
+                # Deciding what node to use, if last or new one
+                # You need -2 because the complete key is metadata
+                selected_node = new_node
+                if i == n_keys - 2 and data["__complete__"] is True:
+                    selected_node = last_node
+
+                new_addition = empty_node * empty_indent + fill_indent * vertical_node + selected_node + key + "\n"
+                ret_ += new_addition
+                ret_ = make_tree(value, ret_, fill_indent + 1, empty_indent)
+        return ret_
+
+    ent = INDEX[ID]
+
+    tree = {}
+    tree = populate_tree(ent, deepness, tree)
+    ret = make_tree(tree)
+    return make_response(json.dumps(ret), 201)
 
 
 def _get_rank_and_num_children(ent: Entity) -> Tuple[int, int]:

@@ -180,6 +180,21 @@ paths:
         "404":
           description: "Entity not found"
 
+  /entities/{ID}/tree:
+    get:
+      operationId: "entities.generate_tree"
+      tags:
+        - Entities
+        - Info
+      summary: "Returns a tree representation of the children of this entity."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
   /entities/{ID}/{imageName}:
     get:
       operationId: "entities.read_image"
