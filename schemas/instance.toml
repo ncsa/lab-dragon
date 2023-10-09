@@ -11,13 +11,21 @@ inherits_from = "Entity"
 start_time = "str"
 end_time = "str"
 version = "int"
-stored_content = "List[Path]"
+stored_params = "Union[List[Path], List[str]]"
+tags = "List[str]"
+images = "Union[List[Path], List[str]]"
+data = "Union[List[Path], List[str]]"
+data_structure = "Dict[str, Union[Tuple[int], int]]"
 
 [defaults]
 start_time = ""
 end_time = ""
 version = 0
-stored_content = ""
+stored_params = ""
+tags = ""
+images = []
+data = []
+data_structure = {}
 
 [imports]
 Path = "from pathlib import Path"
