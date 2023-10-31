@@ -126,6 +126,9 @@ def read_child_entity(entity_path: Path):
 
     add_ent_to_index(ent, entity_path)
 
+    # Add the user to the user index
+    USERS.add(ent.user)
+
     child_list = []
     if len(ent.children) > 0:
         for child in ent.children:
