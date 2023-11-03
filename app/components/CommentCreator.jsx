@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Tiptap from './editor/Tiptap';
 
 const BASE_API = "http://localhost:8000/api/"
 
@@ -40,12 +41,14 @@ export default function CommentCreator({entID, reloader}) {
         <div className="CommentCreator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
-                <textarea 
+                <Tiptap />
+
+                {/* { <textarea
                     required
                     placeholder="Add a comment or drop an image here..."
                     onChange={e => setContent(e.target.value)}
                     value={content}
-                />
+                /> } */}
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit">Submit</button>}
             </form>
