@@ -3,37 +3,14 @@ import tippy from 'tippy.js'
 
 import MentionList from './MentionList.jsx'
 
+const BASE_API = "http://localhost:8000/api/"
+
 export default {
-  items: ({ query }) => {
-    return [
-      'Lea Thompson',
-      'Cyndi Lauper',
-      'Tom Cruise',
-      'Madonna',
-      'Jerry Hall',
-      'Joan Collins',
-      'Winona Ryder',
-      'Christina Applegate',
-      'Alyssa Milano',
-      'Molly Ringwald',
-      'Ally Sheedy',
-      'Debbie Harry',
-      'Olivia Newton-John',
-      'Elton John',
-      'Michael J. Fox',
-      'Axl Rose',
-      'Emilio Estevez',
-      'Ralph Macchio',
-      'Rob Lowe',
-      'Jennifer Grey',
-      'Mickey Rourke',
-      'John Cusack',
-      'Matthew Broderick',
-      'Justine Bateman',
-      'Lisa Bonet',
-    ]
-      .filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
-      .slice(0, 5)
+  items: async ({ query }) => {
+    const response = await fetch(BASE_API + "testing/fake_mentions");
+    const data = await response.json();
+  
+    return JSON.parse(data);
   },
 
   render: () => {
