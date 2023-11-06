@@ -1,70 +1,83 @@
-import './MentionList.css'
+ import React from "react";
+import "./MentionList.css";
 
-import React, {
-  forwardRef, useEffect, useImperativeHandle,
-  useState,
-} from 'react'
+export class MentionList extends React.Component {
+  constructor(props) {
+    super(props);
 
-export default forwardRef((props, ref) => {
-  const [selectedIndex, setSelectedIndex] = useState(0)
+    this.state = {
+      selectedIndex: 0
+    };
+  }
 
-  const selectItem = index => {
-    const item = props.items[index]
-
-    if (item) {
-      props.command({ id: item })
+  componentDidUpdate(oldProps) {
+    if (this.props.items !== oldProps.items) {
+      this.setState({
+        selectedIndex: 0
+      });
     }
   }
 
-  const upHandler = () => {
-    setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length)
+  onKeyDown({ event }) {
+    if (event.key === "ArrowUp") {
+      this.upHandler();
+      return true;
+    }
+
+    if (event.key === "ArrowDown") {
+      this.downHandler();
+      return true;
+    }
+
+    if (event.key === "Enter") {
+      this.enterHandler();
+      return true;
+    }
+
+    return false;
   }
 
-  const downHandler = () => {
-    setSelectedIndex((selectedIndex + 1) % props.items.length)
+  upHandler() {
+    this.setState({
+      selectedIndex:
+        (this.state.selectedIndex + this.props.items.length - 1) %
+        this.props.items.length
+    });
   }
 
-  const enterHandler = () => {
-    selectItem(selectedIndex)
+  downHandler() {
+    this.setState({
+      selectedIndex: (this.state.selectedIndex + 1) % this.props.items.length
+    });
   }
 
-  useEffect(() => setSelectedIndex(0), [props.items])
+  enterHandler() {
+    this.selectItem(this.state.selectedIndex);
+  }
 
-  useImperativeHandle(ref, () => ({
-    onKeyDown: ({ event }) => {
-      if (event.key === 'ArrowUp') {
-        upHandler()
-        return true
-      }
+  selectItem(index) {
+    const item = this.props.items[index];
 
-      if (event.key === 'ArrowDown') {
-        downHandler()
-        return true
-      }
+    if (item) {
+      this.props.command({ id: item });
+    }
+  }
 
-      if (event.key === 'Enter') {
-        enterHandler()
-        return true
-      }
-
-      return false
-    },
-  }))
-
-  return (
-    <div className="items">
-      {props.items.length
-        ? props.items.map((item, index) => (
+  render() {
+    return (
+      <div className="items">
+        {this.props.items.map((item, index) => (
           <button
-            className={`item ${index === selectedIndex ? 'is-selected' : ''}`}
+            className={`item ${
+              index === this.state.selectedIndex ? "is-selected" : ""
+            }`}
             key={index}
-            onClick={() => selectItem(index)}
+            onClick={() => this.selectItem(index)}
           >
             {item}
           </button>
-        ))
-        : <div className="item">No result</div>
-      }
-    </div>
-  )
-})
+        ))}
+      </div>
+    );
+  }
+}

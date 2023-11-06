@@ -50,7 +50,7 @@ export default function CommentCreator({entID, reloader}) {
                     value={content}
                 /> } */}
                 {isLoading && <p>Loading...</p>}
-                {!isLoading && <button type="submit">Submit</button>}
+                {!isLoading && <button type="submit" className="submitButton">Submit</button>}
             </form>
         </div>
     )

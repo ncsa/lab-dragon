@@ -346,10 +346,10 @@ ul > li {
     outline: 2px solid cornflowerblue;
 }
 
-.addition-section button {
+.addition-section button.submitButton {
     background-color: #b5270e;
 }
 
-.addition-section button:hover{
+.addition-section button.submitButton:hover{
     background-color: #8a1c09;
 }

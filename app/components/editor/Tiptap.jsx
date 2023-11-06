@@ -1,39 +1,152 @@
-'use client'
+"use client"
 
-import './styles.css'
+import React from "react";
+import tippy from "tippy.js";
+import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
+// import CharacterCount from "@tiptap/extension-character-count";
+import Mention from "@tiptap/extension-mention";
+import { MentionList } from "./MentionList";
+import "./styles.css";
+import { PluginKey } from "prosemirror-state";
 
-import Mention from '@tiptap/extension-mention'
-import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import React from 'react'
 
-import suggestion from './suggestion.js'
+const BASE_API = "http://localhost:8000/api/"
 
-const Tiptap = () => {
+
+export default () => {
+  const limit = 280;
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      Document,
+      Paragraph,
+      Text,
       Mention.configure({
         HTMLAttributes: {
-          class: 'mention',
+          class: "mention"
         },
-        suggestion,
+        renderLabel: ({options, node}) => {
+            return `${node.attrs.label ?? node.attrs.id}`
+        },
+        suggestion: {
+          items: async ({ query }) => {
+            const response = await fetch(BASE_API + "testing/fake_mentions");
+            const data = await response.json();
+            console.log('HELLO I AM HERE I AM HERE')
+            console.log(data)
+            console.log("THe query")
+            console.log(query)
+            return JSON.parse(data);
+            return ["hello", "bye bye", "something else"]
+          },
+          char: "@",
+          pluginKey: new PluginKey("atKey"),
+          render: () => {
+            let reactRenderer;
+            let popup;
+
+            return {
+              onStart: (props) => {
+                reactRenderer = new ReactRenderer(MentionList, {
+                  props,
+                  editor: props.editor
+                });
+
+                popup = tippy("body", {
+                  getReferenceClientRect: props.clientRect,
+                  appendTo: () => document.body,
+                  content: reactRenderer.element,
+                  showOnCreate: true,
+                  interactive: true,
+                  trigger: "manual",
+                  placement: "bottom-start"
+                });
+              },
+              onUpdate(props) {
+                reactRenderer.updateProps(props);
+
+                popup[0].setProps({
+                  getReferenceClientRect: props.clientRect
+                });
+              },
+              onKeyDown(props) {
+                return reactRenderer.ref?.onKeyDown(props);
+              },
+              onExit() {
+                popup[0].destroy();
+                reactRenderer.destroy();
+              }
+            };
+          }
+        },
+
       }),
+      Mention.configure({
+        HTMLAttributes: {
+          class: "mention"
+        },
+        renderLabel: ({options, node}) => {
+            return `${node.attrs.label ?? node.attrs.id}`
+        },
+        suggestion: {
+          items: ({ query }) => {
+            return ["hola", "chau chau"];
+          },
+          char: "#",
+          pluginKey: new PluginKey("hashKey"),
+          render: () => {
+            let reactRenderer;
+            let popup;
+
+            return {
+              onStart: (props) => {
+                reactRenderer = new ReactRenderer(MentionList, {
+                  props,
+                  editor: props.editor
+                });
+
+                popup = tippy("body", {
+                  getReferenceClientRect: props.clientRect,
+                  appendTo: () => document.body,
+                  content: reactRenderer.element,
+                  showOnCreate: true,
+                  interactive: true,
+                  trigger: "manual",
+                  placement: "bottom-start"
+                });
+              },
+              onUpdate(props) {
+                reactRenderer.updateProps(props);
+
+                popup[0].setProps({
+                  getReferenceClientRect: props.clientRect
+                });
+              },
+              onKeyDown(props) {
+                return reactRenderer.ref?.onKeyDown(props);
+              },
+              onExit() {
+                popup[0].destroy();
+                reactRenderer.destroy();
+              }
+            };
+          }
+        }
+      })
     ],
     content: `
-        <p>Hi everyone! Don’t forget the daily stand up at 8 AM.</p>
-        <p><span data-type="mention" data-id="Jennifer Grey"></span> Would you mind to share what you’ve been working on lately? We fear not much happened since Dirty Dancing.
-        <p><span data-type="mention" data-id="Winona Ryder"></span> <span data-type="mention" data-id="Axl Rose"></span> Let’s go through your most important points quickly.</p>
-        <p>I have a meeting with <span data-type="mention" data-id="Christina Applegate"></span> and don’t want to come late.</p>
-        <p>– Thanks, your big boss</p>
-      `,
-  })
+      <p>
+       Write a comment here...
+      </p>
+    `
+  });
 
-  if (!editor) {
-    return null
-  }
-
-  return <EditorContent editor={editor} />
-}
-
-export default Tiptap
+  return (
+    <div>
+      <EditorContent editor={editor} />
+    </div>
+  );
+};

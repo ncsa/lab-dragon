@@ -50,7 +50,7 @@ export default function StepCreator({entID, user, reloader, reloader1}) {
                     value={name}
                 />
                 {isLoading && <p>Loading...</p>}
-                {!isLoading && <button type="submit">Submit</button>}
+                {!isLoading && <button type="submit" className='submitButton'>Submit</button>}
             </form>
         </div>
     )
