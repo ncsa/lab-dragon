@@ -135,6 +135,12 @@ paths:
           schema:
             type: "string"
           description: "Username of the user adding the comment, if left empty the user of the entity is used"
+        - in: query
+          name: "HTML"
+          schema:
+            type: "boolean"
+          description: "If true, the comment is interpreted as HTML and converted to markdown"
+
       responses:
         "200":
             description: "Successfully added comment"
@@ -240,7 +246,7 @@ paths:
         "200":
           description: "Successfully read parents"
 
-  /testing:
+  /testing/indices:
     get:
       operationId: "entities.get_indices"
       tags:
@@ -250,4 +256,12 @@ paths:
         "200":
           description: "Call used exclusively for testing purposes. Returns all indices so they can be inspected"
 
-
+  /testing/fake_mentions:
+    get:
+      operationId: "entities.get_fake_mentions"
+      tags:
+        - Testing
+      summary: "Returns a fake list of mentions for testing porpuses"
+      responses:
+        "200":
+          description: "Call used exclusively for testing purposes. Returns a fake list of entities"

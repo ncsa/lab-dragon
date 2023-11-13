@@ -13,6 +13,7 @@ from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
+from converters import MyMarkdownConverter
 
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
@@ -37,6 +38,9 @@ IMAGEINDEX = {}
 
 # Holds all of the users that exists in the notebook
 USERS = set()
+
+# Instantiates the HTML to Markdon converter object
+html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
 def get_indices():
@@ -339,7 +343,7 @@ def read_entity_info(ID):
     return make_response(json.dumps({"rank": rank, "num_children": num_children}), 201)
 
 
-def add_comment(ID, comment, username: Optional[str] = None):
+def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False):
     """
     Adds a comment to the indicated entity. It does not handle images or tables yet.
 
@@ -347,6 +351,7 @@ def add_comment(ID, comment, username: Optional[str] = None):
     :param comment: The text of the comment itself.
     :param username: Optional argument. If passed, the author of the comment will be that username instead of the
      user of the entity.
+    :param HTML: If true, the comment text is assumed to be in html form and is converted to markdown.
     """
 
     if ID not in INDEX:
@@ -355,7 +360,11 @@ def add_comment(ID, comment, username: Optional[str] = None):
     ent = INDEX[ID]
     if username is None:
         username = ent.user
-    content = comment['content']
+
+    if HTML:
+        content = html_to_markdown.convert(comment['content'])
+    else:
+        content = comment['content']
 
     ent.add_comment(content, username)
 
@@ -436,5 +445,23 @@ def get_possible_parents():
         if v.__class__.__name__ in PARENT_TYPES:
             ret[k] = v.name
     return json.dumps(ret), 201
+
+
+def get_fake_mentions():
+    """
+    Api function used to send a fake list of options for testing mentions
+
+    :return:
+    """
+    global counter
+
+    fake_dict = {
+        "Choose Koala": "5f782c07-6c65-48b1-9742-036cff3b8a1a",
+        "Choose Panda": "f4eff811-f13f-4457-9a74-a88249deb186",
+        "Named The Koala": "8ecdb320-74f7-4728-b7f8-f675cdc2df9e",
+    }
+
+    return json.dumps(fake_dict), 201
+
 
 read_all()
