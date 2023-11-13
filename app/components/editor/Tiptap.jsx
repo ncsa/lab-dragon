@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
 import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
@@ -15,7 +15,7 @@ import { createDataMention } from "./extensions/DataMention";
 const BASE_API = "http://localhost:8000/api/"
 
 
-export default () => {
+export default ({ onContentChange}) => {
   
   const dataMentionsOptionsRef = useRef({});
 
@@ -88,61 +88,10 @@ export default () => {
           }
         },
       }),
-
-      // }),
-      // Mention.configure({
-      //   HTMLAttributes: {
-      //     class: "mention"
-      //   },
-      //   renderLabel: ({options, node}) => {
-      //       return `${node.attrs.label ?? node.attrs.id}`
-      //   },
-      //   suggestion: {
-      //     items: ({ query }) => {
-      //       return ["hola", "chau chau", "hola"];
-      //     },
-      //     char: "#",
-      //     pluginKey: new PluginKey("hashKey"),
-      //     render: () => {
-      //       let reactRenderer;
-      //       let popup;
-
-      //       return {
-      //         onStart: (props) => {
-      //           reactRenderer = new ReactRenderer(MentionList, {
-      //             props,
-      //             editor: props.editor
-      //           });
-
-      //           popup = tippy("body", {
-      //             getReferenceClientRect: props.clientRect,
-      //             appendTo: () => document.body,
-      //             content: reactRenderer.element,
-      //             showOnCreate: true,
-      //             interactive: true,
-      //             trigger: "manual",
-      //             placement: "bottom-start"
-      //           });
-      //         },
-      //         onUpdate(props) {
-      //           reactRenderer.updateProps(props);
-
-      //           popup[0].setProps({
-      //             getReferenceClientRect: props.clientRect
-      //           });
-      //         },
-      //         onKeyDown(props) {
-      //           return reactRenderer.ref?.onKeyDown(props);
-      //         },
-      //         onExit() {
-      //           popup[0].destroy();
-      //           reactRenderer.destroy();
-      //         }
-      //       };
-      //     }
-      //   }
-      // })
     ],
+    onUpdate: (props) => {
+      onContentChange(props.editor.getHTML());
+    },
     content: `
       <p>
        Write a comment here...

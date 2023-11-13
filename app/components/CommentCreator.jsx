@@ -11,6 +11,12 @@ export default function CommentCreator({entID, reloader}) {
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const handleContentChange = (content) => {
+        setContent(content);
+        console.log("Content changed");
+        console.log(content);
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -19,7 +25,7 @@ export default function CommentCreator({entID, reloader}) {
             content, 
         }
 
-        let response = await fetch(BASE_API+"entities/" + entID, {
+        let response = await fetch(BASE_API+"entities/" + entID + "?HTML=True", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,7 +47,7 @@ export default function CommentCreator({entID, reloader}) {
         <div className="CommentCreator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
-                <Tiptap />
+                <Tiptap onContentChange={handleContentChange}/>
 
                 {/* { <textarea
                     required
