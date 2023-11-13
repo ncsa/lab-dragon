@@ -1,9 +1,11 @@
+import re
 import json
 import copy
 from pathlib import Path
 from typing import Optional, Union, Tuple
 from enum import Enum, auto
 
+import markdown
 from flask import abort, make_response, send_file
 
 from qdata.modules.task import Task
@@ -15,8 +17,8 @@ from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from converters import MyMarkdownConverter
 
-# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
-ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
+ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
 
 
@@ -41,6 +43,9 @@ USERS = set()
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
+
+# Domain, used to convert from links to paths, to links the web browser can understand
+DOMAIN = 'http://localhost:3000'
 
 
 def get_indices():
@@ -71,6 +76,26 @@ def create_path_entity_copy(ent: Entity) -> Entity:
         children_paths.append(UUID_TO_PATH_INDEX[child])
     copy_ent.children = children_paths
     return copy_ent
+
+
+def comment_path_to_uuid(content: str):
+
+    def replacer(match):
+        # Extract the text and file path from the match
+        text = match.group(1)
+        file_path = match.group(2)
+        # If the file path is a key in the replacements dictionary, replace it
+        # Otherwise, keep the original file path
+        new_file_path = PATH_TO_UUID_INDEX.get(file_path, file_path)
+        # Return the reconstructed string with the replacement file path
+        return f'{text}({new_file_path})'
+
+    # Regex pattern for file paths preceded by text in square brackets and enclosed in parentheses
+    pattern = r'(\[.*?\])\(([\w\-.\/\s]+)\)'
+
+    replaced_s = re.sub(pattern, replacer, content)
+    return replaced_s
+
 
 
 class MediaTypes(Enum):
@@ -189,7 +214,14 @@ def read_one(ID, name_only=False):
         if name_only:
             return ent.name
 
-        return json.dumps(ent.to_TOML()[ent.name]), 201
+        ent_copy = copy.deepcopy(ent)
+        for comment in ent_copy.comments:
+            if comment.com_type[0] == SupportedCommentType.md.value or comment.com_type[0] == SupportedCommentType.string.value:
+                replaced_path = comment_path_to_uuid(comment.content[0])
+                html_comment = markdown.markdown(replaced_path)
+                comment.content[0] = html_comment
+
+        return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
     else:
         abort(404, f"Entity with ID {ID} not found")
 
@@ -456,9 +488,9 @@ def get_fake_mentions():
     global counter
 
     fake_dict = {
-        "Choose Koala": "5f782c07-6c65-48b1-9742-036cff3b8a1a",
-        "Choose Panda": "f4eff811-f13f-4457-9a74-a88249deb186",
-        "Named The Koala": "8ecdb320-74f7-4728-b7f8-f675cdc2df9e",
+        "Choose Koala": "9f8968d5-f98e-4ecf-ba37-3a1c84f9da7a",
+        "Choose Panda": "23f07cfe-8f82-4294-a9a5-03241ad47194",
+        "Named The Koala": "cca50dad-add7-4ea5-b452-d59eb3edb16d",
     }
 
     return json.dumps(fake_dict), 201
