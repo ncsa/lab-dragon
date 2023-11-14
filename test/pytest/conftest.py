@@ -1,6 +1,17 @@
+import os
+import random
+import shutil
+import string
+import itertools
 from pathlib import Path
 
 import pytest
+import numpy as np
+
+# Tools from pfafflab
+from labcore.measurement.sweep import Sweep, sweep_parameter
+from labcore.measurement.record import record_as
+from labcore.measurement.storage import run_and_save_sweep
 
 import qdata
 from qdata.generators.meta import generate_all_classes, delete_all_modules
@@ -28,3 +39,42 @@ def module_names(refresh_modules):
         raise FileNotFoundError(f'Number of schemas ({nschemas}) does not match number of modules ({nmodules})')
 
     return [x.stem for x in qdata.MODULESDIR.glob('*.py') if '__init__' not in str(x)]
+
+
+@pytest.fixture()
+def generate_msmt_folder_structure(folder_path=Path(r'tmp'), n_measurements=5, generate_each_run=False):
+    if folder_path.is_dir() and generate_each_run:
+        shutil.rmtree(folder_path)
+        folder_path.mkdir()
+
+    folder_path = folder_path.joinpath('data')
+    if folder_path.is_dir():
+        return None
+
+    folder_path.mkdir()
+
+    msmt_names = ["test_through",
+                  "pulsed_resonator_spec",
+                  "qA_power_rabi",
+                  "qB_power_rabi",
+                  "qA_T1",
+                  "qB_T1",
+                  "qA_T2_echo",
+                  "qB_T2_echo",
+                  "ssb_spec_pi",
+                  ]
+
+    inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x*2, 'z'))
+    outer_sweep = sweep_parameter('y', np.linspace(0, 10))
+
+    my_sweep = outer_sweep @ inner_sweep
+
+    for name in msmt_names:
+        for i in range(n_measurements):
+            test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j in range(1, 11)}
+            path, data = run_and_save_sweep(sweep=my_sweep, data_dir=folder_path, name=name, test_parameters=test_params)
+            if i == 0:
+                star_path = path.joinpath('__star__.tag')
+                star_path.touch()
+
+

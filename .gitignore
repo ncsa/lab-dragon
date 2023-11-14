@@ -20,3 +20,4 @@ qdata/modules/*
 !qdata/modules/__init__.py
 !qdata/modules/data_bucket.py
 _build/
+test/pytest/tmp/*
