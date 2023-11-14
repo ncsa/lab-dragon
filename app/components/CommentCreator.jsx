@@ -13,8 +13,6 @@ export default function CommentCreator({entID, reloader}) {
 
     const handleContentChange = (content) => {
         setContent(content);
-        console.log("Content changed");
-        console.log(content);
     }
 
     const handleSubmit = async (e) => {

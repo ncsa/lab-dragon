@@ -67,7 +67,7 @@ export default function Entities( {params} ) {
                 <EntityViewer entity={entity} displayChildren={children} />
             </div>
             <div className="addition-section">
-                <CommentCreator entID={entity.ID} reloader={reloadEntityComments}/>
+                <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadEntityComments}/>
                 <StepCreator entID={entity.ID} user={entity.user} reloader={reloadEntityChildren} reloader1={reloadEntityComments}/>
             </div>
         </div>

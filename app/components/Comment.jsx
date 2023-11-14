@@ -40,6 +40,6 @@ export default function Comment({comment, entID}) {
             </div>
         ) 
     } else {
-        return (<p>{content[0]}</p>)
+        return <div className="comment" dangerouslySetInnerHTML={{ __html: content[0] }}></div> // The  span is there to have an element in which to place the argument.
     }
 }

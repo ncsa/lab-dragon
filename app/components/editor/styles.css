@@ -1,29 +1,23 @@
 .tiptap {
-    > * + * {
-      margin-top: 0.75em;
-    }
-  }
+  width: 100%;
+  min-height: 100px;
+  min-width: 100px;
+  resize: both;
+  border: 2px solid black;
+  padding: 10px;
   
-  .mention {
-    border: 1px solid #000;
-    border-radius: 0.4rem;
-    box-decoration-break: clone;
-    padding: 0.1rem 0.3rem;
-  }
-  /* Basic editor styles */
-.ProseMirror {
-  > * + * {
-    margin-top: 0.75em;
-  }
+}
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    line-height: 1.1;
-  }
+.tiptap:hover {
+  outline: 2px solid cornflowerblue;
+}
+
+.tiptap a {
+  color: #A975FF;
+  border: 1px solid black;
+  border-radius: .4rem;
+  box-decoration-break: clone;
+  padding: .1rem .3rem;
 }
 
 .mention {
@@ -51,7 +45,6 @@
     color: #868e96;
   }
 }
-
 
 span::first-letter {
   display: none;
