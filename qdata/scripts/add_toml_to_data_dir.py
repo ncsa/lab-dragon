@@ -5,10 +5,6 @@ from labcore.data.datadict_storage import datadict_from_hdf5
 from qdata.modules.instance import Instance
 from qdata.modules.data_bucket import DataBucket
 
-# Folder containing the data directory
-ROOTDIR = Path("/Users/marcosf2/Documents/playground/notebook_testing/ChocolateAndVanillaCoherence/Measurements")
-USER = "Michael Mollenhauer"
-
 
 def delete_toml_files(directory):
     print(f'Deleting all TOML files in {directory}...')
@@ -27,12 +23,12 @@ def count_toml_files(directory):
     return counter
 
 
-def add_toml_to_data(dir):
+def add_toml_to_data(dir, user="testUser"):
     delete_toml_files(dir)
 
     # Create the data bucket
     bucket = DataBucket(name="Measurements",
-                        user=USER)
+                        user=user)
     bucket_path = dir.joinpath(bucket.name + '.toml')
 
     counter = 0
@@ -74,7 +70,7 @@ def add_toml_to_data(dir):
 
                 # Create the instance
                 instance = Instance(name=parent.name,
-                                    user=USER,
+                                    user=user,
                                     parent=bucket_path,
                                     data_structure=data_structure,
                                     tags=tags,
@@ -92,8 +88,3 @@ def add_toml_to_data(dir):
     # Save the bucket
     bucket.to_TOML(bucket_path)
     print(f'bucket created all done')
-
-
-if __name__ == "__main__":
-
-    add_toml_to_data(ROOTDIR)

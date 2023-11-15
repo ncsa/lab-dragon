@@ -1,8 +1,6 @@
-import os
 import random
 import shutil
 import string
-import itertools
 from pathlib import Path
 
 import pytest
@@ -15,6 +13,8 @@ from labcore.measurement.storage import run_and_save_sweep
 
 import qdata
 from qdata.generators.meta import generate_all_classes, delete_all_modules
+from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
+from ..env_creator import create_full_test_env
 
 
 def count_files(path):
@@ -42,12 +42,12 @@ def module_names(refresh_modules):
 
 
 @pytest.fixture()
-def generate_msmt_folder_structure(folder_path=Path(r'tmp'), n_measurements=5, generate_each_run=False):
-    if folder_path.is_dir() and generate_each_run:
-        shutil.rmtree(folder_path)
-        folder_path.mkdir()
+def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, generate_each_run=False):
+    if tmp_path.is_dir() and generate_each_run:
+        shutil.rmtree(tmp_path)
+        tmp_path.mkdir()
 
-    folder_path = folder_path.joinpath('data')
+    folder_path = tmp_path.joinpath('data')
     if folder_path.is_dir():
         return None
 
@@ -64,6 +64,13 @@ def generate_msmt_folder_structure(folder_path=Path(r'tmp'), n_measurements=5, g
                   "ssb_spec_pi",
                   ]
 
+    images = ["koalas/baby_koala.png",
+              "koalas/creepy_koala.jpg",
+              "koalas/sleepy_koala.png",
+              "pandas/baby_pandas.png",
+              "pandas/Giant_panda.jpg",
+              "pandas/panda_eating.png"]
+
     inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x*2, 'z'))
     outer_sweep = sweep_parameter('y', np.linspace(0, 10))
 
@@ -71,10 +78,19 @@ def generate_msmt_folder_structure(folder_path=Path(r'tmp'), n_measurements=5, g
 
     for name in msmt_names:
         for i in range(n_measurements):
-            test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j in range(1, 11)}
-            path, data = run_and_save_sweep(sweep=my_sweep, data_dir=folder_path, name=name, test_parameters=test_params)
+            test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j
+                           in range(1, 11)}
+            path, data = run_and_save_sweep(sweep=my_sweep,
+                                            data_dir=folder_path,
+                                            name=name, test_parameters=test_params)
+            image = random.choice(images)
+            shutil.copy(Path("../testing_images").joinpath(image), path)
+
             if i == 0:
                 star_path = path.joinpath('__star__.tag')
                 star_path.touch()
+
+    add_toml_to_data(folder_path)
+    create_full_test_env(tmp_path, create_md=False, light_delete=True)
 
 

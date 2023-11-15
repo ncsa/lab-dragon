@@ -88,6 +88,12 @@ class {{class_name}}({{ inherits_from }}):
         else:
             self.{{ key }} = [].copy()
 
+        {% elif 'data_structure' in key %}
+        if isinstance({{ key }}, dict) and len([x for x in {{ key }}.keys()]) != 0:
+            self.{{ key }} = {{ key }}
+        else:
+            self.{{ key }} = dict()
+
         {% elif not defaults[key] is string and defaults[key] is iterable -%}
         # If we don't save a copy of the list,
         #   python ends up assigning the same object in memory to every Entity instance.

@@ -6,30 +6,44 @@ from qdata.generators.meta import generate_all_classes
 from qdata.generators.jupyterbook import generate_book
 
 
-def delete_directory_contents(directory_path):
+def delete_directory_contents(directory_path, light_delete=False):
+    """
+    Deletes all files and subdirectories in a directory. if light_delete is True, will only delete toml files in the
+    same directory
+
+    :param directory_path:
+    :param light_delete:
+    :return:
+    """
     # Create a Path object from the directory path
     directory = Path(directory_path)
 
     # Iterate over all files and subdirectories in the directory
     for item in directory.glob('*'):
-        if item.is_file():
-            # Delete file
-            item.unlink()
+        if light_delete:
+            if item.is_file() and item.suffix == '.toml':
+                # Delete file
+                item.unlink()
         else:
-            # Recursively delete subdirectory and its contents
-            delete_directory_contents(item)
-            # Delete empty subdirectory
-            item.rmdir()
+            if item.is_file():
+                # Delete file
+                item.unlink()
+            else:
+                # Recursively delete subdirectory and its contents
+                delete_directory_contents(item)
+                # Delete empty subdirectory
+                item.rmdir()
 
 
 # TODO: When we have a better plan for how to handle the instance object, add the images into the instance object.
-def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: bool = True) -> None:
+def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: bool = True, light_delete=False) -> None:
     """
     Creates a standard notebook used for testing in the target path.
 
     :param target: The location of the testing notebook. If this is None, it will create it in the env_generator
      folder inside the testing folder of this project.
     :param create_md: If True, it will also create the md representation of the TOML files. Defaults, to True.
+    :param light_delete: If True, will only delete toml files in the same directory. Defaults to False.
     """
     self_path = Path(__file__)
     if target is None:
@@ -37,7 +51,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
     else:
         path = Path(target)
 
-    delete_directory_contents(path)
+    delete_directory_contents(path, light_delete)
 
     generate_all_classes()
     to_be_created = []

@@ -1,6 +1,4 @@
 
 
-
-def test_data_generating_fixture(generate_msmt_folder_structure):
-    print("Everything should be done with this now")
+def test_data_generating_fixture(refresh_modules, generate_msmt_folder_structure):
     return True
