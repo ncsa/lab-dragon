@@ -207,17 +207,22 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
     to_be_created.append((name_koala_step, name_koala_path))
 
     koala_project.add_child(name_koala_path)
-
     for i, p in to_be_created:
         i.to_TOML(p)
         if create_md:
             generate_md(p, path)
 
 
+# if __name__ == "__main__":
+#
+#     root_path = Path("./env_generator/Testing Project.toml")
+#     target_path = Path("./env_generator/jupyterbook/")
+#
+#     create_full_test_env(create_md=False)
+#     generate_book(root_path, target_path)
+
 if __name__ == "__main__":
 
-    root_path = Path("./env_generator/Testing Project.toml")
-    target_path = Path("./env_generator/jupyterbook/")
+    # delete_directory_contents(path, light_delete)
 
-    create_full_test_env(create_md=False)
-    generate_book(root_path, target_path)
+    generate_all_classes()

@@ -62,6 +62,7 @@ def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, gene
                   "qA_T2_echo",
                   "qB_T2_echo",
                   "ssb_spec_pi",
+                  "no_star",
                   ]
 
     images = ["koalas/baby_koala.png",
@@ -86,7 +87,7 @@ def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, gene
             image = random.choice(images)
             shutil.copy(Path("../testing_images").joinpath(image), path)
 
-            if i == 0:
+            if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
                 star_path.touch()
 
