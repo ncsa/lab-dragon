@@ -212,4 +212,36 @@ class {{class_name}}({{ inherits_from }}):
             else:
                 raise TypeError(f"Comment must be a string, Table object, or a Comment object, not {type(comment)}")
 
+    def suggest_data(self, query: str = "", min_threshold=5) -> List[str]:
+        """
+        Function used to suggest Instances based on a passed query.
+        This function will go to any data bucket attached to this or any parent entity,
+        ask all the data buckets associated with them and
+        return any Instances that are starred and pass a regex match with the query.
+        If no query is passed, it will return all starred Instances.
+
+        :param query: The query to find Instances with.
+        :param min_threshold: The minimum number of matches an Instance must have for the search to not
+            go to parent data buckets.
+        """
+
+        def search_parents(parent, inner_matches):
+            if parent is None:
+                return inner_matches
+            for bucket in parent.data_buckets:
+                inner_matches.add(bucket.suggest_data(query))
+            if len(inner_matches) < min_threshold:
+                return search_parents(parent.parent, inner_matches)
+            return inner_matches
+
+
+        matches = set()
+        for bucket in self.data_buckets:
+            matches.add(bucket.suggest_data(query))
+
+        if len(matches) < min_threshold:
+            matches = search_parents(self.parent, matches)
+
+        return matches
+
     {% endif %}

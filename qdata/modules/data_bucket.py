@@ -2,12 +2,14 @@
 This entity is simply a data bucket that groups all instances in a single place.
 The customization of this entity is still to be determined, so for now I will be hard-coding it and committing it.
 """
+import re
 from pathlib import Path
 from typing import Optional, Union
 
 import tomlkit
 
 from .entity import Entity
+from qdata.generators.meta import read_from_TOML
 
 
 class DataBucket(Entity):
@@ -55,4 +57,12 @@ class DataBucket(Entity):
 
         return doc
 
-
+    def suggest_data(self, query: str = "", min_threshold: int = 5):
+        matched_paths = {}
+        pattern = re.compile(query)
+        for path, uuid in self.path_to_uuid.items():
+            if pattern.search(path.name):
+                matched_paths[path] = uuid
+                entity = read_from_TOML(path)
+                print(entity)
+        return matched_paths

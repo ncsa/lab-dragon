@@ -2,7 +2,7 @@ from pathlib import Path
 
 from qdata.generators.meta import read_from_TOML
 
-entity_with_data_bucket = Path("/tmp/Testing Pandas.toml")
+entity_with_data_bucket = Path("tmp/Testing Pandas.toml")
 
 
 def test_data_generating_fixture(refresh_modules, generate_msmt_folder_structure):

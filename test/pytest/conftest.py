@@ -12,8 +12,10 @@ from labcore.measurement.record import record_as
 from labcore.measurement.storage import run_and_save_sweep
 
 import qdata
-from qdata.generators.meta import generate_all_classes, delete_all_modules
+from qdata.generators.meta import read_from_TOML
 from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
+from qdata.generators.meta import generate_all_classes, delete_all_modules
+
 from ..env_creator import create_full_test_env
 
 
@@ -93,5 +95,11 @@ def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, gene
 
     add_toml_to_data(folder_path)
     create_full_test_env(tmp_path, create_md=False, light_delete=True)
+
+    ent_path = Path("tmp/Testing Pandas.toml")
+    ent = read_from_TOML(ent_path)
+
+    ent.data_buckets.append("data/Measurements.toml")
+    ent.to_TOML(ent_path)
 
 
