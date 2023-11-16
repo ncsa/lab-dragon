@@ -68,7 +68,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                                     '\nThis project is going to have 2 subprojects focusing on pandas and koalas '
                                     'in which I create a fake environment to start testing things'], )
 
-    top_project_path = Path(path, "Testing Project.toml")
+    top_project_path = Path(path, "Testing Project.toml").resolve()
     to_be_created.append((top_project, top_project_path))
 
     testing_table_panda = Table(panda_types=["cute", "fuzzy", "black and white"], panda_colors=["black", "white", "purple"], panda_size=["small", "medium", "large"])
@@ -79,7 +79,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                             parent=top_project_path,
                             comments=['This project is about pandas, we will get a panda online a qualify the panda', testing_table_panda]
                             )
-    panda_project_path = Path(path, "Testing Pandas.toml")
+    panda_project_path = Path(path, "Testing Pandas.toml").resolve()
     to_be_created.append((panda_project, panda_project_path))
 
     testing_table_koala = Table(koala_types=["cute", "chubby", "creepy"], koala_colors=["black", "white", "purple"], koala_size=["small", "medium", "large"])
@@ -90,7 +90,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                             parent=top_project_path,
                             comments=['This project is about koalas, we will get a koala online a qualify the koala', testing_table_koala]
                             )
-    koala_project_path = Path(path, "Testing Koalas.toml")
+    koala_project_path = Path(path, "Testing Koalas.toml").resolve()
     to_be_created.append((koala_project, koala_project_path))
 
     top_project.add_child(panda_project_path)
@@ -104,7 +104,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                           parent=panda_project_path,
                           objective="Find a panda online",
                           )
-    get_panda_path = Path(path, "Get Panda.toml")
+    get_panda_path = Path(path, "Get Panda.toml").resolve()
     to_be_created.append((get_panda_task, get_panda_path))
 
     panda_project.add_child(get_panda_path)
@@ -114,7 +114,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                                       user='testUser',
                                       comments=['Wow there are a lot of panda images online'],
                                       parent=get_panda_path, )
-    look_for_panda_images_path = Path(path, "Look For Panda Images.toml")
+    look_for_panda_images_path = Path(path, "Look For Panda Images.toml").resolve()
     to_be_created.append((look_for_panda_images_step, look_for_panda_images_path))
 
     get_panda_task.add_child(look_for_panda_images_path)
@@ -124,7 +124,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                              user='testUser2',
                              comments=[str(self_path.parent.joinpath("testing_images", "pandas"))],
                              parent=get_panda_path, )
-    found_pandas_path = Path(path, "Found Pandas.toml")
+    found_pandas_path = Path(path, "Found Pandas.toml").resolve()
     to_be_created.append((found_pandas_step, found_pandas_path))
 
     get_panda_task.add_child(found_pandas_path)
@@ -136,7 +136,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
                                  str(self_path.parent.joinpath("testing_images", "pandas", "Giant_panda.jpg"))],
                              parent=get_panda_path, )
-    choose_panda_path = Path(path, "Choose Panda.toml")
+    choose_panda_path = Path(path, "Choose Panda.toml").resolve()
     to_be_created.append((choose_panda_step, choose_panda_path))
 
     get_panda_task.add_child(choose_panda_path)
@@ -147,7 +147,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                            parent=panda_project_path,
                            comments=["The panda will be named Homer"]
                            )
-    name_panda_path = Path(path, "Named Panda.toml")
+    name_panda_path = Path(path, "Named Panda.toml").resolve()
     to_be_created.append((name_panda_step, name_panda_path))
 
     panda_project.add_child(name_panda_path)
@@ -160,7 +160,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                           parent=koala_project_path,
                           objective="Find a Koala online",
                           )
-    get_koala_path = Path(path, "Get Koala.toml")
+    get_koala_path = Path(path, "Get Koala.toml").resolve()
     to_be_created.append((get_koala_task, get_koala_path))
 
     koala_project.add_child(get_koala_path)
@@ -170,7 +170,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                                       user='testUser',
                                       comments=['Wow there are a lot of koala images online'],
                                       parent=get_koala_path, )
-    look_for_koala_images_path = Path(path, "Look For Koala Images.toml")
+    look_for_koala_images_path = Path(path, "Look For Koala Images.toml").resolve()
     to_be_created.append((look_for_koala_images_step, look_for_koala_images_path))
 
     get_koala_task.add_child(look_for_koala_images_path)
@@ -180,7 +180,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                              user='testUser3',
                              comments=[str(self_path.parent.joinpath("testing_images", "koalas"))],
                              parent=get_koala_path, )
-    found_koalas_path = Path(path, "Found Koalas.toml")
+    found_koalas_path = Path(path, "Found Koalas.toml").resolve()
     to_be_created.append((found_koalas_step, found_koalas_path))
 
     get_koala_task.add_child(found_koalas_path)
@@ -192,7 +192,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
                                  str(self_path.parent.joinpath("testing_images", "koalas", "creepy_koala.jpg"))],
                              parent=get_koala_path, )
-    choose_koala_path = Path(path, "Choose Koala.toml")
+    choose_koala_path = Path(path, "Choose Koala.toml").resolve()
     to_be_created.append((choose_koala_step, choose_koala_path))
 
     get_koala_task.add_child(choose_koala_path)
@@ -203,7 +203,7 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                            parent=koala_project_path,
                            comments=["The koala will be named Bart"]
                            )
-    name_koala_path = Path(path, "Named Koala.toml")
+    name_koala_path = Path(path, "Named Koala.toml").resolve()
     to_be_created.append((name_koala_step, name_koala_path))
 
     koala_project.add_child(name_koala_path)

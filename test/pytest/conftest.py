@@ -1,9 +1,12 @@
+import os
+import sys
 import random
 import shutil
 import string
 from pathlib import Path
 
 import pytest
+import connexion
 import numpy as np
 
 # Tools from pfafflab
@@ -44,7 +47,7 @@ def module_names(refresh_modules):
 
 
 @pytest.fixture()
-def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, generate_each_run=False):
+def generate_msmt_folder_structure(tmp_path=Path(r'test/pytest/tmp').resolve(), n_measurements=1, generate_each_run=False):
     if tmp_path.is_dir() and generate_each_run:
         shutil.rmtree(tmp_path)
         tmp_path.mkdir()
@@ -87,7 +90,7 @@ def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, gene
                                             data_dir=folder_path,
                                             name=name, test_parameters=test_params)
             image = random.choice(images)
-            shutil.copy(Path("../testing_images").joinpath(image), path)
+            shutil.copy(Path("test/testing_images").resolve().joinpath(image), path)
 
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
@@ -96,10 +99,34 @@ def generate_msmt_folder_structure(tmp_path=Path(r'tmp'), n_measurements=1, gene
     add_toml_to_data(folder_path)
     create_full_test_env(tmp_path, create_md=False, light_delete=True)
 
-    ent_path = Path("tmp/Testing Pandas.toml")
+    ent_path = Path("test/pytest/tmp/Testing Pandas.toml").resolve()
     ent = read_from_TOML(ent_path)
 
     ent.data_buckets.append("data/Measurements.toml")
     ent.to_TOML(ent_path)
 
 
+# -- Testing the server -- #
+
+def set_cors_headers_on_response(response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Headers'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = '*'
+    return response
+
+
+@pytest.fixture(scope='module')
+def client():
+    original_path = os.getcwd() + '/test/pytest'
+    entities_path = Path("./qdata/api").resolve()
+
+    sys.path.insert(0, str(entities_path))
+
+    os.chdir(entities_path)
+
+    app = connexion.App(__name__, specification_dir='../../qdata/api/')
+    app.add_api(Path("../../qdata/api/API_specification.yaml"))
+    app.app.after_request(set_cors_headers_on_response)
+    with app.app.test_client() as c:
+        os.chdir(original_path)
+        yield c

@@ -2,16 +2,23 @@ from pathlib import Path
 
 from qdata.generators.meta import read_from_TOML
 
-entity_with_data_bucket = Path("tmp/Testing Pandas.toml")
+entity_with_data_bucket = Path("test/pytest/tmp/Testing Pandas.toml").resolve()
 
 
-def test_data_generating_fixture(refresh_modules, generate_msmt_folder_structure):
+def get_entity_id(path=entity_with_data_bucket):
+    return read_from_TOML(path).ID
+
+
+def test_data_generating_fixture(refresh_modules, generate_msmt_folder_structure, client):
+    id = get_entity_id()
+    client.get(f"api/entities/{id}")
     return True
 
 
-def test_empty_query(refresh_modules, generate_msmt_folder_structure):
+def test_empty_query(refresh_modules, generate_msmt_folder_structure, client):
 
     ent = read_from_TOML(entity_with_data_bucket)
+    ID = ent.id
     query = ""
     ret = ent.suggest_data()
     assert len(ret) == 9
