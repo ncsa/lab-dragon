@@ -1,4 +1,7 @@
 
+import CommentCreator from "./CommentCreator"
+
+
 export const BASE_API = "http://localhost:8000/api/"
 
 /*
@@ -62,7 +65,7 @@ export default function Comment({comment, entID, onClickHandler, isSelected, onD
     } else {
 
         if (isActivated) {
-           return <div>Hello this is a lovely comment that we have here</div>
+           return <CommentCreator entID={entID} initialContent={content[0]} />
         }
 
         return <div className={`comment ${isSelected ? 'selected': ''}`}

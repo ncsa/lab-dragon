@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
 import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
+import Placeholder from "@tiptap/extension-placeholder";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
@@ -15,8 +16,8 @@ import { createDataMention } from "./extensions/DataMention";
 const BASE_API = "http://localhost:8000/api/"
 
 
-export default ({ onContentChange, entID}) => {
-  
+export default ({ onContentChange, entID, initialContent }) => {
+
   const dataMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
@@ -38,6 +39,9 @@ export default ({ onContentChange, entID}) => {
       Document,
       Paragraph,
       Text,
+      Placeholder.configure({
+        placeholder: "Write a comment here..."
+      }),
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
           class: "data_mention"
@@ -96,11 +100,7 @@ export default ({ onContentChange, entID}) => {
     onUpdate: (props) => {
       onContentChange(props.editor.getHTML());
     },
-    content: `
-      <p>
-       Write a comment here...
-      </p>
-    `
+    content: initialContent ? initialContent : '',
   });
 
   return (
