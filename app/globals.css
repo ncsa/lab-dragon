@@ -160,15 +160,6 @@ button:active{
     color: purple;
 }
 
-
-/*!* comments css *!*/
-
-.comment img{
-    text-align: center;
-    white-space: nowrap;
-    margin-top: 5px;
-}
-
 /* SmallEntityViewer css */
 
 .small-entity{
@@ -265,9 +256,21 @@ button:active{
 }
 
 .comment:hover{
-    padding: 10px;
-    border: 1px solid black;
+    padding: 15px;
+    border: 2px solid black;
     
+}
+
+.comment.selected{
+    padding: 15px;
+    outline: 2px solid cornflowerblue;
+
+}
+
+.comment img{
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 5px;
 }
 
 .comment table {

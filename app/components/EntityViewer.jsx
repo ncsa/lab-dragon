@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import CommentViewer from "./CommentViewer";
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
 
@@ -22,6 +21,8 @@ export async function getEntityName(id) {
 export default function EntityViewer({ entity, displayChildren }) {
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
+    const [selectedComment, setSelectedComment] = useState(null);
+
     let combinedArray = null;
 
     useEffect(() => {
@@ -37,6 +38,10 @@ export default function EntityViewer({ entity, displayChildren }) {
             });
         }
     }, [entity.parent, entity.children]);
+
+    const handleCommentClick = (id) => {
+        setSelectedComment(id);
+    }
 
     if (entity !== null && displayChildren !== null) {
         combinedArray = [...entity.comments, ...displayChildren];
@@ -59,8 +64,20 @@ export default function EntityViewer({ entity, displayChildren }) {
 
             <div className="Content">
                 {
-                    combinedArray === null ? <CommentViewer comments={entity.comments} entID={entity.ID}/> : combinedArray.map(item => {
-                        return item.com_type ? <Comment comment={item} entID={entity.ID}/> : <SmallEntityViewer entity={item} />
+                    combinedArray === null ?  Object.keys(entity.comments).map((key) => {
+                        return (<Comment key={entity.comments[key].ID} 
+                            comment={entity.comments[key]}
+                            entID={entity.ID}
+                            isSelected={selectedComment == entity.comments[key].ID}
+                            onClickHandler={handleCommentClick} />)
+                    }) : combinedArray.map(item => {
+                        return item.com_type ? <Comment comment={item} 
+                            entID={entity.ID} 
+                            isSelected={selectedComment === item.ID}
+                            onClickHandler={handleCommentClick}/> : 
+                                <SmallEntityViewer entity={item} 
+                                    onClickHandler={handleCommentClick}
+                                    selectedComment={selectedComment}/>
                     })
 
                 }

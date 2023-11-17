@@ -1,14 +1,29 @@
 
 export const BASE_API = "http://localhost:8000/api/"
 
-export default function Comment({comment, entID}) {
+/*
+
+A comment can be selected. This will just add a blue box around it. This will probably make it easier to add usability later on.
+
+A comment can also be activated. This means that the comment has an active editor on it and can be edited. This will probably be done by clicking on the comment.
+
+a comment gets selected with a single click. A comment can be activated with a double click
+
+*/
+
+export default function Comment({comment, entID, onClickHandler, isSelected}) {
     const content = comment.content
     const type = comment.com_type
     const comID = comment.ID
     
+    const innerClickHandler = (event) => {
+        onClickHandler(comID)
+    }
+
     if (type[0] == 4 || type[0] == 5) {
         return (
-            <div className="comment">
+            <div className={`comment ${isSelected ? 'selected': ''}`}
+                onClick={innerClickHandler}>
                 <img src={BASE_API+"entities/"+entID+"/"+comID} alt="Image is loading" />
             </div>
         )
@@ -18,7 +33,8 @@ export default function Comment({comment, entID}) {
         const numberOfRows = tableData[columnNames[0]].length;
 
         return (
-            <div className="comment">
+            <div className={`comment ${isSelected ? 'selected': ''}`}
+                onClick={innerClickHandler}>
                 <table>
                     <thead>
                         <tr>
@@ -40,6 +56,8 @@ export default function Comment({comment, entID}) {
             </div>
         ) 
     } else {
-        return <div className="comment" dangerouslySetInnerHTML={{ __html: content[0] }}></div> // The  span is there to have an element in which to place the argument.
+        return <div className={`comment ${isSelected ? 'selected': ''}`}
+            onClick={innerClickHandler} 
+            dangerouslySetInnerHTML={{ __html: content[0] }}></div> // The  span is there to have an element in which to place the argument.
     }
 }

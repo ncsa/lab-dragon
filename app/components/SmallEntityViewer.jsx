@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect} from 'react';
+import Comment from './Comment';
 
-import CommentViewer from "@/app/components/CommentViewer";
 
 export const BASE_URL = 'http://localhost:3000/entities/';
 
@@ -32,7 +32,7 @@ export async function getTree(id) {
 }
 
 
-export default function SmallEntityViewer({entity}) {
+export default function SmallEntityViewer({entity, onClickHandler, selectedComment}) {
 
     const [numChildren, setNumChildren] = useState(null);
     const [rank, setRank] = useState(null);
@@ -98,7 +98,13 @@ export default function SmallEntityViewer({entity}) {
                     </div>
                 </h3>
             </div>
-            <CommentViewer comments={entity.comments} entID={entity.ID}/>
+            { Object.keys(entity.comments).map((key) => {
+                return (<Comment key={entity.comments[key].ID} 
+                    comment={entity.comments[key]} 
+                    entID={entity.ID}
+                    onClickHandler={onClickHandler}
+                    isSelected={selectedComment == entity.comments[key].ID} />)
+            })}
         </div>
     )
 
