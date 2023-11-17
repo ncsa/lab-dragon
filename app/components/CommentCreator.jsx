@@ -6,7 +6,7 @@ import Tiptap from './editor/Tiptap';
 
 const BASE_API = "http://localhost:8000/api/"
 
-export default function CommentCreator({entID, reloader}) {
+export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,10 @@ export default function CommentCreator({entID, reloader}) {
         <div className="CommentCreator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
-                <Tiptap onContentChange={handleContentChange} entID={entID}/>
+                <Tiptap onContentChange={handleContentChange}
+                 entID={entID}
+                 initialContent={initialContent}
+                 />
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit" className="submitButton">Submit</button>}
             </form>
