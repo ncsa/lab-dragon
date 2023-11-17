@@ -506,17 +506,14 @@ def get_possible_parents():
 
 def _search_parents_with_buckets(ent):
 
-    ret_ent = None
-
     if ent.parent == "":
         return None
 
-    parent = INDEX[ent.parent]
-    if len(parent.data_buckets) == 0:
-        ret_ent = _search_parents_with_buckets(parent)
+    ret_ent = INDEX[ent.parent]
+    if len(ret_ent.data_buckets) == 0:
+        ret_ent = _search_parents_with_buckets(ret_ent)
 
     return ret_ent
-
 
 
 def get_data_suggestions(ID, query="", num_matches=10):
