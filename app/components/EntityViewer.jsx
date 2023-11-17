@@ -22,6 +22,7 @@ export default function EntityViewer({ entity, displayChildren }) {
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
+    const [activatedComment, setActivatedComment] = useState(null);
 
     let combinedArray = null;
 
@@ -41,6 +42,10 @@ export default function EntityViewer({ entity, displayChildren }) {
 
     const handleCommentClick = (id) => {
         setSelectedComment(id);
+    }
+
+    const handleCommentDoubleClick = (id) => {
+        setActivatedComment(id);
     }
 
     if (entity !== null && displayChildren !== null) {
@@ -69,15 +74,21 @@ export default function EntityViewer({ entity, displayChildren }) {
                             comment={entity.comments[key]}
                             entID={entity.ID}
                             isSelected={selectedComment == entity.comments[key].ID}
-                            onClickHandler={handleCommentClick} />)
+                            onClickHandler={handleCommentClick}
+                            isActivated={activatedComment == entity.comments[key].ID}
+                            onDoubleClickHandler={handleCommentDoubleClick} />)
                     }) : combinedArray.map(item => {
                         return item.com_type ? <Comment comment={item} 
                             entID={entity.ID} 
                             isSelected={selectedComment === item.ID}
-                            onClickHandler={handleCommentClick}/> : 
+                            onClickHandler={handleCommentClick}
+                            isActivated={activatedComment === item.ID}
+                            onDoubleClickHandler={handleCommentDoubleClick} /> : 
                                 <SmallEntityViewer entity={item} 
                                     onClickHandler={handleCommentClick}
-                                    selectedComment={selectedComment}/>
+                                    selectedComment={selectedComment}
+                                    onDoubleClickHandler={handleCommentDoubleClick}
+                                    activatedComment={activatedComment} />
                     })
 
                 }

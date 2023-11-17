@@ -32,7 +32,7 @@ export async function getTree(id) {
 }
 
 
-export default function SmallEntityViewer({entity, onClickHandler, selectedComment}) {
+export default function SmallEntityViewer({entity, onClickHandler, selectedComment, onDoubleClickHandler, activatedComment}) {
 
     const [numChildren, setNumChildren] = useState(null);
     const [rank, setRank] = useState(null);
@@ -103,7 +103,9 @@ export default function SmallEntityViewer({entity, onClickHandler, selectedComme
                     comment={entity.comments[key]} 
                     entID={entity.ID}
                     onClickHandler={onClickHandler}
-                    isSelected={selectedComment == entity.comments[key].ID} />)
+                    isSelected={selectedComment == entity.comments[key].ID}
+                    onDoubleClickHandler={onDoubleClickHandler}
+                    isActivated={activatedComment == entity.comments[key].ID} />)
             })}
         </div>
     )

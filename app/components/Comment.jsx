@@ -11,13 +11,17 @@ a comment gets selected with a single click. A comment can be activated with a d
 
 */
 
-export default function Comment({comment, entID, onClickHandler, isSelected}) {
+export default function Comment({comment, entID, onClickHandler, isSelected, onDoubleClickHandler, isActivated}) {
     const content = comment.content
     const type = comment.com_type
     const comID = comment.ID
     
     const innerClickHandler = (event) => {
         onClickHandler(comID)
+    }
+
+    const innerDoubleClickHandler = (event) => {
+        onDoubleClickHandler(comID)
     }
 
     if (type[0] == 4 || type[0] == 5) {
@@ -56,8 +60,14 @@ export default function Comment({comment, entID, onClickHandler, isSelected}) {
             </div>
         ) 
     } else {
+
+        if (isActivated) {
+           return <div>Hello this is a lovely comment that we have here</div>
+        }
+
         return <div className={`comment ${isSelected ? 'selected': ''}`}
-            onClick={innerClickHandler} 
+            onClick={innerClickHandler}
+            onDoubleClick={innerDoubleClickHandler} 
             dangerouslySetInnerHTML={{ __html: content[0] }}></div> // The  span is there to have an element in which to place the argument.
     }
 }
