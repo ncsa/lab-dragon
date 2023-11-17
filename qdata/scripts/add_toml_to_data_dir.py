@@ -3,7 +3,7 @@ from pathlib import Path
 from labcore.data.datadict_storage import datadict_from_hdf5
 
 from qdata.modules.instance import Instance
-from qdata.modules.data_bucket import DataBucket
+from qdata.modules.bucket import Bucket
 
 
 def delete_toml_files(directory):
@@ -27,7 +27,7 @@ def add_toml_to_data(dir, user="testUser"):
     delete_toml_files(dir)
 
     # Create the data bucket
-    bucket = DataBucket(name="Measurements",
+    bucket = Bucket(name="Measurements",
                         user=user)
     bucket_path = dir.joinpath(bucket.name + '.toml')
 

@@ -150,6 +150,23 @@ def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
     ENTITY_TYPES.add(entity.__class__.__name__)
 
 
+def initialize_bucket(bucket_path):
+    """
+    Function that initializes a bucket by adding it to the index and initializing the instances it contains.
+
+    :param bucket: The bucket that is being initialized.
+    """
+    bucket = read_from_TOML(bucket_path)
+
+    add_ent_to_index(bucket, bucket_path)
+
+    for ins_path in bucket.path_to_uuid.keys():
+        instance = read_from_TOML(ins_path)
+        add_ent_to_index(instance, ins_path)
+
+    return bucket
+
+
 def read_child_entity(entity_path: Path):
 
     ent = read_from_TOML(entity_path)
@@ -163,6 +180,13 @@ def read_child_entity(entity_path: Path):
     if len(ent.children) > 0:
         for child in ent.children:
             child_list.append(read_child_entity(child))
+
+    data_buckets = []
+    for bucket_path in ent.data_buckets:
+        bucket = initialize_bucket(bucket_path)
+        data_buckets.append(bucket.ID)
+
+    # ent.data_buckets = data_buckets
 
     ret_dict = {"id": ent.ID,
                 "name": ent.name,
@@ -478,6 +502,49 @@ def get_possible_parents():
         if v.__class__.__name__ in PARENT_TYPES:
             ret[k] = v.name
     return json.dumps(ret), 201
+
+
+def _search_parents_with_buckets(ent):
+
+    ret_ent = None
+
+    if ent.parent == "":
+        return None
+
+    parent = INDEX[ent.parent]
+    if len(parent.data_buckets) == 0:
+        ret_ent = _search_parents_with_buckets(parent)
+
+    return ret_ent
+
+
+
+def get_data_suggestions(ID, query="", num_matches=10):
+    matches = {}
+
+    ent = INDEX[ID]
+    if len(ent.data_buckets) == 0:
+        ent = _search_parents_with_buckets(ent)
+        if ent is None:
+            return json.dumps({}), 201
+
+    for bucket_path in ent.data_buckets:
+        bucket_id = PATH_TO_UUID_INDEX[str(bucket_path)]
+        bucket = INDEX[bucket_id]
+        pattern = re.compile(query)
+        for p, uuid in bucket.path_to_uuid.items():
+            if len(matches) >= num_matches:
+                break
+            path = Path(p)
+            instance = INDEX[uuid]
+            if 'star' in instance.tags:
+                if query == "" or query is None:
+                    matches[path.stem] = uuid
+                else:
+                    if pattern.search(path.stem):
+                        matches[path.stem] = uuid
+
+    return json.dumps(matches), 201
 
 
 def get_fake_mentions():

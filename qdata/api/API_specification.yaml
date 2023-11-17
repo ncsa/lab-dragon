@@ -63,6 +63,14 @@ components:
         schema:
             type: "string"
 
+    query:
+      name: "query"
+      description: "Query to search for"
+      in: query
+      required: false
+      schema:
+        type: "string"
+
 paths:
   /entities:
     get:
@@ -200,6 +208,24 @@ paths:
           description: "Successfully read entity info"
         "404":
           description: "Entity not found"
+
+  /entities/{ID}/data_suggestions:
+    get:
+      operationId: "entities.get_data_suggestions"
+      tags:
+        - Entities
+        - Suggestions
+      summary: "Returns a dictionary of suggestions for a specified query. If no query is specified,
+       all suggestions are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/query"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
 
   /entities/{ID}/{imageName}:
     get:

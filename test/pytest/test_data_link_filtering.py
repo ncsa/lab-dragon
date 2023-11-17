@@ -2,30 +2,34 @@ from pathlib import Path
 
 from qdata.generators.meta import read_from_TOML
 
-entity_with_data_bucket = Path("test/pytest/tmp/Testing Pandas.toml").resolve()
+entity_with_data_bucket = Path("/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Pandas.toml")
 
 
 def get_entity_id(path=entity_with_data_bucket):
     return read_from_TOML(path).ID
 
 
-def test_data_generating_fixture(refresh_modules, generate_msmt_folder_structure, client):
-    id = get_entity_id()
-    client.get(f"api/entities/{id}")
+def test_basic_generation(refresh_modules, generate_msmt_folder_structure):
     return True
+
+
+def test_data_generating_fixture(refresh_modules, client):
+    id = get_entity_id()
+    ret = client.get(f"api/entities/{id}")
+    assert ret.status_code == 201
 
 
 def test_empty_query(refresh_modules, generate_msmt_folder_structure, client):
 
     ent = read_from_TOML(entity_with_data_bucket)
-    ID = ent.id
+    ID = ent.ID
     query = ""
-    ret = ent.suggest_data()
-    assert len(ret) == 9
+    ret_no_query = client.get(f"api/entities/{ID}/dataSuggestions")
+    assert len(ret_no_query) == 9
 
-    ret = ent.suggest_data(query=query)
+    ret = client.get(f"api/entities/{ID}/dataSuggestions?query={query}")
     assert len(ret) == 9
-
+    assert ret == ret_no_query
 
 def test_specific_query(refresh_modules, generate_msmt_folder_structure):
 

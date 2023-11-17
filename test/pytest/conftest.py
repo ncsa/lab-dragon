@@ -47,7 +47,7 @@ def module_names(refresh_modules):
 
 
 @pytest.fixture()
-def generate_msmt_folder_structure(tmp_path=Path(r'test/pytest/tmp').resolve(), n_measurements=1, generate_each_run=False):
+def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
     if tmp_path.is_dir() and generate_each_run:
         shutil.rmtree(tmp_path)
         tmp_path.mkdir()
@@ -90,7 +90,7 @@ def generate_msmt_folder_structure(tmp_path=Path(r'test/pytest/tmp').resolve(), 
                                             data_dir=folder_path,
                                             name=name, test_parameters=test_params)
             image = random.choice(images)
-            shutil.copy(Path("test/testing_images").resolve().joinpath(image), path)
+            shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
 
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
@@ -99,10 +99,11 @@ def generate_msmt_folder_structure(tmp_path=Path(r'test/pytest/tmp').resolve(), 
     add_toml_to_data(folder_path)
     create_full_test_env(tmp_path, create_md=False, light_delete=True)
 
-    ent_path = Path("test/pytest/tmp/Testing Pandas.toml").resolve()
+    ent_path = Path("./tmp/Testing Pandas.toml").resolve()
     ent = read_from_TOML(ent_path)
 
-    ent.data_buckets.append("data/Measurements.toml")
+    bucket_path = Path("./tmp/data/Measurements.toml").resolve()
+    ent.data_buckets.append(str(bucket_path))
     ent.to_TOML(ent_path)
 
 
@@ -117,8 +118,8 @@ def set_cors_headers_on_response(response):
 
 @pytest.fixture(scope='module')
 def client():
-    original_path = os.getcwd() + '/test/pytest'
-    entities_path = Path("./qdata/api").resolve()
+    original_path = os.getcwd() #+ '/test/pytest'
+    entities_path = Path("../../qdata/api").resolve()
 
     sys.path.insert(0, str(entities_path))
 

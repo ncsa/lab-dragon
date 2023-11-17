@@ -18,6 +18,6 @@ __pycache__/
 # Ignore the files created by the generators
 qdata/modules/*
 !qdata/modules/__init__.py
-!qdata/modules/data_bucket.py
+!qdata/modules/bucket.py
 _build/
 test/pytest/tmp/*

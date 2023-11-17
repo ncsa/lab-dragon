@@ -138,7 +138,7 @@ def delete_all_modules() -> None:
      Helper class to delete all modules in the modules directory.
     """
     for f in MODULESDIR.glob('*.py'):
-        if '__init__.py' in f.name or 'data_bucket.py' in f.name:
+        if '__init__.py' in f.name or 'bucket.py' in f.name:
             continue
         f.unlink()
 

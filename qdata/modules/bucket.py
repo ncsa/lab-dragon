@@ -12,13 +12,25 @@ from .entity import Entity
 from qdata.generators.meta import read_from_TOML
 
 
-class DataBucket(Entity):
+class Bucket(Entity):
+    """
+    Stands for data_bucket, entity needs to be called the same name as the module for the code to work.
 
-    def __init__(self, *args, **kwargs):
+    """
+
+    def __init__(self,path_to_uuid={}, uuid_to_path={}, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.path_to_uuid = {}
-        self.uuid_to_path = {}
+        if len(path_to_uuid) == 0:
+            self.path_to_uuid = {}.copy()
+        else:
+            self.path_to_uuid = path_to_uuid
+
+        if len(uuid_to_path) == 0:
+            if len(self.path_to_uuid) != 0:
+                self.uuid_to_path = {v: k for k, v in self.path_to_uuid.items()}
+        else:
+            self.uuid_to_path = uuid_to_path
 
     def add_instance(self, instance_path, uuid):
         self.path_to_uuid[instance_path] = uuid
