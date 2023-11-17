@@ -15,12 +15,16 @@ import { createDataMention } from "./extensions/DataMention";
 const BASE_API = "http://localhost:8000/api/"
 
 
-export default ({ onContentChange}) => {
+export default ({ onContentChange, entID}) => {
   
   const dataMentionsOptionsRef = useRef({});
 
-  const updateDataMentionsOptions = async () => {
-    const response = await fetch(BASE_API + "testing/fake_mentions");
+  const updateDataMentionsOptions = async (query) => {
+    let url = BASE_API + "entities/" + entID + "/data_suggestions";
+    if (query) {
+      url += "?query=" + query;
+    }
+    const response = await fetch(url);
     const data = JSON.parse(await response.json());
     dataMentionsOptionsRef.current = data;
   }
@@ -43,7 +47,7 @@ export default ({ onContentChange}) => {
         },
         suggestion: {
           items: async ({ query }) => {
-            await updateDataMentionsOptions();
+            await updateDataMentionsOptions(query);
             const keys = Object.keys(dataMentionsOptionsRef.current);
             return keys;
           },

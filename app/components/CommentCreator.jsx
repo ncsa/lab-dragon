@@ -23,7 +23,7 @@ export default function CommentCreator({entID, reloader}) {
             content, 
         }
 
-        let response = await fetch(BASE_API+"entities/" + entID + "?HTML=True", {
+        let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,14 +45,7 @@ export default function CommentCreator({entID, reloader}) {
         <div className="CommentCreator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
-                <Tiptap onContentChange={handleContentChange}/>
-
-                {/* { <textarea
-                    required
-                    placeholder="Add a comment or drop an image here..."
-                    onChange={e => setContent(e.target.value)}
-                    value={content}
-                /> } */}
+                <Tiptap onContentChange={handleContentChange} entID={entID}/>
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit" className="submitButton">Submit</button>}
             </form>
