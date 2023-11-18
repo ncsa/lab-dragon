@@ -505,7 +505,12 @@ def get_possible_parents():
 
 
 def _search_parents_with_buckets(ent):
+    """
+    Recursive function that searches for parent entities with data buckets
 
+    :param ent: The entity to search
+    :return: The entity with data buckets, or None if no entity with data buckets can be found
+    """
     if ent.parent == "":
         return None
 
@@ -516,7 +521,18 @@ def _search_parents_with_buckets(ent):
     return ret_ent
 
 
+# FIXME: The return value should have the keys and value of the dictionary flipped.
 def get_data_suggestions(ID, query="", num_matches=10):
+    """
+    Returns matched datasets in a bucket with the query.
+    If the entity does not have a bucket, it will search the parents for buckets or return None if no buckets are found.
+
+    :param ID: The id of the entity to search
+    :param query: The query to match
+    :param num_matches: How many matches until the function stops looking for matches.
+
+    :return: Dictionary with the name of data as keys and the id as values
+    """
     matches = {}
 
     ent = INDEX[ID]
