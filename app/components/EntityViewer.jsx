@@ -48,6 +48,14 @@ export default function EntityViewer({ entity, displayChildren }) {
         setActivatedComment(id);
     }
 
+    const deactivateAllComments = () => {
+        setActivatedComment(null);
+    }
+
+    const unselectAllComments = () => {
+        setSelectedComment(null);
+    }
+
     if (entity !== null && displayChildren !== null) {
         combinedArray = [...entity.comments, ...displayChildren];
         combinedArray.sort((a, b) => {
@@ -77,18 +85,22 @@ export default function EntityViewer({ entity, displayChildren }) {
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment == entity.comments[key].ID}
                             onDoubleClickHandler={handleCommentDoubleClick} />)
+
                     }) : combinedArray.map(item => {
                         return item.com_type ? <Comment comment={item} 
                             entID={entity.ID} 
                             isSelected={selectedComment === item.ID}
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment === item.ID}
-                            onDoubleClickHandler={handleCommentDoubleClick} /> : 
+                            onDoubleClickHandler={handleCommentDoubleClick}
+                            deactivateAllComments={deactivateAllComments} /> : 
+                                
                                 <SmallEntityViewer entity={item} 
                                     onClickHandler={handleCommentClick}
                                     selectedComment={selectedComment}
                                     onDoubleClickHandler={handleCommentDoubleClick}
-                                    activatedComment={activatedComment} />
+                                    activatedComment={activatedComment}
+                                    deactivateAllComments={deactivateAllComments} />
                     })
 
                 }

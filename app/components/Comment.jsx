@@ -1,8 +1,20 @@
 
-import CommentCreator from "./CommentCreator"
+import React, { useState } from "react"
+import CommentEditor from "./CommentEditor"
 
 
 export const BASE_API = "http://localhost:8000/api/"
+
+export async function getComment(entId, commentId) {
+    let response = await fetch(BASE_API+"entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    return await response.json()
+}
 
 /*
 
@@ -14,28 +26,35 @@ a comment gets selected with a single click. A comment can be activated with a d
 
 */
 
-export default function Comment({comment, entID, onClickHandler, isSelected, onDoubleClickHandler, isActivated}) {
-    const content = comment.content
-    const type = comment.com_type
-    const comID = comment.ID
+export default function Comment({comment, entID, onClickHandler, isSelected, onDoubleClickHandler, isActivated, deactivateAllComments}) {
     
+    const [updatingComment, setUpdatingComment] = useState(comment);
+    
+    const refreshComment = () => {
+        getComment(entID, updatingComment.ID).then(newComment => {
+            const parsed_item = JSON.parse(JSON.parse(newComment)); // FIXME: This means I am over stringifying my object from the server. This should be fixed.
+            setUpdatingComment(parsed_item);
+        });
+        deactivateAllComments();
+    }
+
     const innerClickHandler = (event) => {
-        onClickHandler(comID)
+        onClickHandler(updatingComment.ID)
     }
 
     const innerDoubleClickHandler = (event) => {
-        onDoubleClickHandler(comID)
+        onDoubleClickHandler(updatingComment.ID)
     }
 
-    if (type[0] == 4 || type[0] == 5) {
+    if (updatingComment.com_type[updatingComment.com_type.length - 1] == 4 || updatingComment.com_type[updatingComment.com_type.length - 1] == 5) {
         return (
             <div className={`comment ${isSelected ? 'selected': ''}`}
                 onClick={innerClickHandler}>
-                <img src={BASE_API+"entities/"+entID+"/"+comID} alt="Image is loading" />
+                <img src={BASE_API+"entities/"+entID+"/"+updatingComment.ID} alt="Image is loading" />
             </div>
         )
-    } else if (type[0] == 6) {
-        const tableData = content[0];
+    } else if (updatingComment.com_type[updatingComment.com_type.length - 1] == 6) {
+        const tableData = updatingComment.content[updatingComment.content.length - 1];
         const columnNames = Object.keys(tableData);
         const numberOfRows = tableData[columnNames[0]].length;
 
@@ -65,12 +84,12 @@ export default function Comment({comment, entID, onClickHandler, isSelected, onD
     } else {
 
         if (isActivated) {
-           return <CommentCreator entID={entID} initialContent={content[0]} />
+           return <CommentEditor entID={entID} comment={comment} refresh={refreshComment}/>
         }
 
         return <div className={`comment ${isSelected ? 'selected': ''}`}
             onClick={innerClickHandler}
             onDoubleClick={innerDoubleClickHandler} 
-            dangerouslySetInnerHTML={{ __html: content[0] }}></div> // The  span is there to have an element in which to place the argument.
+            dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}></div> // The  span is there to have an element in which to place the argument.
     }
 }

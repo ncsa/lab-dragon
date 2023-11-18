@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tiptap/extension-link": "^2.1.12",
     "@tiptap/extension-mention": "^2.1.12",
     "@tiptap/extension-placeholder": "^2.1.12",
     "@tiptap/pm": "^2.1.12",
