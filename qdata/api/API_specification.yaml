@@ -63,6 +63,14 @@ components:
         schema:
             type: "string"
 
+    username:
+      name: "username"
+      description: "The username adding content"
+      in: query
+      required: false
+      schema:
+          type: "string"
+
     query:
       name: "query"
       description: "Query to search for"
@@ -70,6 +78,14 @@ components:
       required: false
       schema:
         type: "string"
+
+    HTML:
+      name: "HTML"
+      description: "If true, the text in the request body is interpreted as HTML and converted to markdown or vice versa. Always defaults to False"
+      in: query
+      required: false
+      schema:
+          type: "boolean"
 
 paths:
   /entities:
@@ -138,17 +154,8 @@ paths:
       summary: "Add a comment to the entity with the given ID"
       parameters:
         - $ref: "#/components/parameters/ID"
-        - in: query
-          name: "username"
-          schema:
-            type: "string"
-          description: "Username of the user adding the comment, if left empty the user of the entity is used"
-        - in: query
-          name: "HTML"
-          schema:
-            type: "boolean"
-          description: "If true, the comment is interpreted as HTML and converted to markdown"
-
+        - $ref: "#/components/parameters/username"
+        - $ref: "#/components/parameters/HTML"
       responses:
         "200":
             description: "Successfully added comment"
@@ -173,11 +180,43 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ID"
         - $ref: "#/components/parameters/commentID"
+        - in: query
+          name: "whole_comment"
+          schema:
+              type: "boolean"
+          description: "If true, the whole comment is returned, otherwise only the content"
+        - $ref: "#/components/parameters/HTML"
       responses:
         "200":
           description: "Successfully read comment"
         "404":
           description: "Comment not found"
+
+    patch:
+      operationId: "entities.edit_comment"
+      tags:
+          - Entities
+          - Comments
+      summary: "Edit the comment with the given ID of an entity"
+      parameters:
+          - $ref: "#/components/parameters/ID"
+          - $ref: "#/components/parameters/commentID"
+          - $ref: "#/components/parameters/username"
+          - $ref: "#/components/parameters/HTML"
+      responses:
+          "200":
+              description: "Successfully edited comment"
+          "404":
+              description: "Comment not found"
+
+      requestBody:
+        description: "Updated comment"
+        required: true
+        content:
+          application/json:
+              schema:
+                x-body-name: "comment"
+                $ref: "#/components/schemas/Comment"
 
   /entities/{ID}/info:
     get:

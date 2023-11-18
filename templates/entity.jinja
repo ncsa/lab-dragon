@@ -212,6 +212,23 @@ class {{class_name}}({{ inherits_from }}):
             else:
                 raise TypeError(f"Comment must be a string, Table object, or a Comment object, not {type(comment)}")
 
+    def modify_comment(self, comment_id, content, user=None):
+
+        comment = None
+        for com in self.comments:
+            if com.ID == comment_id:
+                comment = com
+                break
+        if comment is None:
+            raise ValueError(f"Comment with id {comment_id} does not exist.")
+
+        if user is None:
+            user = comment.authors[-1]
+
+        comment.modify(content=content, user=user)
+        return True
+
+
     def suggest_data(self, query: str = "", min_threshold=5) -> List[str]:
         """
         Function used to suggest Instances based on a passed query.

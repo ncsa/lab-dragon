@@ -9,7 +9,7 @@ def get_entity_id(path=entity_with_data_bucket):
     return read_from_TOML(path).ID
 
 
-def test_basic_generation(refresh_modules, generate_msmt_folder_structure):
+def test_basic_generation(refresh_modules):
     return True
 
 

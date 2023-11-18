@@ -263,12 +263,13 @@ def read_image(ID, imageName):
         abort(404, f"Image with ID {ID} and name {imageName} not found")
 
 
-def read_comment(ID, commentID):
+def read_comment(ID, commentID, whole_comment=False, HTML=False):
     """
     API function that looks at the comment ID of the entity with ID and returns the comment
 
     :param ID:
     :param commentID:
+    :param whole_comment: if True, returns the whole comment, if False, returns only the last content.
     :return:
     """
 
@@ -286,6 +287,19 @@ def read_comment(ID, commentID):
     content, media_type, author, date = comment.last_comment()
     if media_type == SupportedCommentType.jpg.value or media_type == SupportedCommentType.png.value:
         return send_file(content)
+
+    if whole_comment:
+        if HTML:
+            comment_copy = copy.deepcopy(comment)
+            converted_content = []
+            for cont in comment.content:
+                replaced_path = comment_path_to_uuid(cont)
+                html_comment = markdown.markdown(replaced_path)
+                converted_content.append(html_comment)
+            comment_copy.content = converted_content
+            return json.dumps(str(comment_copy)), 201
+        else:
+            return json.dumps(str(comment)), 201
     else:
         return json.dumps(content), 201
 
@@ -431,6 +445,28 @@ def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False)
     copy_ent.to_TOML(ent_path)
 
     return make_response("Comment added", 201)
+
+
+# TODO: don't forget to check if the comments are the same, this will mean that the comment was not edited so no update is needed.
+def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: bool = False):
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+
+    content = html_to_markdown.convert(comment['content'])
+
+    try:
+
+        ret = ent.modify_comment(commentID, content, username)
+        if ret:
+            ent.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+            return make_response("Comment edited successfully", 201)
+    except ValueError as e:
+        abort(400, str(e))
+
+    return abort(400, "Something went wrong, try again")
 
 
 def add_entity(**kwargs):
