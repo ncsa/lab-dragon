@@ -76,6 +76,19 @@ def create_path_entity_copy(ent: Entity) -> Entity:
     for child in copy_ent.children:
         children_paths.append(UUID_TO_PATH_INDEX[child])
     copy_ent.children = children_paths
+
+    comments = []
+    for comment in copy_ent.comments:
+        content = []
+        for cont, category in zip(comment.content, comment.com_type):
+            if category == SupportedCommentType.md.value or category == SupportedCommentType.string.value:
+                content.append(comment_path_to_uuid(cont))
+            else:
+                content.append(cont)
+
+        comment.content = content
+        comments.append(comment)
+
     return copy_ent
 
 
@@ -461,7 +474,9 @@ def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: b
     try:
         ret = ent.modify_comment(commentID, comment, username)
         if ret:
-            ent.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+            # Convert uuids in the entity to paths
+            path_copy = create_path_entity_copy(ent)
+            path_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
             return make_response("Comment edited successfully", 201)
     except ValueError as e:
         abort(400, str(e))
