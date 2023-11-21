@@ -202,7 +202,11 @@ paths:
           - $ref: "#/components/parameters/ID"
           - $ref: "#/components/parameters/commentID"
           - $ref: "#/components/parameters/username"
-          - $ref: "#/components/parameters/HTML"
+          - in: query
+            name: "HTML"
+            schema:
+              type: "boolean"
+            description: "If true, the comment is interpreted as HTML and converted to markdown"
       responses:
           "200":
               description: "Successfully edited comment"
@@ -215,8 +219,8 @@ paths:
         content:
           application/json:
               schema:
+                type: "string"
                 x-body-name: "comment"
-                $ref: "#/components/schemas/Comment"
 
   /entities/{ID}/info:
     get:

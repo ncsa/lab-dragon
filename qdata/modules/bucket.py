@@ -26,9 +26,8 @@ class Bucket(Entity):
         else:
             self.path_to_uuid = path_to_uuid
 
-        if len(uuid_to_path) == 0:
-            if len(self.path_to_uuid) != 0:
-                self.uuid_to_path = {v: k for k, v in self.path_to_uuid.items()}
+        if len(uuid_to_path) == 0 and len(self.path_to_uuid) != 0:
+            self.uuid_to_path = {v: k for k, v in self.path_to_uuid.items()}
         else:
             self.uuid_to_path = uuid_to_path
 

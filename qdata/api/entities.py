@@ -447,7 +447,7 @@ def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False)
     return make_response("Comment added", 201)
 
 
-# TODO: don't forget to check if the comments are the same, this will mean that the comment was not edited so no update is needed.
+# TODO: Commments don't yet accept any other username.
 def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: bool = False):
 
     if ID not in INDEX:
@@ -455,11 +455,11 @@ def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: b
 
     ent = INDEX[ID]
 
-    content = html_to_markdown.convert(comment['content'])
+    if HTML:
+        comment = html_to_markdown.convert(comment)
 
     try:
-
-        ret = ent.modify_comment(commentID, content, username)
+        ret = ent.modify_comment(commentID, comment, username)
         if ret:
             ent.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
             return make_response("Comment edited successfully", 201)
