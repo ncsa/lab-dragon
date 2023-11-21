@@ -7,6 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
+import Link from "@tiptap/extension-link";
 import { MentionList } from "./MentionList";
 import "./styles.css";
 import { PluginKey } from "prosemirror-state";
@@ -39,6 +40,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       Document,
       Paragraph,
       Text,
+      Link,
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),

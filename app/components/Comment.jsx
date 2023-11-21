@@ -84,7 +84,7 @@ export default function Comment({comment, entID, onClickHandler, isSelected, onD
     } else {
 
         if (isActivated) {
-           return <CommentEditor entID={entID} comment={comment} refresh={refreshComment}/>
+            return <CommentEditor entID={entID} comment={updatingComment} refresh={refreshComment}/>
         }
 
         return <div className={`comment ${isSelected ? 'selected': ''}`}

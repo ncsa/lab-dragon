@@ -20,11 +20,11 @@ export default function CommentEditor({entID, comment, refresh}) {
         e.preventDefault();
         setIsLoading(true);
 
-        const editedComment = {
-            content,
-        }
+        // FIXME: This is a dirty a way of fixing the issue of the content being a string or an array. I should probably make content always a string directly.
+        const editedComment = typeof content === 'string' ? content : content[0];
+        console.log("what is happening with editedComment", editedComment)
 
-        let response = await fetch(BASE_API + "entities/" + entID + "/" + comment.ID + "?HTML=True", {
+        let response = await fetch(BASE_API + "entities/" + entID + "/" + comment.ID + "?HTML=True&username=" + comment.authors[comment.authors.length - 1], {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export default function CommentEditor({entID, comment, refresh}) {
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}
                  entID={entID}
-                 initialContent={content[0]}
+                 initialContent={comment.content[comment.content.length - 1]}
                  />
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit" className="submitButton">Submit</button>}
