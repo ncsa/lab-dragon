@@ -254,10 +254,10 @@ def read_one(ID, name_only=False):
 
         ent_copy = copy.deepcopy(ent)
         for comment in ent_copy.comments:
-            if comment.com_type[0] == SupportedCommentType.md.value or comment.com_type[0] == SupportedCommentType.string.value:
-                replaced_path = comment_path_to_uuid(comment.content[0])
+            if comment.com_type[-1] == SupportedCommentType.md.value or comment.com_type[-1] == SupportedCommentType.string.value:
+                replaced_path = comment_path_to_uuid(comment.content[-1])
                 html_comment = markdown.markdown(replaced_path)
-                comment.content[0] = html_comment
+                comment.content[-1] = html_comment
 
         return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
     else:
