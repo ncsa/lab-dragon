@@ -26,10 +26,20 @@ a comment gets selected with a single click. A comment can be activated with a d
 
 */
 
-export default function Comment({comment, entID, onClickHandler, isSelected, onDoubleClickHandler, isActivated, deactivateAllComments}) {
+export default function Comment({comment,
+                                 entID,
+                                 onClickHandler, 
+                                 isSelected, 
+                                 onDoubleClickHandler, 
+                                 isActivated, 
+                                 deactivateAllComments,
+                                 entType = null,
+                                }) {
+                                 
     
     const [updatingComment, setUpdatingComment] = useState(comment);
-    
+    const [isHovered, setIsHovered] = useState(false);
+
     const refreshComment = () => {
         getComment(entID, updatingComment.ID).then(newComment => {
             const parsed_item = JSON.parse(JSON.parse(newComment)); // FIXME: This means I am over stringifying my object from the server. This should be fixed.
@@ -90,6 +100,17 @@ export default function Comment({comment, entID, onClickHandler, isSelected, onD
         return <div className={`comment ${isSelected ? 'selected': ''}`}
             onClick={innerClickHandler}
             onDoubleClick={innerDoubleClickHandler} 
-            dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}></div> // The  span is there to have an element in which to place the argument.
+            onMouseEnter = {() => setIsHovered(true)}
+            onMouseLeave = {() => setIsHovered(false)}
+            >
+                <span dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}/>
+                {isHovered && (
+                    <div className={`comment-buttons ${entType ? entType : ""}`}>
+                        <button>New Comment</button>
+                        <button>New Step</button>
+                        <button>New Task</button>
+                    </div>
+    )}
+            </div> // The  span is there to have an element in which to place the argument.
     }
 }

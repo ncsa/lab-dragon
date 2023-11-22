@@ -111,7 +111,8 @@ export default function SmallEntityViewer({entity,
                     isSelected={selectedComment == entity.comments[key].ID}
                     onDoubleClickHandler={onDoubleClickHandler}
                     isActivated={activatedComment == entity.comments[key].ID}
-                    deactivateAllComments={deactivateAllComments} />)
+                    deactivateAllComments={deactivateAllComments}
+                    entType={entity.type} />)
             })}
         </div>
     )

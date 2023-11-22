@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --project-color: lightgrey;
+    --task-color: lightpink;
+    --step-color: lightsalmon;
+}
+
+
 *{
     margin: 0;
     padding: 0;
@@ -171,15 +178,15 @@ button:active{
 }
 
 .small-entity.Project{
-    background-color: lightgrey;
+    background-color: var(--project-color);
 }
 
 .small-entity.Task{
-    background-color: lightpink;
+    background-color: var(--task-color);
 }
 
 .small-entity.Step{
-    background-color: lightsalmon;
+    background-color: var(--step-color);
 }
 
 .small-entity .tree{
@@ -246,18 +253,21 @@ button:active{
     padding: 10px;
     border: 1px solid #ddd;
     background-color: inherit;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1000;
+    z-index: 5;
     border-radius: 5px;
     font-size: 14px;
     color: #333;
     white-space: pre-wrap;
+    position: relative;
 
 }
 
 .comment:hover{
     padding: 15px;
     border: 2px solid black;
+    padding-bottom: 20px;
+    z-index: 1000;
+    position: relative;
     
 }
 
@@ -311,7 +321,38 @@ button:active{
     padding: .1rem .3rem;
 }
 
+ .comment-buttons {
+    position: absolute;
+    bottom: -10;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    z-index: 1500;
+ }
 
+ .comment-buttons button {
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    /* width: 80px; */
+    height: 30px;
+    padding: 5px;
+    font-size: 12px;  
+    z-index: 1500;
+ }
+
+ .comment-buttons.Project button {
+    background-color: var(--project-color);
+ }
+
+.comment-buttons.Task button {
+    background-color: var(--task-color);
+}
+
+.comment-buttons.Step button {
+    background-color: var(--step-color);
+}
 /* ENTITY POPUP */  
 
 .entity-popup {
