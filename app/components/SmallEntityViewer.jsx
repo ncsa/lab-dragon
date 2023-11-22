@@ -72,7 +72,7 @@ export default function SmallEntityViewer({entity,
         setShowTree(false);
     };
 
-    // also sets the activated comment to null
+    // also deactivates all comments.
     const reloadComments = () => {
         getComments(entity.ID).then(data => {
             setComments(data);
@@ -140,7 +140,7 @@ export default function SmallEntityViewer({entity,
                     entType={entity.type} />)
             })}
 
-            {activatedComment === entity.ID &&
+            {activatedComment == entity.ID && 
             <div>
                 <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadComments}/>
             </div>
