@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect} from 'react';
 import Comment from './Comment';
+import CommentCreator from './CommentCreator';
 
 
 export const BASE_URL = 'http://localhost:3000/entities/';
@@ -31,19 +32,36 @@ export async function getTree(id) {
     return await response.json()
 }
 
+export async function getComments(id) {
+    let response = await fetch(BASE_API+"entities/" + id, {
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    const ent = await response.json()
+    const parsedEnt = JSON.parse(ent)
+    const parsedComments = parsedEnt.comments.map(comment => JSON.parse(comment))
+
+    return parsedComments
+}
+
 
 export default function SmallEntityViewer({entity,
                                            onClickHandler,
                                            selectedComment,
                                            onDoubleClickHandler,
                                            activatedComment,
-                                           deactivateAllComments,}) {
+                                           deactivateAllComments,
+                                           reloadEntityComments,}) {
 
     const [numChildren, setNumChildren] = useState(null);
     const [rank, setRank] = useState(null);
     const [tree, setTree] = useState(null);
     const [showTree, setShowTree] = useState(false);
     const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 });
+    const [comments, setComments] = useState(entity.comments);
 
     const handleMouseEnter = (event) => {
         setShowTree(true);
@@ -54,6 +72,13 @@ export default function SmallEntityViewer({entity,
         setShowTree(false);
     };
 
+    // also sets the activated comment to null
+    const reloadComments = () => {
+        getComments(entity.ID).then(data => {
+            setComments(data);
+        });
+        deactivateAllComments();
+    }
 
     useEffect(() => {
         getInfo(entity.ID).then(data => {
@@ -103,17 +128,24 @@ export default function SmallEntityViewer({entity,
                     </div>
                 </h3>
             </div>
-            { Object.keys(entity.comments).map((key) => {
-                return (<Comment key={entity.comments[key].ID} 
-                    comment={entity.comments[key]} 
+            { Object.keys(comments).map((key) => {
+                return (<Comment key={comments[key].ID} 
+                    comment={comments[key]} 
                     entID={entity.ID}
                     onClickHandler={onClickHandler}
-                    isSelected={selectedComment == entity.comments[key].ID}
+                    isSelected={selectedComment == comments[key].ID}
                     onDoubleClickHandler={onDoubleClickHandler}
-                    isActivated={activatedComment == entity.comments[key].ID}
+                    isActivated={activatedComment == comments[key].ID}
                     deactivateAllComments={deactivateAllComments}
                     entType={entity.type} />)
             })}
+
+            {activatedComment === entity.ID &&
+            <div>
+                <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadComments}/>
+            </div>
+            }
+
         </div>
     )
 

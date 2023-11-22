@@ -18,7 +18,7 @@ export async function getEntityName(id) {
     return await response.json()
 }
 
-export default function EntityViewer({ entity, displayChildren }) {
+export default function EntityViewer({ entity, displayChildren, childrenReloader}) {
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
@@ -100,7 +100,8 @@ export default function EntityViewer({ entity, displayChildren }) {
                                     selectedComment={selectedComment}
                                     onDoubleClickHandler={handleCommentDoubleClick}
                                     activatedComment={activatedComment}
-                                    deactivateAllComments={deactivateAllComments} />
+                                    deactivateAllComments={deactivateAllComments} 
+                                    reloadEntityComments={childrenReloader}/>
                     })
 
                 }

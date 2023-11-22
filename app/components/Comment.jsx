@@ -106,7 +106,10 @@ export default function Comment({comment,
             >
                 <span dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}/>
                 {isHovered && (
-                    <CreationButtons entType={entType}/>
+                    <CreationButtons 
+                    entID={entID}
+                    entType={entType}
+                    newCommentActivator={onDoubleClickHandler}/>
     )}
             </div> // The  span is there to have an element in which to place the argument.
     }
