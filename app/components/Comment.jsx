@@ -1,6 +1,7 @@
 
 import React, { useState } from "react"
 import CommentEditor from "./CommentEditor"
+import CreationButtons from "./CreationButtons"
 
 
 export const BASE_API = "http://localhost:8000/api/"
@@ -105,11 +106,7 @@ export default function Comment({comment,
             >
                 <span dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}/>
                 {isHovered && (
-                    <div className={`comment-buttons ${entType ? entType : ""}`}>
-                        <button>New Comment</button>
-                        <button>New Step</button>
-                        <button>New Task</button>
-                    </div>
+                    <CreationButtons entType={entType}/>
     )}
             </div> // The  span is there to have an element in which to place the argument.
     }
