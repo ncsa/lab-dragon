@@ -258,7 +258,6 @@ button:active{
     font-size: 14px;
     color: #333;
     white-space: pre-wrap;
-    /* position: relative; */
 
 }
 
@@ -267,7 +266,6 @@ button:active{
     border: 2px solid black;
     padding-bottom: 20px;
     z-index: 6;
-    /* position: relative; */
     
 }
 

@@ -1,7 +1,8 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import SidebarItem from "./SidebarItem";
 import EntityInput from './EntityInput';
+import { CreationPopupContext } from '@/app/contexts/CreationPopupContext';
 
 const BASE_API = "http://localhost:8000/api/";
 
@@ -12,7 +13,7 @@ async function getSidebarItems() {
 
 export default function Sidebar() {
     const [entities, setEntities] = useState([]);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const { isPopupOpen, setIsPopupOpen } = useContext(CreationPopupContext);
 
     const closePopup = () => {setIsPopupOpen(false)}
 
