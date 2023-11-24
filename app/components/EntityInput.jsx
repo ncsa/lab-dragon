@@ -1,6 +1,7 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
 const BASE_API = "http://localhost:8000/api/"
 
@@ -33,17 +34,20 @@ export default function EntityInput({closeFunction, populateSideBar}) {
     const [TypesOptions, setTypesOptions] = useState([]);
     const [parentsOptions, setParentsOptions] = useState([]);
 
-    // Figure out what the default parent should be
-    const currentPath = usePathname();
-    const currentPathSliced = currentPath.slice(-36);
-    const defaultParent = isUUID(currentPathSliced) ? currentPathSliced : "";
-
-    // Variables holding the form values
-    const [name, setName] = useState("");
-    const [user, setUser] = useState("");
-    const [type, setType] = useState("");
-    const [parent, setParent] = useState(defaultParent);
+    // Variables holding the form values, getting from context so other components can access them
+    const { name, setName } = useContext(CreationPopupContext);
+    const { user, setUser } = useContext(CreationPopupContext);
+    const { type, setType } = useContext(CreationPopupContext);
+    const { parent, setParent } = useContext(CreationPopupContext);
     const [isLoading, setIsLoading] = useState(false);
+
+    if (parent === null) {
+        const currentPath = usePathname();
+        const currentPathSliced = currentPath.slice(-36);
+        const defaultParent = isUUID(currentPathSliced) ? currentPathSliced : "";
+        setParent(defaultParent);
+    };
+
 
     useEffect(() => {
         getUsers().then(data => {
@@ -66,6 +70,19 @@ export default function EntityInput({closeFunction, populateSideBar}) {
             setParentsOptions(JSON.parse(data));
         });
     }, []);
+
+    if (name === null) {
+        setName("");
+    }
+
+    if (user === null) {
+        setUser(userOptions[0]);
+    };
+
+    if (type === null) {
+        setType(TypesOptions[0]);
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
