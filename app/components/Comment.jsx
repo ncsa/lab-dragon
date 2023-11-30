@@ -35,6 +35,7 @@ export default function Comment({comment,
                                  isActivated, 
                                  deactivateAllComments,
                                  entType = null,
+                                 onlyComment = false,
                                 }) {
                                  
     
@@ -109,7 +110,8 @@ export default function Comment({comment,
                     <CreationButtons 
                     entID={entID}
                     entType={entType}
-                    newCommentActivator={onDoubleClickHandler}/>
+                    newCommentActivator={onDoubleClickHandler}
+                    onlyComment={onlyComment}/>
     )}
             </div> // The  span is there to have an element in which to place the argument.
     }

@@ -84,7 +84,9 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
                             isSelected={selectedComment == entity.comments[key].ID}
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment == entity.comments[key].ID}
-                            onDoubleClickHandler={handleCommentDoubleClick} />)
+                            onDoubleClickHandler={handleCommentDoubleClick}
+                            onlyComment={entity.type === "Step" ? true : false}
+                        />)
 
                     }) : combinedArray.map(item => {
                         return item.com_type ? <Comment comment={item} 
@@ -93,7 +95,8 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment === item.ID}
                             onDoubleClickHandler={handleCommentDoubleClick}
-                            deactivateAllComments={deactivateAllComments} /> : 
+                            deactivateAllComments={deactivateAllComments} 
+                            onlyComment={entity.type === "Step" ? true : false} /> : 
                                 
                                 <SmallEntityViewer entity={item} 
                                     onClickHandler={handleCommentClick}
