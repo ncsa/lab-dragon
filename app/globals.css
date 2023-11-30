@@ -56,6 +56,9 @@ button:active{
     border: 2px solid #ccc;
 }
 
+.flex-container {
+    display: flex;
+}
 
 .sidebar{
     color: aliceblue;
@@ -258,6 +261,7 @@ button:active{
     font-size: 14px;
     color: #333;
     white-space: pre-wrap;
+    position: relative;
 
 }
 

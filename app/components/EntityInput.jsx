@@ -9,30 +9,15 @@ function isUUID(str) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
     return uuidRegex.test(str);
   }
-  
 
-async function getUsers() {
-    const response = await fetch(BASE_API + "properties/users");
-    return await response.json();
-}
+export default function EntityInput( {populateSideBar} ) {
 
-async function getTypes() {
-    const response = await fetch(BASE_API + "properties/types");
-    return await response.json();
-}
-
-async function getParents() {
-    const response = await fetch(BASE_API + "properties/parents");
-    return await response.json();
-}
-
-export default function EntityInput({closeFunction, populateSideBar}) {
     const router = useRouter();
 
     // Variables used to hold the different options that the fields can have
-    const [userOptions, setUserOptions] = useState([]);
-    const [TypesOptions, setTypesOptions] = useState([]);
-    const [parentsOptions, setParentsOptions] = useState([]);
+    const { userOptions, setUserOptions } = useContext(CreationPopupContext);
+    const { typesOptions, setTypesOptions } = useContext(CreationPopupContext);
+    const { parentsOptions, setParentsOptions } = useContext(CreationPopupContext);
 
     // Variables holding the form values, getting from context so other components can access them
     const { name, setName } = useContext(CreationPopupContext);
@@ -41,48 +26,14 @@ export default function EntityInput({closeFunction, populateSideBar}) {
     const { parent, setParent } = useContext(CreationPopupContext);
     const [isLoading, setIsLoading] = useState(false);
 
-    if (parent === null) {
-        const currentPath = usePathname();
+    const { isPopupOpen, setIsPopupOpen } = useContext(CreationPopupContext);
+
+    const currentPath = usePathname();
+    if (parent === null || parent === undefined || parent === "") {
         const currentPathSliced = currentPath.slice(-36);
         const defaultParent = isUUID(currentPathSliced) ? currentPathSliced : "";
         setParent(defaultParent);
     };
-
-
-    useEffect(() => {
-        getUsers().then(data => {
-            const parsed = JSON.parse(data);
-            setUserOptions(parsed);
-            setUser(parsed[0])
-        });
-    }, []);
-
-    useEffect(() => {
-        getTypes().then(data => {
-            const parsed = JSON.parse(data);
-            setTypesOptions(parsed);
-            setType(parsed[0])
-        });
-    }, []); 
-
-    useEffect(() => {
-        getParents().then(data => {
-            setParentsOptions(JSON.parse(data));
-        });
-    }, []);
-
-    if (name === null) {
-        setName("");
-    }
-
-    if (user === null) {
-        setUser(userOptions[0]);
-    };
-
-    if (type === null) {
-        setType(TypesOptions[0]);
-    };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -111,6 +62,10 @@ export default function EntityInput({closeFunction, populateSideBar}) {
             closeFunction();
         }
     }
+
+    const closeFunction = () => {
+        setIsPopupOpen(false);
+    };
 
     return (
         <div className="entity-popup">
@@ -147,7 +102,7 @@ export default function EntityInput({closeFunction, populateSideBar}) {
                                 value={type}
                             >
                                 {
-                                TypesOptions && TypesOptions.map((type, index) => (
+                                typesOptions && typesOptions.map((type, index) => (
                                     <option key={index} value={type}>{type}</option>
                                 ))}
                             </select>

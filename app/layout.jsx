@@ -1,10 +1,8 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 
-// components
-import Sidebar from './components/Sidebar';
-import CreationPopupProvider from './contexts/CreationPopupContext';
-
+import CreationPopupProvider from '@/app/contexts/CreationPopupContext';
+import EntityPopupWrapper from '@/app/components/EntityPopupWrapper';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,8 +20,7 @@ export default function RootLayout({ children }) {
         </head>
         <body className={inter.className}>
           <CreationPopupProvider>
-            <Sidebar />
-            {children}
+            <EntityPopupWrapper children={children}/>
           </CreationPopupProvider>
         </body>
     </html>
