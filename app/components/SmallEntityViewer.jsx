@@ -54,7 +54,11 @@ export default function SmallEntityViewer({entity,
                                            onDoubleClickHandler,
                                            activatedComment,
                                            deactivateAllComments,
-                                           reloadEntityComments,}) {
+                                           reloadEntityComments,
+                                           isHovered,
+                                           onHoverHandler,
+                                           OnHoverLeaveHandler
+                                        }) {
 
     const [numChildren, setNumChildren] = useState(null);
     const [rank, setRank] = useState(null);
@@ -137,6 +141,9 @@ export default function SmallEntityViewer({entity,
                     onDoubleClickHandler={onDoubleClickHandler}
                     isActivated={activatedComment == comments[key].ID}
                     deactivateAllComments={deactivateAllComments}
+                    isHovered={isHovered == comments[key].ID}
+                    onHoverHandler={onHoverHandler}
+                    OnHoverLeaveHandler={OnHoverLeaveHandler}
                     entType={entity.type} />)
             })}
 

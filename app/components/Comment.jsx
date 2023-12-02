@@ -34,13 +34,15 @@ export default function Comment({comment,
                                  onDoubleClickHandler, 
                                  isActivated, 
                                  deactivateAllComments,
+                                 isHovered,
+                                 onHoverHandler,
+                                 OnHoverLeaveHandler,
                                  entType = null,
                                  onlyComment = false,
                                 }) {
                                  
     
     const [updatingComment, setUpdatingComment] = useState(comment);
-    const [isHovered, setIsHovered] = useState(false);
 
     const refreshComment = () => {
         getComment(entID, updatingComment.ID).then(newComment => {
@@ -102,8 +104,8 @@ export default function Comment({comment,
         return <div className={`comment ${isSelected ? 'selected': ''}`}
             onClick={innerClickHandler}
             onDoubleClick={innerDoubleClickHandler} 
-            onMouseEnter = {() => setIsHovered(true)}
-            onMouseLeave = {() => setIsHovered(false)}
+            onMouseEnter = {() => onHoverHandler(updatingComment.ID)}
+            onMouseLeave = {() => OnHoverLeaveHandler(updatingComment.ID)}
             >
                 <span dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}/>
                 {isHovered && (

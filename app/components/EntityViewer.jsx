@@ -23,6 +23,7 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
     const [childrenNames, setChildrenNames] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
     const [activatedComment, setActivatedComment] = useState(null);
+    const [isHovered, setIsHovered] = useState(null);
 
     let combinedArray = null;
 
@@ -48,12 +49,20 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
         setActivatedComment(id);
     }
 
+    const handleOnHover = (id) => {
+        setIsHovered(id);
+    }
+
     const deactivateAllComments = () => {
         setActivatedComment(null);
     }
 
     const unselectAllComments = () => {
         setSelectedComment(null);
+    }
+
+    const handleOnHoverLeave = (id) => {
+        setIsHovered(null);
     }
 
     if (entity !== null && displayChildren !== null) {
@@ -85,7 +94,11 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment == entity.comments[key].ID}
                             onDoubleClickHandler={handleCommentDoubleClick}
+                            isHovered={isHovered == entity.comments[key].ID}
+                            onHoverHandler={handleOnHover}
+                            OnHoverLeaveHandler={handleOnHoverLeave}
                             onlyComment={entity.type === "Step" ? true : false}
+
                         />)
 
                     }) : combinedArray.map(item => {
@@ -95,7 +108,10 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
                             onClickHandler={handleCommentClick}
                             isActivated={activatedComment === item.ID}
                             onDoubleClickHandler={handleCommentDoubleClick}
-                            deactivateAllComments={deactivateAllComments} 
+                            deactivateAllComments={deactivateAllComments}
+                            isHovered={isHovered == item.ID}
+                            onHoverHandler={handleOnHover}
+                            OnHoverLeaveHandler={handleOnHoverLeave}
                             onlyComment={entity.type === "Step" ? true : false} /> : 
                                 
                                 <SmallEntityViewer entity={item} 
@@ -104,7 +120,10 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
                                     onDoubleClickHandler={handleCommentDoubleClick}
                                     activatedComment={activatedComment}
                                     deactivateAllComments={deactivateAllComments} 
-                                    reloadEntityComments={childrenReloader}/>
+                                    reloadEntityComments={childrenReloader}
+                                    isHovered={isHovered}
+                                    onHoverHandler={handleOnHover}
+                                    OnHoverLeaveHandler={handleOnHoverLeave}/>
                     })
 
                 }
