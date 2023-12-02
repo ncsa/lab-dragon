@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import CommentViewer from "./CommentViewer";
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
 
@@ -16,13 +15,16 @@ export async function getEntityName(id) {
         throw new Error(response.statusText)
     }
 
-    const data = await response.json()
-    return data
+    return await response.json()
 }
 
-export default function EntityViewer({ entity, children}) {
+export default function EntityViewer({ entity, displayChildren, childrenReloader}) {
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
+    const [selectedComment, setSelectedComment] = useState(null);
+    const [activatedComment, setActivatedComment] = useState(null);
+    const [isHovered, setIsHovered] = useState(null);
+
     let combinedArray = null;
 
     useEffect(() => {
@@ -39,8 +41,32 @@ export default function EntityViewer({ entity, children}) {
         }
     }, [entity.parent, entity.children]);
 
-    if (entity !== null && children !== null) {
-        combinedArray = [...entity.comments, ...children];
+    const handleCommentClick = (id) => {
+        setSelectedComment(id);
+    }
+
+    const handleCommentDoubleClick = (id) => {
+        setActivatedComment(id);
+    }
+
+    const handleOnHover = (id) => {
+        setIsHovered(id);
+    }
+
+    const deactivateAllComments = () => {
+        setActivatedComment(null);
+    }
+
+    const unselectAllComments = () => {
+        setSelectedComment(null);
+    }
+
+    const handleOnHoverLeave = (id) => {
+        setIsHovered(null);
+    }
+
+    if (entity !== null && displayChildren !== null) {
+        combinedArray = [...entity.comments, ...displayChildren];
         combinedArray.sort((a, b) => {
             const timeA = a.created ? new Date(a.created) : new Date(a.start_time);
             const timeB = b.created ? new Date(b.created) : new Date(b.start_time);
@@ -50,7 +76,7 @@ export default function EntityViewer({ entity, children}) {
 
     return (
         <div>
-            <h1 className="entity-tittle">{entity.name}</h1>
+            <h1 className="tittle">{entity.name}</h1>
 
             <h2 className="entity-header">
                 { entity.parent && <p><b>Parent</b>: <Link className="entity-link" href={ BASE_URL + entity.parent }> {parentName} </Link></p>}
@@ -60,18 +86,48 @@ export default function EntityViewer({ entity, children}) {
 
             <div className="Content">
                 {
-                    combinedArray === null ? <CommentViewer comments={entity.comments} entID={entity.ID}/> : combinedArray.map(item => {
-                        return item.com_type ? <Comment comment={item} entID={entity.ID}/> : <SmallEntityViewer entity={item} />
+                    combinedArray === null ?  Object.keys(entity.comments).map((key) => {
+                        return (<Comment key={entity.comments[key].ID} 
+                            comment={entity.comments[key]}
+                            entID={entity.ID}
+                            isSelected={selectedComment == entity.comments[key].ID}
+                            onClickHandler={handleCommentClick}
+                            isActivated={activatedComment == entity.comments[key].ID}
+                            onDoubleClickHandler={handleCommentDoubleClick}
+                            isHovered={isHovered == entity.comments[key].ID}
+                            onHoverHandler={handleOnHover}
+                            OnHoverLeaveHandler={handleOnHoverLeave}
+                            onlyComment={entity.type === "Step" ? true : false}
+
+                        />)
+
+                    }) : combinedArray.map(item => {
+                        return item.com_type ? <Comment comment={item} 
+                            entID={entity.ID} 
+                            isSelected={selectedComment === item.ID}
+                            onClickHandler={handleCommentClick}
+                            isActivated={activatedComment === item.ID}
+                            onDoubleClickHandler={handleCommentDoubleClick}
+                            deactivateAllComments={deactivateAllComments}
+                            isHovered={isHovered == item.ID}
+                            onHoverHandler={handleOnHover}
+                            OnHoverLeaveHandler={handleOnHoverLeave}
+                            onlyComment={entity.type === "Step" ? true : false} /> : 
+                                
+                                <SmallEntityViewer entity={item} 
+                                    onClickHandler={handleCommentClick}
+                                    selectedComment={selectedComment}
+                                    onDoubleClickHandler={handleCommentDoubleClick}
+                                    activatedComment={activatedComment}
+                                    deactivateAllComments={deactivateAllComments} 
+                                    reloadEntityComments={childrenReloader}
+                                    isHovered={isHovered}
+                                    onHoverHandler={handleOnHover}
+                                    OnHoverLeaveHandler={handleOnHoverLeave}/>
                     })
 
                 }
             </div>
-
-
-            <h2 className="entity-footer">
-                <p><b><u>CONTINUE</u></b></p>
-                { entity.children && entity.children.map((child, index) => <p key={index}><Link className="entity-link" href={ BASE_URL + child }> {childrenNames ? childrenNames[index] : ''} </Link></p>)}
-            </h2>
         </div>
     )
 }

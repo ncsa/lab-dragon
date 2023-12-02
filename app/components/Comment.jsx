@@ -1,24 +1,80 @@
 
+import React, { useState } from "react"
+import CommentEditor from "./CommentEditor"
+import CreationButtons from "./CreationButtons"
+
+
 export const BASE_API = "http://localhost:8000/api/"
 
-export default function Comment({comment, entID}) {
-    const content = comment.content
-    const type = comment.com_type
-    const comID = comment.ID
+export async function getComment(entId, commentId) {
+    let response = await fetch(BASE_API+"entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    return await response.json()
+}
+
+/*
+
+A comment can be selected. This will just add a blue box around it. This will probably make it easier to add usability later on.
+
+A comment can also be activated. This means that the comment has an active editor on it and can be edited. This will probably be done by clicking on the comment.
+
+a comment gets selected with a single click. A comment can be activated with a double click
+
+*/
+
+export default function Comment({comment,
+                                 entID,
+                                 onClickHandler, 
+                                 isSelected, 
+                                 onDoubleClickHandler, 
+                                 isActivated, 
+                                 deactivateAllComments,
+                                 isHovered,
+                                 onHoverHandler,
+                                 OnHoverLeaveHandler,
+                                 entType = null,
+                                 onlyComment = false,
+                                }) {
+                                 
     
-    if (type[0] == 4 || type[0] == 5) {
+    const [updatingComment, setUpdatingComment] = useState(comment);
+
+    const refreshComment = () => {
+        getComment(entID, updatingComment.ID).then(newComment => {
+            const parsed_item = JSON.parse(JSON.parse(newComment)); // FIXME: This means I am over stringifying my object from the server. This should be fixed.
+            setUpdatingComment(parsed_item);
+        });
+        deactivateAllComments();
+    }
+
+    const innerClickHandler = (event) => {
+        onClickHandler(updatingComment.ID)
+    }
+
+    const innerDoubleClickHandler = (event) => {
+        onDoubleClickHandler(updatingComment.ID)
+    }
+
+    if (updatingComment.com_type[updatingComment.com_type.length - 1] == 4 || updatingComment.com_type[updatingComment.com_type.length - 1] == 5) {
         return (
-            <div className="comment">
-                <img src={BASE_API+"entities/"+entID+"/"+comID} alt="Image is loading" />
+            <div className={`comment ${isSelected ? 'selected': ''}`}
+                onClick={innerClickHandler}>
+                <img src={BASE_API+"entities/"+entID+"/"+updatingComment.ID} alt="Image is loading" />
             </div>
         )
-    } else if (type[0] == 6) {
-        const tableData = content[0];
+    } else if (updatingComment.com_type[updatingComment.com_type.length - 1] == 6) {
+        const tableData = updatingComment.content[updatingComment.content.length - 1];
         const columnNames = Object.keys(tableData);
         const numberOfRows = tableData[columnNames[0]].length;
 
         return (
-            <div className="comment">
+            <div className={`comment ${isSelected ? 'selected': ''}`}
+                onClick={innerClickHandler}>
                 <table>
                     <thead>
                         <tr>
@@ -40,6 +96,25 @@ export default function Comment({comment, entID}) {
             </div>
         ) 
     } else {
-        return (<p>{content[0]}</p>)
+
+        if (isActivated) {
+            return <CommentEditor entID={entID} comment={updatingComment} refresh={refreshComment}/>
+        }
+
+        return <div className={`comment ${isSelected ? 'selected': ''}`}
+            onClick={innerClickHandler}
+            onDoubleClick={innerDoubleClickHandler} 
+            onMouseEnter = {() => onHoverHandler(updatingComment.ID)}
+            onMouseLeave = {() => OnHoverLeaveHandler(updatingComment.ID)}
+            >
+                <span dangerouslySetInnerHTML={{ __html: updatingComment.content[updatingComment.content.length - 1] }}/>
+                {isHovered && (
+                    <CreationButtons 
+                    entID={entID}
+                    entType={entType}
+                    newCommentActivator={onDoubleClickHandler}
+                    onlyComment={onlyComment}/>
+    )}
+            </div> // The  span is there to have an element in which to place the argument.
     }
 }

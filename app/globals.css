@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --project-color: lightgrey;
+    --task-color: lightpink;
+    --step-color: lightsalmon;
+}
+
+
 *{
     margin: 0;
     padding: 0;
@@ -23,6 +30,36 @@ body {
     display: flex;
 }
 
+button{
+    background-color: #b5270e;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    z-index: 1; 
+    border-radius: 10px;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+button:hover{
+    background-color: #8a1c09;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+button:active{
+    transform: scale(0.95);
+    border: 2px solid #ccc;
+}
+
+.flex-container {
+    display: flex;
+}
+
 .sidebar{
     color: aliceblue;
     max-width: 20%;
@@ -37,15 +74,11 @@ body {
 
 .sidebar-item{
     padding: 0.5em;
-    /*font-size: 1.2em;*/
     display: block;
     border-radius: 5px;
-    /*This will let the hover effect have a slight animation. Probably not needed*/
-    /*transition: background-color 0.1s;*/
 }
 
 .sidebar-item:hover{
-    /*background-color: lightgrey;*/
     background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -94,7 +127,14 @@ body {
     width: 1.7em;
 }
 
-.entity-tittle{
+.sidebar button{
+    position: sticky;
+    bottom: 20px;
+    left: 25%;
+    right: 25%;
+}
+
+.tittle{
     font-size: 4.2em;
     font-weight: 700;
     padding: 0.5em;
@@ -116,8 +156,6 @@ body {
 
 .entity-link {
     color: blue;
-    /*text-decoration: none;*/
-    /*text-transform: uppercase;*/
 }
 
 .entity-link:hover {
@@ -132,25 +170,42 @@ body {
     color: purple;
 }
 
-
-/*!* comments css *!*/
-
-.comment img{
-    text-align: center;
-    white-space: nowrap;
-    margin-top: 5px;
-}
-
 /* SmallEntityViewer css */
+
 .small-entity{
     background-color: lightgrey;
-    border-top: 2px dashed grey;
-    border-bottom: 2px dotted grey;
-    margin-bottom: 5px;
+    border-top: 4px dashed grey;
+    border-bottom: 4px dotted grey;
+    margin-bottom: 15px;
     margin-top: 5px;
 }
 
-.small-entity h3{
+.small-entity.Project{
+    background-color: var(--project-color);
+}
+
+.small-entity.Task{
+    background-color: var(--task-color);
+}
+
+.small-entity.Step{
+    background-color: var(--step-color);
+}
+
+.small-entity .tree{
+    position: fixed;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 11;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.small-entity .small-entity-tittle h3{
     /*color: blue;*/
     text-decoration: none;
     font-size: 1.1em;
@@ -158,16 +213,77 @@ body {
     line-height: 1.2em;
     margin-bottom: 0;
     border-bottom: none;
+    display: inline-flex;
+    align-items: center;
 }
 
-.small-entity h3:hover{
+.small-entity .small-entity-tittle .Link-text:hover{
     text-decoration: underline;
 }
 
-.small-entity h3:visited{
+.small-entity .small-entity-tittle h3:visited{
     color: purple;
 }
 
+.small-entity .small-entity-tittle i{
+    font-size: 1.7em;
+    padding-right: 0.5em;
+    padding-left: 10px;
+}
+
+.small-entity .small-entity-tittle .small-entity-options{
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+}
+
+.small-entity .small-entity-tittle .small-entity-options span{
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    border: 1px solid black;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+}
+
+.small-entity .small-entity-tittle .small-entity-options:hover{
+    text-decoration: none;
+}
+
+/* Comment section */
+
+.comment {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: inherit;
+    z-index: 5;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    white-space: pre-wrap;
+    position: relative;
+
+}
+
+.comment:hover{
+    padding: 15px;
+    border: 2px solid black;
+    padding-bottom: 20px;
+    z-index: 6;
+    
+}
+
+.comment.selected{
+    padding: 15px;
+    outline: 2px solid cornflowerblue;
+
+}
+
+.comment img{
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 5px;
+}
 
 .comment table {
     width: 100%;
@@ -190,7 +306,132 @@ body {
     background-color: #f2f2f2;
 }
 
+.comment table tbody tr:nth-child(odd) {
+    background-color: rgb(254, 223, 192);
+}
+
 .comment table tbody td {
     padding: 10px;
     border: 1px solid #ddd;
+}
+
+.comment a {
+    color: #A975FF;
+    border: 1px solid black;
+    border-radius: .4rem;
+    box-decoration-break: clone;
+    padding: .1rem .3rem;
+}
+
+ .comment-buttons {
+    position: absolute;
+    bottom: -10;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    z-index: 7;
+ }
+
+ .comment-buttons button {
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    /* width: 80px; */
+    height: 30px;
+    padding: 5px;
+    font-size: 12px;  
+    z-index: 7;
+ }
+
+ .comment-buttons.Project button {
+    background-color: var(--project-color);
+ }
+
+.comment-buttons.Task button {
+    background-color: var(--task-color);
+}
+
+.comment-buttons.Step button {
+    background-color: var(--step-color);
+}
+/* ENTITY POPUP */  
+
+.entity-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;   
+    z-index: 1000;
+}
+
+.entity-popup .content{
+    background-color: white;
+    display: inline-block;
+    z-index: 1000;
+    padding: 20px; /* Add extra space around the content */
+    border-radius: 10px; /* Round the corners */
+    box-sizing: border-box;
+}
+
+.entity-popup.form {
+    display: inline-block;
+}
+
+.entity-popup h1 {
+    padding-bottom: 10px;
+}
+
+ul > li {
+    margin-bottom: 2px;
+}
+
+.entity-popup form input{
+    border: 1px solid black;
+}
+
+.entity-popup form input:hover{
+    outline: 2px solid cornflowerblue;
+}
+
+.entity-popup form select:hover{
+    outline: 2px solid cornflowerblue;
+}
+
+/* add content section */
+
+.addition-section {
+    display: flex;
+    flex-direction: row;
+    margin: 0.5em;
+    border-top: 1px solid #ccc;
+}
+
+.addition-section textarea{
+    width: 100%;
+    height: 100px;
+    resize: both;
+    border: 2px solid black;
+}
+
+.addition-section textarea:hover{
+    outline: 2px solid cornflowerblue;
+}
+
+.addition-section button.submitButton {
+    background-color: #b5270e;
+}
+
+.addition-section button.submitButton:hover{
+    background-color: #8a1c09;
+}
+
+.comment-creator {
+    padding-right: 20px;
 }

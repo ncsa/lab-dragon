@@ -1,0 +1,36 @@
+.tiptap {
+  width: 100%;
+  min-height: 100px;
+  min-width: 100px;
+  resize: both;
+  border: 2px solid black;
+  padding: 10px;
+  
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap:hover {
+  outline: 2px solid cornflowerblue;
+}
+
+.tiptap a {
+  color: #A975FF;
+  border: 1px solid black;
+  border-radius: .4rem;
+  box-decoration-break: clone;
+  padding: .1rem .3rem;
+}
+
+.mention {
+  color: #A975FF;
+  background-color: rgba(#A975FF, 0.1);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.3rem;
+}
