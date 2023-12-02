@@ -31,9 +31,9 @@ components:
     Comment:
       type: "object"
       required:
-        - text
+        - content
       properties:
-        text:
+        content:
           type: "string"
           description: "Text of the comment"
 
@@ -63,6 +63,30 @@ components:
         schema:
             type: "string"
 
+    username:
+      name: "username"
+      description: "The username adding content"
+      in: query
+      required: false
+      schema:
+          type: "string"
+
+    query:
+      name: "query"
+      description: "Query to search for"
+      in: query
+      required: false
+      schema:
+        type: "string"
+
+    HTML:
+      name: "HTML"
+      description: "If true, the text in the request body is interpreted as HTML and converted to markdown or vice versa. Always defaults to False"
+      in: query
+      required: false
+      schema:
+          type: "boolean"
+
 paths:
   /entities:
     get:
@@ -73,6 +97,34 @@ paths:
       responses:
         "200":
           description: "Successfully created lab entries"
+
+    post:
+      summary: "Adds a new entity to the lab notebook"
+      operationId: "entities.add_entity"
+      tags:
+        - Entities
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                  user:
+                    type: "string"
+                  type:
+                    type: "string"
+                  parent:
+                    type: "string"
+
+      responses:
+        "200":
+          description: "Successfully added entity"
+        "400":
+          description: "Invalid entity"
+        "404":
+          description: "Parent not found"
 
   /entities/{ID}:
     get:
@@ -98,9 +150,12 @@ paths:
       operationId: "entities.add_comment"
       tags:
         - Entities
+        - Comments
       summary: "Add a comment to the entity with the given ID"
       parameters:
         - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/username"
+        - $ref: "#/components/parameters/HTML"
       responses:
         "200":
             description: "Successfully added comment"
@@ -120,15 +175,100 @@ paths:
       operationId: "entities.read_comment"
       tags:
         - Entities
+        - Comments
       summary: "Read the comment with the given ID, mainly used to get entity images"
       parameters:
         - $ref: "#/components/parameters/ID"
         - $ref: "#/components/parameters/commentID"
+        - in: query
+          name: "whole_comment"
+          schema:
+              type: "boolean"
+          description: "If true, the whole comment is returned, otherwise only the content"
+        - $ref: "#/components/parameters/HTML"
       responses:
         "200":
           description: "Successfully read comment"
         "404":
           description: "Comment not found"
+
+    patch:
+      operationId: "entities.edit_comment"
+      tags:
+          - Entities
+          - Comments
+      summary: "Edit the comment with the given ID of an entity"
+      parameters:
+          - $ref: "#/components/parameters/ID"
+          - $ref: "#/components/parameters/commentID"
+          - $ref: "#/components/parameters/username"
+          - in: query
+            name: "HTML"
+            schema:
+              type: "boolean"
+            description: "If true, the comment is interpreted as HTML and converted to markdown"
+      responses:
+          "200":
+              description: "Successfully edited comment"
+          "404":
+              description: "Comment not found"
+
+      requestBody:
+        description: "Updated comment"
+        required: true
+        content:
+          application/json:
+              schema:
+                type: "string"
+                x-body-name: "comment"
+
+  /entities/{ID}/info:
+    get:
+      operationId: "entities.read_entity_info"
+      tags:
+          - Entities
+          - Info
+      summary: "Returns the rank and number of children this entity has."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/tree:
+    get:
+      operationId: "entities.generate_tree"
+      tags:
+        - Entities
+        - Info
+      summary: "Returns a tree representation of the children of this entity."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/data_suggestions:
+    get:
+      operationId: "entities.get_data_suggestions"
+      tags:
+        - Entities
+        - Suggestions
+      summary: "Returns a dictionary of suggestions for a specified query. If no query is specified,
+       all suggestions are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/query"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
 
   /entities/{ID}/{imageName}:
     get:
@@ -145,7 +285,37 @@ paths:
         "404":
             description: "Image not found"
 
-  /testing:
+  /properties/users:
+    get:
+      operationId: "entities.get_users"
+      tags:
+        - Properties
+      summary: "Returns all users present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read users"
+
+  /properties/types:
+    get:
+      operationId: "entities.get_types"
+      tags:
+        - Properties
+      summary: "Returns all types present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read types"
+
+  /properties/parents:
+    get:
+      operationId: "entities.get_possible_parents"
+      tags:
+        - Properties
+      summary: "Returns all the possible parents in the notebook"
+      responses:
+        "200":
+          description: "Successfully read parents"
+
+  /testing/indices:
     get:
       operationId: "entities.get_indices"
       tags:
@@ -155,4 +325,12 @@ paths:
         "200":
           description: "Call used exclusively for testing purposes. Returns all indices so they can be inspected"
 
-
+  /testing/fake_mentions:
+    get:
+      operationId: "entities.get_fake_mentions"
+      tags:
+        - Testing
+      summary: "Returns a fake list of mentions for testing porpuses"
+      responses:
+        "200":
+          description: "Call used exclusively for testing purposes. Returns a fake list of entities"

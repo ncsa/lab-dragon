@@ -105,17 +105,21 @@ class Comment:
 
     def modify(self, content: Union[str, Path, Table], user: str) -> None:
         """
-        Modify the comment. This will append the new comment to the list of comments and update the timestamp.
+        Modify the comment.
+        This will check if the content or user are different
+        and append the new comment to the list of comments and update the timestamp.
         Passing the user is required.
 
         :param content: The actual comment.
         :param user: The user that wrote the comment
         """
-        time = create_timestamp()
-        self.dates.append(time)
-        self.authors.append(user)
-        self.content.append(content)
-        self.com_type.append(SupportedCommentType.classify(content))
+
+        if content != self.content[-1] or user != self.authors[-1]:
+            self.content.append(content)
+            time = create_timestamp()
+            self.dates.append(time)
+            self.authors.append(user)
+            self.com_type.append(SupportedCommentType.classify(content))
 
     # TODO: This might be obsolete since in theory the last index should always be the latest comment.
     #  I am not fully convinced that this is the case though.

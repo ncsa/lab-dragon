@@ -21,6 +21,7 @@ description = "str"
 comments = "List[Union[Comment, Table, str]]"
 children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
+data_buckets = "List[Union[str, Path]]"
 
 # Imports is optional
 [imports]
@@ -36,6 +37,7 @@ description = ''
 comments = []
 children = []
 params= []
+data_buckets = []
 
 # Params is optional
 [params]

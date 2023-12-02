@@ -1,24 +1,52 @@
+import re
 import json
-from enum import Enum, auto
+import copy
 from pathlib import Path
+from typing import Optional, Union, Tuple
+from enum import Enum, auto
 
+import markdown
 from flask import abort, make_response, send_file
 
 from qdata.modules.task import Task
 from qdata.modules.step import Step
+from qdata.modules.entity import Entity
 from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
+from converters import MyMarkdownConverter
 
-ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
+
+
+
+# List of classes that can contain children. Only Project and Task can contain children for now.
+PARENT_TYPES = ["Project", "Task"]
+ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+# Holds all of the entity types that exists in the notebook
+ENTITY_TYPES = set()
 
 INDEX = {}
 
-PATHINDEX = {}
+# Holds as keys the paths to the TOML files and as values the UUID of the entity
+PATH_TO_UUID_INDEX = {}
+# Holds as keys the UUIDs of entities and as values the path to the TOML files
+UUID_TO_PATH_INDEX = {}
 
 # Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
 IMAGEINDEX = {}
+
+# Holds all of the users that exists in the notebook
+USERS = set()
+
+# Instantiates the HTML to Markdon converter object
+html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
+
+# Domain, used to convert from links to paths, to links the web browser can understand
+DOMAIN = 'http://localhost:3000'
 
 
 def get_indices():
@@ -26,8 +54,62 @@ def get_indices():
     index = json.dumps(str(INDEX))
     imageindex = json.dumps(str(IMAGEINDEX))
 
-    ret = {'index': index, 'imageindex': imageindex, 'pathindex': PATHINDEX}
+    ret = {'index': index, 'imageindex': imageindex, 'PATH_TO_UUID_INDEX': PATH_TO_UUID_INDEX}
     return ret
+
+
+def create_path_entity_copy(ent: Entity) -> Entity:
+    """
+    Returns a copy of the passed entity with any mention to a UUID replaced with the paths of the TOML files for that
+    entity. This is used to convert from working with paths to working with UUID
+
+    :param ent: The entity you want a copy with the UUIDs replaced with paths :param index: A reverse of the
+     PATH_TO_UUID_INDEX dictionary. This is used to convert from UUID to paths If not passed, it will be created on demand. The
+     intention of having it optional is to avoid having to compute it every time this function is called if this
+     function gets called multiple times for a single operation. :return:
+    """
+    copy_ent = copy.deepcopy(ent)
+    if ent.parent in UUID_TO_PATH_INDEX:
+        copy_ent.parent = UUID_TO_PATH_INDEX[ent.parent]
+
+    children_paths = []
+    for child in copy_ent.children:
+        children_paths.append(UUID_TO_PATH_INDEX[child])
+    copy_ent.children = children_paths
+
+    comments = []
+    for comment in copy_ent.comments:
+        content = []
+        for cont, category in zip(comment.content, comment.com_type):
+            if category == SupportedCommentType.md.value or category == SupportedCommentType.string.value:
+                content.append(comment_path_to_uuid(cont))
+            else:
+                content.append(cont)
+
+        comment.content = content
+        comments.append(comment)
+
+    return copy_ent
+
+
+def comment_path_to_uuid(content: str):
+
+    def replacer(match):
+        # Extract the text and file path from the match
+        text = match.group(1)
+        file_path = match.group(2)
+        # If the file path is a key in the replacements dictionary, replace it
+        # Otherwise, keep the original file path
+        new_file_path = PATH_TO_UUID_INDEX.get(file_path, file_path)
+        # Return the reconstructed string with the replacement file path
+        return f'{text}({new_file_path})'
+
+    # Regex pattern for file paths preceded by text in square brackets and enclosed in parentheses
+    pattern = r'(\[.*?\])\(([\w\-.\/\s]+)\)'
+
+    replaced_s = re.sub(pattern, replacer, content)
+    return replaced_s
+
 
 
 class MediaTypes(Enum):
@@ -50,28 +132,74 @@ class MediaTypes(Enum):
 def _reset_indices():
     global INDEX
     global IMAGEINDEX
-    global PATHINDEX
+    global PATH_TO_UUID_INDEX
 
     INDEX = {}
     IMAGEINDEX = {}
-    PATHINDEX = {}
+    PATH_TO_UUID_INDEX = {}
 
 
-# TODO: This reshuffling of comments is breaking the order in which comments are displayed in the UI.
-#  Order should be maintained even when expanding folders.
+def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
+    """
+    Adds an entity to all the necessary memory indices.
+
+    :param entity: The entity which is being added to the index.
+    :param entity_path: The path on disk to the TOML file that contains the entity.
+    """
+
+    if entity.ID not in INDEX:
+        INDEX[entity.ID] = entity
+
+    if entity_path not in PATH_TO_UUID_INDEX:
+        PATH_TO_UUID_INDEX[str(entity_path)] = entity.ID
+
+    if entity.ID not in UUID_TO_PATH_INDEX:
+        UUID_TO_PATH_INDEX[entity.ID] = str(entity_path)
+
+    # Add the user to the user index
+    USERS.add(entity.user)
+
+    # Add the entity type to the entity type index
+    ENTITY_TYPES.add(entity.__class__.__name__)
+
+
+def initialize_bucket(bucket_path):
+    """
+    Function that initializes a bucket by adding it to the index and initializing the instances it contains.
+
+    :param bucket: The bucket that is being initialized.
+    """
+    bucket = read_from_TOML(bucket_path)
+
+    add_ent_to_index(bucket, bucket_path)
+
+    for ins_path in bucket.path_to_uuid.keys():
+        instance = read_from_TOML(ins_path)
+        add_ent_to_index(instance, ins_path)
+
+    return bucket
+
+
 def read_child_entity(entity_path: Path):
 
     ent = read_from_TOML(entity_path)
-    if ent.ID not in INDEX:
-        INDEX[ent.ID] = ent
 
-    if entity_path not in PATHINDEX:
-        PATHINDEX[str(entity_path)] = ent.ID
+    add_ent_to_index(ent, entity_path)
+
+    # Add the user to the user index
+    USERS.add(ent.user)
 
     child_list = []
     if len(ent.children) > 0:
         for child in ent.children:
             child_list.append(read_child_entity(child))
+
+    data_buckets = []
+    for bucket_path in ent.data_buckets:
+        bucket = initialize_bucket(bucket_path)
+        data_buckets.append(bucket.ID)
+
+    # ent.data_buckets = data_buckets
 
     ret_dict = {"id": ent.ID,
                 "name": ent.name,
@@ -99,13 +227,13 @@ def read_all():
     for key, val in INDEX.items():
         path = Path(val.parent)
         if path.is_file():
-            val.parent = PATHINDEX[str(path)]
+            val.parent = PATH_TO_UUID_INDEX[str(path)]
 
         # Update the children of the parent
         for child in val.children:
             path = Path(child)
             if path.is_file():
-                val.children[val.children.index(child)] = PATHINDEX[str(path)]
+                val.children[val.children.index(child)] = PATH_TO_UUID_INDEX[str(path)]
 
     return ret
 
@@ -124,7 +252,14 @@ def read_one(ID, name_only=False):
         if name_only:
             return ent.name
 
-        return json.dumps(ent.to_TOML()[ent.name]), 201
+        ent_copy = copy.deepcopy(ent)
+        for comment in ent_copy.comments:
+            if comment.com_type[-1] == SupportedCommentType.md.value or comment.com_type[-1] == SupportedCommentType.string.value:
+                replaced_path = comment_path_to_uuid(comment.content[-1])
+                html_comment = markdown.markdown(replaced_path)
+                comment.content[-1] = html_comment
+
+        return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
     else:
         abort(404, f"Entity with ID {ID} not found")
 
@@ -141,12 +276,13 @@ def read_image(ID, imageName):
         abort(404, f"Image with ID {ID} and name {imageName} not found")
 
 
-def read_comment(ID, commentID):
+def read_comment(ID, commentID, whole_comment=False, HTML=False):
     """
     API function that looks at the comment ID of the entity with ID and returns the comment
 
     :param ID:
     :param commentID:
+    :param whole_comment: if True, returns the whole comment, if False, returns only the last content.
     :return:
     """
 
@@ -164,24 +300,332 @@ def read_comment(ID, commentID):
     content, media_type, author, date = comment.last_comment()
     if media_type == SupportedCommentType.jpg.value or media_type == SupportedCommentType.png.value:
         return send_file(content)
+
+    if whole_comment:
+        if HTML:
+            comment_copy = copy.deepcopy(comment)
+            converted_content = []
+            for cont in comment.content:
+                replaced_path = comment_path_to_uuid(cont)
+                html_comment = markdown.markdown(replaced_path)
+                converted_content.append(html_comment)
+            comment_copy.content = converted_content
+            return json.dumps(str(comment_copy)), 201
+        else:
+            return json.dumps(str(comment)), 201
     else:
         return json.dumps(content), 201
 
 
-def add_comment(ID, comment):
+def generate_tree(ID: str, deepness: int = 7):
+    """
+    Deepness is the number of levels of children that are included in the tree.
+    as well as how many children per level are returning.
+
+    :param ent: The entity to generate the tree from
+    :param deepness: How many items and levels (rank) to include in the tree.
+    """
+    new_node = "├── "
+    last_node = "└── "
+    empty_node = "    "
+    vertical_node = "│   "
+    incomplete_node = "└ ⋯ "
+
+    def populate_tree(ent, deepness, parent_tree, level=0):
+        if level == deepness:
+            return parent_tree
+
+        parent_tree[ent.name] = {}
+        for i, child in enumerate(ent.children):
+            if i == deepness:
+                break
+            populate_tree(INDEX[child], deepness, parent_tree[ent.name], level+1)
+
+        if len(parent_tree[ent.name]) == len(ent.children):
+            parent_tree[ent.name]["__complete__"] = True
+        else:
+            parent_tree[ent.name]["__complete__"] = False
+        return parent_tree
+
+    def make_tree(data, ret_="", fill_indent=0, empty_indent=0):
+        n_keys = len(list(data.keys()))
+        lines = ret_.split("\n")
+
+        # you need to change from fill indent to empty indent in the last row
+        # so that lines that head to nowhere don't appear
+        if len(lines) >= 2 and last_node in lines[-2]:
+            empty_indent += 1
+            fill_indent -= 1
+
+        if fill_indent + empty_indent == 0:
+            keys = list(data.keys())
+            ret_ += keys[0] + "\n"
+            ret_ = make_tree(data[keys[0]], ret_, fill_indent, empty_indent + 1)
+        else:
+            for i, (key, value) in enumerate(data.items()):
+                if key == "__complete__":
+                    if value:
+                        continue
+                    else:
+                        new_addition = empty_node * empty_indent + fill_indent * vertical_node + incomplete_node + "\n"
+                        ret_ += new_addition
+                    continue
+
+                # Deciding what node to use, if last or new one
+                # You need -2 because the complete key is metadata
+                selected_node = new_node
+                if i == n_keys - 2 and data["__complete__"] is True:
+                    selected_node = last_node
+
+                new_addition = empty_node * empty_indent + fill_indent * vertical_node + selected_node + key + "\n"
+                ret_ += new_addition
+                ret_ = make_tree(value, ret_, fill_indent + 1, empty_indent)
+        return ret_
 
     ent = INDEX[ID]
-    ent.comments.append(comment['text'])
-    path = None
-    for key, val in PATHINDEX.items():
-        if val == ID:
-            path = key
-            break
 
-    if path is None:
-        return abort(404, f"Could not find the original location of entity")
+    tree = {}
+    tree = populate_tree(ent, deepness, tree)
+    ret = make_tree(tree)
+    return make_response(json.dumps(ret), 201)
 
-    ent.to_TOML(path)
+
+def _get_rank_and_num_children(ent: Entity) -> Tuple[int, int]:
+    """
+    Recursive helper function. Returns the rank of the entity and the total number of children it has.
+
+    :param ent: The current entity that we are going over.
+    :return: The number of entities that are child of ent as well as the rank of this entity.
+    """
+    rank = 0
+    num_children = 0
+    for child_id in ent.children:
+        if child_id in INDEX:
+            num_children += 1
+            child = INDEX[child_id]
+            child_rank, child_num_children = _get_rank_and_num_children(child)
+            rank = max(rank, child_rank + 1)
+            num_children += child_num_children
+
+    return rank, num_children
+
+
+def read_entity_info(ID):
+    """
+    For now, this function only figures out the "rank" and the total number of children it has.
+    By "rank" we mean how many levels deep the children go, multiple siblings do not add to this number.
+
+    :param ID:
+    :return:
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    rank, num_children = _get_rank_and_num_children(ent)
+    return make_response(json.dumps({"rank": rank, "num_children": num_children}), 201)
+
+
+def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False):
+    """
+    Adds a comment to the indicated entity. It does not handle images or tables yet.
+
+    :param ID: The id of the entity the comment should be added to.
+    :param comment: The text of the comment itself.
+    :param username: Optional argument. If passed, the author of the comment will be that username instead of the
+     user of the entity.
+    :param HTML: If true, the comment text is assumed to be in html form and is converted to markdown.
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    if username is None:
+        username = ent.user
+
+    if HTML:
+        content = html_to_markdown.convert(comment['content'])
+    else:
+        content = comment['content']
+
+    ent.add_comment(content, username)
+
+    # After adding the comment update the file location
+    ent_path = Path(UUID_TO_PATH_INDEX[ID])
+    copy_ent = create_path_entity_copy(ent)
+    copy_ent.to_TOML(ent_path)
+
     return make_response("Comment added", 201)
 
 
+# TODO: Commments don't yet accept any other username.
+def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: bool = False):
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+
+    if HTML:
+        comment = html_to_markdown.convert(comment)
+
+    try:
+        ret = ent.modify_comment(commentID, comment, username)
+        if ret:
+            # Convert uuids in the entity to paths
+            path_copy = create_path_entity_copy(ent)
+            path_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+            return make_response("Comment edited successfully", 201)
+    except ValueError as e:
+        abort(400, str(e))
+
+    return abort(400, "Something went wrong, try again")
+
+
+def add_entity(**kwargs):
+    """
+    Creates an entity through the API call. It will add the entity to the parent and create the new TOML file
+     immediately.
+
+    :param kwargs: Dictionary with a single item with key 'body' and value a dictionary with the keys:
+        * name: Name of the entity
+        * type: Type of the entity
+        * parent: ID of the parent entity
+        * user: User that created the entity
+    """
+    body = kwargs['body']
+    if "name" not in body or body['name'] == "":
+        abort(400, "Name of entity is required")
+    if "type" not in body or body['type'] == "":
+        abort(400, "Type of entity is required")
+    if "parent" not in body or body['parent'] == "":
+        abort(400, "Parent of entity is required")
+    if "user" not in body or body['user'] == "":
+        abort(400, "User of entity is required")
+
+    cls = ALL_TYPES[body['type']]
+    ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
+    parent = INDEX[body['parent']]
+    parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
+    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
+
+    # Because the children do not have a path yet, you need to make a path copy before adding the child
+    parent_copy = create_path_entity_copy(parent)
+
+    add_ent_to_index(ent, ent_path)
+
+    # Add the child ID to the parent entity in memory.
+    parent.children.append(ent.ID)
+
+    # Create copy of the entity with paths to create the TOML file.
+    ent_copy = create_path_entity_copy(ent)
+
+    parent_copy.add_child(ent_path)
+    parent_copy.to_TOML(parent_path)
+    ent_copy.to_TOML(ent_path)
+
+    return make_response("Entity added", 201)
+
+
+def get_users():
+    """
+    API function that returns the list of users
+    :return: json representation of a list of all the users in the system.
+    """
+    return json.dumps(list(USERS)), 201
+
+
+def get_types():
+    return json.dumps(list(ENTITY_TYPES)), 201
+
+
+def get_possible_parents():
+    """
+    API function that returns a dictionary of all the entities
+    that can have children with the keys being the ID of the entity and the value its name.
+    This is used for the select item to display all the possible parents for new entities.
+    :return: json representation of a list of all the possible parents for a given entity
+    """
+    ret = {}
+    for k, v in INDEX.items():
+        if v.__class__.__name__ in PARENT_TYPES:
+            ret[k] = v.name
+    return json.dumps(ret), 201
+
+
+def _search_parents_with_buckets(ent):
+    """
+    Recursive function that searches for parent entities with data buckets
+
+    :param ent: The entity to search
+    :return: The entity with data buckets, or None if no entity with data buckets can be found
+    """
+    if ent.parent == "":
+        return None
+
+    ret_ent = INDEX[ent.parent]
+    if len(ret_ent.data_buckets) == 0:
+        ret_ent = _search_parents_with_buckets(ret_ent)
+
+    return ret_ent
+
+
+# FIXME: The return value should have the keys and value of the dictionary flipped.
+def get_data_suggestions(ID, query="", num_matches=10):
+    """
+    Returns matched datasets in a bucket with the query.
+    If the entity does not have a bucket, it will search the parents for buckets or return None if no buckets are found.
+
+    :param ID: The id of the entity to search
+    :param query: The query to match
+    :param num_matches: How many matches until the function stops looking for matches.
+
+    :return: Dictionary with the name of data as keys and the id as values
+    """
+    matches = {}
+
+    ent = INDEX[ID]
+    if len(ent.data_buckets) == 0:
+        ent = _search_parents_with_buckets(ent)
+        if ent is None:
+            return json.dumps({}), 201
+
+    for bucket_path in ent.data_buckets:
+        bucket_id = PATH_TO_UUID_INDEX[str(bucket_path)]
+        bucket = INDEX[bucket_id]
+        pattern = re.compile(query)
+        for p, uuid in bucket.path_to_uuid.items():
+            if len(matches) >= num_matches:
+                break
+            path = Path(p)
+            instance = INDEX[uuid]
+            if 'star' in instance.tags:
+                if query == "" or query is None:
+                    matches[path.stem] = uuid
+                else:
+                    if pattern.search(path.stem):
+                        matches[path.stem] = uuid
+
+    return json.dumps(matches), 201
+
+
+def get_fake_mentions():
+    """
+    Api function used to send a fake list of options for testing mentions
+
+    :return:
+    """
+    global counter
+
+    fake_dict = {
+        "Choose Koala": "9f8968d5-f98e-4ecf-ba37-3a1c84f9da7a",
+        "Choose Panda": "23f07cfe-8f82-4294-a9a5-03241ad47194",
+        "Named The Koala": "cca50dad-add7-4ea5-b452-d59eb3edb16d",
+    }
+
+    return json.dumps(fake_dict), 201
+
+
+read_all()
