@@ -27,7 +27,7 @@ ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/
 PARENT_TYPES = ["Project", "Task"]
 ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
 # Holds all of the entity types that exists in the notebook
-ENTITY_TYPES = set()
+ENTITY_TYPES = set(("Project", "Task", "Step"))
 
 INDEX = {}
 
@@ -160,7 +160,7 @@ def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
     USERS.add(entity.user)
 
     # Add the entity type to the entity type index
-    ENTITY_TYPES.add(entity.__class__.__name__)
+    # ENTITY_TYPES.add(entity.__class__.__name__)
 
 
 def initialize_bucket(bucket_path):

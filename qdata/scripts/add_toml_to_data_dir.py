@@ -81,7 +81,7 @@ def add_toml_to_data(dir, user="testUser"):
                 # Save the instance
                 instance.to_TOML(parent)
 
-                bucket.add_instance(parent.joinpath(instance.name, '.toml'), instance.ID)
+                bucket.add_instance(parent.joinpath(instance.name + '.toml'), instance.ID)
                 counter += 1
 
     print(f'Done creating {counter} TOML files')
