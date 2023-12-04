@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tiptap/extension-dropcursor": "^2.1.13",
+    "@tiptap/extension-image": "^2.1.13",
     "@tiptap/extension-link": "^2.1.12",
     "@tiptap/extension-mention": "^2.1.12",
     "@tiptap/extension-placeholder": "^2.1.12",

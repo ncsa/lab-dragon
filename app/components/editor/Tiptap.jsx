@@ -12,6 +12,8 @@ import { MentionList } from "./MentionList";
 import "./styles.css";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
+import Image from "@tiptap/extension-image";
+import Dropcursor from "@tiptap/extension-dropcursor";
 
 
 const BASE_API = "http://localhost:8000/api/"
@@ -44,6 +46,8 @@ export default ({ onContentChange, entID, initialContent }) => {
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),
+      Image,
+      Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
           class: "data_mention"
@@ -99,6 +103,41 @@ export default ({ onContentChange, entID, initialContent }) => {
         },
       }),
     ],
+    editorProps: {
+      handleDrop: function(view, event, slice, moved) {
+
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) { // if dropping external files
+          
+          let file = event.dataTransfer.files[0]; // the dropped file
+          let filesize = ((file.size/1024)/1024).toFixed(4); // get the filesize in MB
+          if ((file.type === "image/jpeg" || file.type === "image/png") && filesize < 10) { // check valid image type under 10MB
+            // check the dimensions
+            let _URL = window.URL || window.webkitURL;
+            let img = new Image(); /* global Image */
+            img.src = _URL.createObjectURL(file);
+            img.onload = function () {
+              if (this.width > 5000 || this.height > 5000) {
+                window.alert("Your images need to be less than 5000 pixels in height and width."); // display alert
+              } else {
+                // valid image so upload to server
+                // uploadImage will be your function to upload the image to the server or s3 bucket somewhere
+                uploadImage(file).then(function(response) { // response is the image url for where it has been saved
+                  // do something with the response
+                }).catch(function(error) {
+                  if (error) {
+                    window.alert("There was a problem uploading your image, please try again.");
+                  }
+                });
+              }
+            };
+          } else {
+            window.alert("Images need to be in jpg or png format and less than 10mb in size.");
+          }
+          return true; // handled
+        }
+        return false;
+      }
+    },
     onUpdate: (props) => {
       onContentChange(props.editor.getHTML());
     },
