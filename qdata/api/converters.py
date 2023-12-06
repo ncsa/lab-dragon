@@ -41,11 +41,19 @@ class MyMarkdownConverter(MarkdownConverter):
         title_part = ' "%s"' % title.replace('"', r'\"') if title else ''
         return '%s[%s](%s%s)%s' % (prefix, text, href, title_part, suffix) if href else text
 
+    def convert_img(self, el, text, convert_as_inline):
+        """
+        Removes the extra localhost part of the url and replaces the %23 with a /
+        """
+        el.attrs["src"] = el.attrs['src'][43:].replace("%23", "/")
+        del el.attrs['alt']
+        return super().convert_img(el, text, convert_as_inline)
+
 
 # Markdown to HTML
 class CustomLinkExtension(Extension):
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(CustomLinkProcessor(r'\[(.*?)\]\((.*?)\)', md), 'link', 160)
+        md.inlinePatterns.register(CustomLinkProcessor(r'!\[(.*?)\]\((.*?)\)', md), 'link', 160)
 
 
 class CustomLinkProcessor(LinkInlineProcessor):
