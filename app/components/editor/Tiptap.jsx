@@ -23,6 +23,8 @@ export default ({ onContentChange, entID, initialContent }) => {
 
   const dataMentionsOptionsRef = useRef({});
 
+  console.log("initialContent", initialContent);
+
   const updateDataMentionsOptions = async (query) => {
     let url = BASE_API + "entities/" + entID + "/data_suggestions";
     if (query) {
@@ -46,7 +48,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),
-      Image,
+      Image.configure({inline: true}),
       Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
