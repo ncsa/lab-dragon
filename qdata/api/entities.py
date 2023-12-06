@@ -2,12 +2,14 @@ import re
 import json
 import copy
 from pathlib import Path
-from typing import Optional, Union, Tuple
 from enum import Enum, auto
+from typing import Optional, Union, Tuple
 
 import markdown
+from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
+from qdata import HOSTADDRESS
 from qdata.modules.task import Task
 from qdata.modules.step import Step
 from qdata.modules.entity import Entity
@@ -21,7 +23,7 @@ from converters import MyMarkdownConverter,  CustomLinkExtension
 ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
-
+RESOURCEPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/resource')
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
 PARENT_TYPES = ["Project", "Task"]
@@ -555,6 +557,17 @@ def add_entity(**kwargs):
     ent_copy.to_TOML(ent_path)
 
     return make_response("Entity added", 201)
+
+
+def add_image(body, image):
+    # Save the image to the RESOURCEPATH
+    filename = secure_filename(image.filename)
+    image_path = RESOURCEPATH / filename
+    image.save(str(image_path))
+
+    image_url = f"{HOSTADDRESS}properties/image/{str(image_path).replace('/', '%23')}"
+
+    return make_response(image_url, 201)
 
 
 def get_users():

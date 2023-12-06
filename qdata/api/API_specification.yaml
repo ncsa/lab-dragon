@@ -299,6 +299,29 @@ paths:
         "200":
           description: "Successfully read parents"
 
+  /properties/image:
+    post:
+      operationId: "entities.add_image"
+      tags:
+        - Properties
+      summary: "Uploads an image to the server"
+      requestBody:
+        description: "Image to upload"
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                image:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "Successfully uploaded image"
+        "400":
+          description: "Invalid image"
+
   /properties/image/{imagePath}:
     get:
       operationId: "entities.read_image"

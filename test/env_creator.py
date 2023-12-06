@@ -214,6 +214,8 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
         if create_md:
             generate_md(p, path)
 
+    path.joinpath("resource").mkdir(exist_ok=True)
+
 
 if __name__ == "__main__":
 
