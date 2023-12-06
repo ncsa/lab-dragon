@@ -21,7 +21,6 @@ identical comments in the same entity they will not be shown.
 - Any field that has the word `time` in the name, will be automatically timestamped
 if the argument passed is `None` or `''`.
 - You cannot add a key called ID, this is reserved for the entity UUID generator.
-- Any Link is done by a string UUID.
 - In the comment section, the user can place a string that will be displayed in the document, or a path to a file.
 The supported data types are in the enum in generator.display module.
 - Each comment in an entity contains metadata associated with this comment. Comments contain the following fields:
@@ -39,3 +38,22 @@ This means that any whitespaces at any other point other than file names will br
 - **DO NOT** add comments directly to the entity. This will break the entity and the entity will not be able to be loaded. use add comment method instead
 WARNING unclear what the behaviour is if the path includes other parts that are outside the network drive.
 - A comment cannot end with an extension of a supported file type.
+- Because of how images are handled, there cannot be a `#` character in an image path
+
+### Initial draft of how images are handled.
+
+**WARNING** At the moment this is just a draft and is not implemented.
+
+- An image can be either a whole comment or more likely it can be part of a comment.
+- Each image should have a unique name, this name will be either the relative path to the file, or the name of the file in the storage directory. 
+- If a repeated image name is found a counter will appear at the end of the name, similar to how an OS handles repeated filenames.
+- internally, all images are placed in an index where the server can access them.
+- The path of that image is the identifier, and when the user or client requests the url with that path, the server will return the image.
+- To refer to an image in a comment, a path to the image must placed in a markdown link format. If the path points to the image bucket, the server will know it is being linked to a specific image.
+- When an image is placed in the notebook, it will be compared to every other image in the notebook. If it finds the same image in the notebook, it will instead create a link to it instead of adding a copy.
+- Currently, the entity in memory as well as in the TOML file, do not keep track of how many images or links they have inside, they simply have the comments. This instead is calculated in the server on demand. This is done to have a single source of truth at the expense of repeated calculations. Caching might be used later or some other system to improve speed.
+ 
+
+#### Things missing from the initial draft
+
+- How do we handle the location of the generic directory to hold the images if they are not appearing.

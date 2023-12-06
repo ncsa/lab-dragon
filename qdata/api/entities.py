@@ -15,10 +15,10 @@ from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from converters import MyMarkdownConverter
+from converters import MyMarkdownConverter,  CustomLinkExtension
 
-ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
-# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
+ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
 
@@ -44,6 +44,9 @@ USERS = set()
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
+
+
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension()])
 
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
@@ -180,6 +183,29 @@ def initialize_bucket(bucket_path):
     return bucket
 
 
+def process_comments(entity):
+    """
+    Function that processes the comments of an entity and checks for markdown links.
+
+    :param entity: The entity whose comments are being processed.
+    """
+    # Regular expression pattern for markdown links
+    pattern = r'\[(.*?)\]\((.*?)\)'
+
+    for comment in entity.comments:
+        for content in comment.content:
+            if isinstance(content, str):
+                matches = re.findall(pattern, content)
+                for match in matches:
+                    # Tries converting it to path and see if the path exists.
+                    # Catches all failures because we don't want to crash if the path doesn't or isn't a path format.
+                    try:
+                        path = Path(match[1]).resolve()
+                    except Exception as e:
+                        continue
+                    if path not in IMAGEINDEX and path.exists() and path.stem == '.jpg' or path.stem == '.png':
+                        IMAGEINDEX[path] = entity.ID
+
 def read_child_entity(entity_path: Path):
 
     ent = read_from_TOML(entity_path)
@@ -199,6 +225,9 @@ def read_child_entity(entity_path: Path):
         bucket = initialize_bucket(bucket_path)
         data_buckets.append(bucket.ID)
 
+    process_comments(ent)
+
+    # TODO: Figure out why this line is commented
     # ent.data_buckets = data_buckets
 
     ret_dict = {"id": ent.ID,
@@ -256,7 +285,7 @@ def read_one(ID, name_only=False):
         for comment in ent_copy.comments:
             if comment.com_type[-1] == SupportedCommentType.md.value or comment.com_type[-1] == SupportedCommentType.string.value:
                 replaced_path = comment_path_to_uuid(comment.content[-1])
-                html_comment = markdown.markdown(replaced_path)
+                html_comment = markdown_to_html.convert(replaced_path)
                 comment.content[-1] = html_comment
 
         return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
@@ -264,16 +293,15 @@ def read_one(ID, name_only=False):
         abort(404, f"Entity with ID {ID} not found")
 
 
-def read_image(ID, imageName):
+def read_image(imagePath):
     """
     API function that returns an image based on the ID of the entity and the name of the image
     """
-
-    if ID + '--' + imageName in IMAGEINDEX:
-        image = IMAGEINDEX[ID + '--' + imageName]
-        return send_file(image)
-    else:
-        abort(404, f"Image with ID {ID} and name {imageName} not found")
+    try:
+        path = Path(imagePath.replace('#', '/')).resolve()
+        return send_file(path)
+    except Exception as e:
+        abort(404, f"Image with path {imagePath} not found")
 
 
 def read_comment(ID, commentID, whole_comment=False, HTML=False):
@@ -307,7 +335,7 @@ def read_comment(ID, commentID, whole_comment=False, HTML=False):
             converted_content = []
             for cont in comment.content:
                 replaced_path = comment_path_to_uuid(cont)
-                html_comment = markdown.markdown(replaced_path)
+                html_comment = markdown_to_html.convert(replaced_path)
                 converted_content.append(html_comment)
             comment_copy.content = converted_content
             return json.dumps(str(comment_copy)), 201

@@ -3,7 +3,14 @@ from urllib.parse import urlparse
 
 from markdownify import MarkdownConverter, chomp
 
+from markdown.extensions import Extension
+from markdown.inlinepatterns import LinkInlineProcessor
+import xml.etree.ElementTree as etree
 
+from qdata import HOSTADDRESS
+
+
+# HTML to markdown
 class MyMarkdownConverter(MarkdownConverter):
 
     def __init__(self, uuid_index, **kwargs):
@@ -35,5 +42,19 @@ class MyMarkdownConverter(MarkdownConverter):
         return '%s[%s](%s%s)%s' % (prefix, text, href, title_part, suffix) if href else text
 
 
+# Markdown to HTML
+class CustomLinkExtension(Extension):
+    def extendMarkdown(self, md):
+        md.inlinePatterns.register(CustomLinkProcessor(r'\[(.*?)\]\((.*?)\)', md), 'link', 160)
 
 
+class CustomLinkProcessor(LinkInlineProcessor):
+    def handleMatch(self, m, data):
+        text = m.group(1)
+        url = m.group(2).replace('/', '%23')
+        url = f"{HOSTADDRESS}properties/image/{url}"
+        el = etree.Element('img')
+        el.text = text
+        el.set('src', url)
+        el.set('alt', 'Image is loading or not available')
+        return el, m.start(0), m.end(0)
