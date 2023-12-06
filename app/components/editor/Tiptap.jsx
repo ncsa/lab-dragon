@@ -12,18 +12,28 @@ import { MentionList } from "./MentionList";
 import "./styles.css";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
-import Image from "@tiptap/extension-image";
+import {Image as TiptapImage} from "@tiptap/extension-image";
 import Dropcursor from "@tiptap/extension-dropcursor";
 
 
 const BASE_API = "http://localhost:8000/api/"
 
 
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const response = await fetch(BASE_API + "properties/image", {
+    method: "POST",
+    body: formData,
+  });
+  const url = await response.text();
+  console.log("url inside", url);
+  return url;
+}
+
 export default ({ onContentChange, entID, initialContent }) => {
 
   const dataMentionsOptionsRef = useRef({});
-
-  console.log("initialContent", initialContent);
 
   const updateDataMentionsOptions = async (query) => {
     let url = BASE_API + "entities/" + entID + "/data_suggestions";
@@ -48,7 +58,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),
-      Image.configure({inline: true}),
+      TiptapImage.configure({inline: true}),
       Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
@@ -106,7 +116,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       }),
     ],
     editorProps: {
-      handleDrop: function(view, event, slice, moved) {
+      handleDrop: (view, event, slice, moved) => {
 
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) { // if dropping external files
           
@@ -118,26 +128,24 @@ export default ({ onContentChange, entID, initialContent }) => {
             let img = new Image(); /* global Image */
             img.src = _URL.createObjectURL(file);
             img.onload = function () {
-              if (this.width > 5000 || this.height > 5000) {
-                window.alert("Your images need to be less than 5000 pixels in height and width."); // display alert
-              } else {
-                // valid image so upload to server
-                // uploadImage will be your function to upload the image to the server or s3 bucket somewhere
-                uploadImage(file).then(function(response) { // response is the image url for where it has been saved
-                  // do something with the response
-                }).catch(function(error) {
-                  if (error) {
-                    window.alert("There was a problem uploading your image, please try again.");
-                  }
-                });
-              }
+              uploadImage(file).then((url) => {
+                console.log("url", url);
+                let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
+                let attrs = {src: url, alt: file.name}; // set the image attributes
+                let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
+                transaction.replaceSelectionWith(node); // replace the space with the image node
+                view.dispatch(transaction); // dispatch the transaction
+              })
             };
+            img.onerror = function () {
+              window.alert("Invalid image. Images must be a .jpg or .png file."); // display alert
+            };
+            return true;
           } else {
-            window.alert("Images need to be in jpg or png format and less than 10mb in size.");
+            window.alert("Invalid image. Images must be a .jpg or .png file and less than 10MB."); // display alert
+            return true;
           }
-          return true; // handled
         }
-        return false;
       }
     },
     onUpdate: (props) => {
