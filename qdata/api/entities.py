@@ -6,6 +6,8 @@ from enum import Enum, auto
 from typing import Optional, Union, Tuple
 
 import markdown
+import imagehash
+from PIL import Image
 from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
@@ -168,6 +170,42 @@ def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
     # ENTITY_TYPES.add(entity.__class__.__name__)
 
 
+def add_image_to_index(image, image_path):
+    """
+    Adds an image to the image index
+
+    :param image: a PIL image instance
+    :param image_path: The path on disk of that image
+    """
+    img_hash = imagehash.average_hash(image)
+    if img_hash not in IMAGEINDEX:
+        IMAGEINDEX[img_hash] = image_path
+    # FIXME: This is a design decision that should be checked
+    elif IMAGEINDEX[img_hash] != image_path:
+        raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
+
+
+def find_equivalent_image(image, threshold=5):
+    """
+    Checks if there is an equivalent image in the system. Does this by calculating the imagehash and comparing it every
+    other image until either it finds a match or does not find any match. If no match has been found, returns None,
+    if a match has been found, returns the hash of the found image
+
+    :param image: PIL instance of an image
+    :param threshold: The bigger this is, the more different an image can be to be considered equivalent
+    """
+
+    img_hash = imagehash.average_hash(image)
+
+    ret_path = None
+    for hash, path in IMAGEINDEX.items():
+        diff = hash - img_hash
+        if diff <= threshold:
+            ret_path = path
+            break
+    return ret_path
+
+
 def initialize_bucket(bucket_path):
     """
     Function that initializes a bucket by adding it to the index and initializing the instances it contains.
@@ -205,8 +243,10 @@ def process_comments(entity):
                         path = Path(match[1]).resolve()
                     except Exception as e:
                         continue
-                    if path not in IMAGEINDEX and path.exists() and path.stem == '.jpg' or path.stem == '.png':
-                        IMAGEINDEX[path] = entity.ID
+                    if path.exists() and path.suffix == '.jpg' or path.suffix == '.png':
+                        img = Image.open(path)
+                        add_image_to_index(img, path)
+
 
 def read_child_entity(entity_path: Path):
 
@@ -560,10 +600,22 @@ def add_entity(**kwargs):
 
 
 def add_image(body, image):
-    # Save the image to the RESOURCEPATH
-    filename = secure_filename(image.filename)
-    image_path = RESOURCEPATH / filename
-    image.save(str(image_path))
+    """
+    Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into
+    resource.
+
+    :param body: Text of the tag being added. usually empty
+    :param image: The image you get from the flask call.
+    """
+    converted_image = Image.open(image.stream)
+    image_path = find_equivalent_image(converted_image)
+
+    if image_path is None:
+        # Save the image to the RESOURCEPATH
+        filename = secure_filename(image.filename)
+        image_path = RESOURCEPATH / filename
+        converted_image.save(image_path)
+        add_image_to_index(Image.open(image_path), image_path)
 
     image_url = f"{HOSTADDRESS}properties/image/{str(image_path).replace('/', '%23')}"
 
