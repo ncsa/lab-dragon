@@ -60,6 +60,16 @@ button:active{
     display: flex;
 }
 
+.sidebar-wrapper {
+    position: fixed;
+    top: 122px; /* Adjust this value to the height of your TopBanner */
+    width: 180px; /* Adjust this value to the width of your Sidebar */
+}
+
+.children-wrapper {
+    padding-left: 185px; /* Adjust this value to the width of your Sidebar */
+}
+
 .banner-container {
     display: flex;
     flex-direction: column;
@@ -70,7 +80,7 @@ button:active{
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #374463;
+    background-color: #115a0d;
     color: white;
     text-align: center;
     padding: 10px;
@@ -79,14 +89,17 @@ button:active{
 
 .sidebar{
     color: aliceblue;
-    max-width: 20%;
+    width: 180px;
     height: 100vh;
+    overflow-y: auto;
     background-color: #1a202c;
-    flex-grow: 1;
     position: sticky;
-    top: 0;
-    /* Makes it such that you can scroll in the sidebar */
-    overflow: auto;
+    top: 122px;
+}
+
+.sidebar-content {
+    overflow-y: auto;
+    max-height: calc(100vh - 50px); /* Adjust this value based on the height of your button */
 }
 
 .sidebar-item{
@@ -142,13 +155,6 @@ button:active{
 .sidebar-item.plain i{
     display: inline-block;
     width: 1.7em;
-}
-
-.sidebar button{
-    position: sticky;
-    bottom: 20px;
-    left: 25%;
-    right: 25%;
 }
 
 .tittle{
@@ -373,6 +379,20 @@ button:active{
     background-color: var(--step-color);
 }
 /* ENTITY POPUP */  
+
+.add-entity-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    border-radius: 100%;
+    font-size: 40px;
+    padding: 10px 10px;
+    line-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .entity-popup {
     position: fixed;

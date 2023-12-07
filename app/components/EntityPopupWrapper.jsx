@@ -19,7 +19,7 @@ async function getSidebarItems() {
 export default function EntityPopupWrapper({ children }) {
     
     const [entities, setEntities] = useState([]); // The entities that will be displayed in the sidebar
-    const { isPopupOpen, setIsPopupOpen } = useContext(CreationPopupContext);
+    const { isPopupOpen, setIsPopupOpen, setName } = useContext(CreationPopupContext);
     
 
     const closePopup = () => {setIsPopupOpen(false)}
@@ -39,9 +39,17 @@ export default function EntityPopupWrapper({ children }) {
         <div>
             {isPopupOpen ? <EntityInput populateSideBar={populateSidebarItems}/> : null}
             <div className="flex-container">
-                <Sidebar entities={entities}/>
-                {children}
+                <div className="sidebar-wrapper">
+                    <Sidebar entities={entities}/>
+                </div>
+                <div className="children-wrapper">
+                    {children}
+                </div>
             </div>
+            <button className="add-entity-button" onClick={() => {
+                    setName("");
+                    setIsPopupOpen(!isPopupOpen);
+                }}>+</button>
         </div>
     )
 
