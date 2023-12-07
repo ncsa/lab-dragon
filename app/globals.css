@@ -60,6 +60,23 @@ button:active{
     display: flex;
 }
 
+.banner-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-banner{
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #374463;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    z-index: 10;
+}
+
 .sidebar{
     color: aliceblue;
     max-width: 20%;
