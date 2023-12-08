@@ -22,8 +22,8 @@ export default function RootLayout({ children }) {
         </head>
         <body className={inter.className}>
           <div className="banner-container">
-            <TopBanner />
             <CreationPopupProvider>
+              <TopBanner />
               <EntityPopupWrapper children={children}/>
             </CreationPopupProvider>
           </div>  

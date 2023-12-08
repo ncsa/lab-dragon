@@ -56,13 +56,16 @@ button:active{
     border: 2px solid #ccc;
 }
 
+select { 
+    margin-left: 10px;
+}
+
 .flex-container {
     display: flex;
 }
 
 .sidebar-wrapper {
     position: fixed;
-    top: 122px; /* Adjust this value to the height of your TopBanner */
     width: 180px; /* Adjust this value to the width of your Sidebar */
 }
 
@@ -95,6 +98,15 @@ button:active{
     background-color: #1a202c;
     position: sticky;
     top: 122px;
+}
+
+.user-selection{
+    margin-left: auto;
+}
+
+.user-selection select{
+    color:  black;
+    margin-left: 10px;
 }
 
 .sidebar-content {
