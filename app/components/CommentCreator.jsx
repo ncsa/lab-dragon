@@ -44,7 +44,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
     }
 
     return (
-        <div className="CommentCreator">
+        <div className="comment-creator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}

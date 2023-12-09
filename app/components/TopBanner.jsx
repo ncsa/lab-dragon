@@ -11,6 +11,7 @@ export default function TopBanner() {
     return (
     <div className="top-banner">
         <Image src="/images/pfafflab_logo.png" alt="First Image" width="64" height="64"/>
+        <h1 className="main-title">Lab Notebook</h1>
         <div className="user-selection">
             <label htmlFor="user-select">Selected User:</label>
             <select

@@ -3,9 +3,29 @@
 @tailwind utilities;
 
 :root {
-    --project-color: lightgrey;
-    --task-color: lightpink;
-    --step-color: lightsalmon;
+    --background-color: #191A1F;
+   
+    --project-color: #4b644a;
+    --task-color: #778da9;
+    --step-color: #e0e1dd;
+
+    --navbar-main-color: #1e223d;
+    --sidebar-main-color: #14172b;
+    --button-main-color: #417b5a;
+    --button-hover-color: #335240;
+
+    --tittle-color: white;
+    --entity-header: white;
+    --section-divider-line-color: #ccc;
+    --comment-background-color: #393B40;
+
+    --small-entity-background-color: #393B40;
+    --small-entity-tittle-color: white;
+    --comment-text-color: white;
+
+    --comment-creator-color: white;
+
+    --tiptap-border-color: white;
 }
 
 
@@ -24,14 +44,19 @@ h1 {
 
 body {
     display: flex;
+    background-color: var(--background-color);
 }
 
 .main{
     display: flex;
 }
 
+.main-title{
+    padding-left: 15px;
+}
+
 button{
-    background-color: #b5270e;
+    background-color: var(--button-main-color);
     border: none;
     color: white;
     padding: 15px 32px;
@@ -47,7 +72,7 @@ button{
 }
 
 button:hover{
-    background-color: #8a1c09;
+    background-color: var(--button-hover-color);
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
@@ -83,30 +108,42 @@ select {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #115a0d;
+    background-color: var(--navbar-main-color);
     color: white;
     text-align: center;
-    padding: 10px;
+    padding: 20px; /* Increased padding */
     z-index: 10;
+    display: flex; /* Added to align items in a row */
+    justify-content: space-between; /* Added to give space between items */
+    align-items: center;
 }
+
+.user-selection{
+    margin-left: auto;
+
+    /* add from gpt */
+    color: white;
+    font-size: 1.2em;
+}
+
+.user-selection select{
+    color:  black;
+    margin-left: 10px;
+    padding: 5px; /* Add padding */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Add border radius */
+    background-color: white; /* Change background color */
+}
+
 
 .sidebar{
     color: aliceblue;
     width: 180px;
     height: 100vh;
     overflow-y: auto;
-    background-color: #1a202c;
+    background-color: var(--sidebar-main-color);
     position: sticky;
     top: 122px;
-}
-
-.user-selection{
-    margin-left: auto;
-}
-
-.user-selection select{
-    color:  black;
-    margin-left: 10px;
 }
 
 .sidebar-content {
@@ -170,23 +207,25 @@ select {
 }
 
 .tittle{
+    color: var(--tittle-color);
     font-size: 4.2em;
     font-weight: 700;
     padding: 0.5em;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--section-divider-line-color);
 }
 
 .entity-header{
+    color: var(--entity-header);
     font-size: 1.2em;
     padding: 0.5em;
     margin-bottom: 0.5em;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--section-divider-line-color);
 }
 
 .entity-footer{
     font-size: 1.2em;
     padding: 0.2em;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--section-divider-line-color);
 }
 
 .entity-link {
@@ -208,23 +247,12 @@ select {
 /* SmallEntityViewer css */
 
 .small-entity{
-    background-color: lightgrey;
-    border-top: 4px dashed grey;
-    border-bottom: 4px dotted grey;
     margin-bottom: 15px;
     margin-top: 5px;
-}
-
-.small-entity.Project{
-    background-color: var(--project-color);
-}
-
-.small-entity.Task{
-    background-color: var(--task-color);
-}
-
-.small-entity.Step{
-    background-color: var(--step-color);
+    position: relative;
+    padding-left: 15px;
+    background-color: var(--small-entity-background-color);
+    border-radius: 8px;
 }
 
 .small-entity .tree{
@@ -240,8 +268,29 @@ select {
     white-space: pre-wrap;
 }
 
+.small-entity .type-indicator{
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.small-entity .type-indicator.Project{
+    background-color: var(--project-color);
+}
+
+.small-entity .type-indicator.Task{
+    background-color: var(--task-color);
+}
+
+.small-entity .type-indicator.Step{
+    background-color: var(--step-color);
+}
+
 .small-entity .small-entity-tittle h3{
-    /*color: blue;*/
+    color: var(--small-entity-tittle-color);
     text-decoration: none;
     font-size: 1.1em;
     font-weight: 700;
@@ -275,7 +324,7 @@ select {
 .small-entity .small-entity-tittle .small-entity-options span{
     padding-left: 0.1em;
     padding-right: 0.1em;
-    border: 1px solid black;
+    border: 1px solid var(--small-entity-tittle-color);
     justify-content: center;
     align-items: center;
     display: inline-flex;
@@ -290,11 +339,11 @@ select {
 .comment {
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: inherit;
+    background-color: var(--comment-background-color);
     z-index: 5;
     border-radius: 5px;
     font-size: 14px;
-    color: #333;
+    color: var(--comment-text-color);
     white-space: pre-wrap;
     position: relative;
 
@@ -360,7 +409,7 @@ select {
 
  .comment-buttons {
     position: absolute;
-    bottom: -10;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -455,32 +504,56 @@ ul > li {
 
 /* add content section */
 
-.addition-section {
-    display: flex;
-    flex-direction: row;
-    margin: 0.5em;
-    border-top: 1px solid #ccc;
-}
-
-.addition-section textarea{
-    width: 100%;
-    height: 100px;
-    resize: both;
-    border: 2px solid black;
-}
-
-.addition-section textarea:hover{
-    outline: 2px solid cornflowerblue;
-}
-
 .addition-section button.submitButton {
-    background-color: #b5270e;
+    background-color: var(--button-main-color);
 }
 
 .addition-section button.submitButton:hover{
-    background-color: #8a1c09;
+    background-color: var(--button-hover-color);
 }
 
 .comment-creator {
+    color: var(--comment-creator-color);
     padding-right: 20px;
 }
+
+
+/* TipTap Editor */
+
+.tiptap {
+    width: 100%;
+    min-height: 100px;
+    min-width: 100px;
+    resize: both;
+    border: 2px solid var(--tiptap-border-color);
+    padding: 10px;
+    
+  }
+  
+  .tiptap p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+  
+  .tiptap:hover {
+    outline: 2px solid cornflowerblue;
+  }
+  
+  .tiptap a {
+    color: #A975FF;
+    border: 1px solid black;
+    border-radius: .4rem;
+    box-decoration-break: clone;
+    padding: .1rem .3rem;
+  }
+  
+  .mention {
+    color: #A975FF;
+    background-color: rgba(#A975FF, 0.1);
+    border-radius: 0.3rem;
+    padding: 0.1rem 0.3rem;
+  }
+  

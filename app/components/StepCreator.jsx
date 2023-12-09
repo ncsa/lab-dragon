@@ -40,19 +40,20 @@ export default function StepCreator({entID, user, reloader, reloader1}) {
     }
 
     return (
-        <div className="StepCreator">
-            <h2>Add a Step</h2>
-            <form onSubmit={handleSubmit}>
-                <textarea
-                    required
-                    placeholder="Write the name of the Step here..."
-                    onChange={e => setName(e.target.value)}
-                    value={name}
-                />
-                {isLoading && <p>Loading...</p>}
-                {!isLoading && <button type="submit" className='submitButton'>Submit</button>}
-            </form>
-        </div>
+        null
+        // <div className="StepCreator">
+        //     <h2>Add a Step</h2>
+        //     <form onSubmit={handleSubmit}>
+        //         <textarea
+        //             required
+        //             placeholder="Write the name of the Step here..."
+        //             onChange={e => setName(e.target.value)}
+        //             value={name}
+        //         />
+        //         {isLoading && <p>Loading...</p>}
+        //         {!isLoading && <button type="submit" className='submitButton'>Submit</button>}
+        //     </form>
+        // </div>
     )
 }
 

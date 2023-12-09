@@ -1,5 +1,7 @@
 "use client"
 
+import '../../globals.css';
+
 import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
 import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
@@ -9,7 +11,6 @@ import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Link from "@tiptap/extension-link";
 import { MentionList } from "./MentionList";
-import "./styles.css";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
 import {Image as TiptapImage} from "@tiptap/extension-image";
