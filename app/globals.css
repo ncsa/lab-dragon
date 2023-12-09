@@ -27,6 +27,15 @@
 
     --tiptap-border-color: white;
     --tiptap-font-color: white;
+
+    --tiptap-a-color: #92dce5;
+    --tiptap-a-border-color: #92dce5;
+    --mentionlist-selected-color: #92dce5;
+
+    --mentionlist-border-color: gray;
+    --mentionlist-background-color: #393B40;
+    --mentionlist-font-color: white;
+    
 }
 
 
@@ -544,17 +553,57 @@ ul > li {
   }
   
   .tiptap a {
-    color: #A975FF;
-    border: 1px solid black;
+    color: var(--tiptap-a-color);
+    border: 1px solid var(--tiptap-a-border-color);
     border-radius: .4rem;
     box-decoration-break: clone;
     padding: .1rem .3rem;
   }
   
   .mention {
-    color: #A975FF;
+    color: var(--tiptap-a-color);
     background-color: rgba(#A975FF, 0.1);
     border-radius: 0.3rem;
     padding: 0.1rem 0.3rem;
   }
   
+
+
+/* MentionList */
+
+.items {
+    position: relative;
+    border: 2px solid var(--mentionlist-border-color);
+    border-radius: 0.25rem;
+    background: var(--mentionlist-background-color);
+    color: var(--mentionlist-font-color);
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.1),
+      0px 10px 20px rgba(0, 0, 0, 0.1),
+    ;
+  }
+  
+  .item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: black;
+    padding: 0.2rem 0.5rem;
+  
+    &.is-selected {
+        color: var(--mentionlist-selected-color);
+    }
+
+    &:hover {
+      /* color: #A975FF; */
+      /* background: rgba(#A975FF, 0.1); */
+      background-color: inherit;
+    }
+  }
+  
+  .items button {
+    color: var(--mentionlist-font-color);
+  }
