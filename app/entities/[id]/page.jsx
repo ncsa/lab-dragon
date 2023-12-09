@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import EntityViewer from "@/app/components/EntityViewer";
 import CommentCreator from "@/app/components/CommentCreator";
-import StepCreator from "@/app/components/StepCreator";
 
 export const BASE_API = "http://localhost:8000/api/";
 
@@ -68,7 +67,6 @@ export default function Entities( {params} ) {
             </div>
             <div className="addition-section">
                 <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadEntityComments}/>
-                <StepCreator entID={entity.ID} user={entity.user} reloader={reloadEntityChildren} reloader1={reloadEntityComments}/>
             </div>
         </div>
     )

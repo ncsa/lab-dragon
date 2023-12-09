@@ -26,6 +26,7 @@
     --comment-creator-color: white;
 
     --tiptap-border-color: white;
+    --tiptap-font-color: white;
 }
 
 
@@ -527,7 +528,7 @@ ul > li {
     resize: both;
     border: 2px solid var(--tiptap-border-color);
     padding: 10px;
-    
+    color: var(--tiptap-font-color);
   }
   
   .tiptap p.is-editor-empty:first-child::before {
