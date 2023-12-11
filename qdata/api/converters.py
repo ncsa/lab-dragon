@@ -7,7 +7,7 @@ from markdown.extensions import Extension
 from markdown.inlinepatterns import LinkInlineProcessor
 import xml.etree.ElementTree as etree
 
-from qdata import HOSTADDRESS
+from qdata import HOSTADDRESS, WEBSERVERADDRESS
 
 
 # HTML to markdown
@@ -39,7 +39,9 @@ class MyMarkdownConverter(MarkdownConverter):
         if self.options['default_title'] and not title:
             title = href
         title_part = ' "%s"' % title.replace('"', r'\"') if title else ''
-        return '%s[%s](%s%s)%s' % (prefix, text, href, title_part, suffix) if href else text
+        # This just makes debugging easier
+        ret_text = '%s[%s](%s%s)%s' % (prefix, text, href, title_part, suffix) if href else text
+        return ret_text
 
     def convert_img(self, el, text, convert_as_inline):
         """
@@ -52,12 +54,34 @@ class MyMarkdownConverter(MarkdownConverter):
 
 # Markdown to HTML
 class CustomLinkExtension(Extension):
+
+    def __init__(self, uuid_index, *args, **kwargs):
+        self.uuid_index = uuid_index
+        super().__init__(*args, **kwargs)
+
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(CustomLinkProcessor(r'!\[(.*?)\]\((.*?)\)', md), 'link', 160)
+        md.inlinePatterns.register(CustomLinkProcessor(self.uuid_index, r'!?\[(.*?)\]\((.*?)\)', md), 'link', 160)
 
 
 class CustomLinkProcessor(LinkInlineProcessor):
+
+    def __init__(self, uuid_index, *args, **kwargs):
+        # Need the index to check if a link goes to an image or to an entity
+        self.uuid_index = uuid_index
+        super().__init__(*args, **kwargs)
+
     def handleMatch(self, m, data):
+
+        # group(2) is the text that it is linking too. If this is uuid and it is in the uuid index, it means it is
+        # mention, if not assuming it is a link to an image
+        if m.group(2) in self.uuid_index:
+            text = m.group(1)
+            url = f"{WEBSERVERADDRESS}entities/{m.group(2)}"
+            el = etree.Element('a')
+            el.text = text
+            el.set('href', url)
+            return el, m.start(0), m.end(0)
+
         text = m.group(1)
         url = m.group(2).replace('/', '%23')
         url = f"{HOSTADDRESS}properties/image/{url}"

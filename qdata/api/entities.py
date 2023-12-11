@@ -21,8 +21,8 @@ from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from converters import MyMarkdownConverter,  CustomLinkExtension
 
-# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
-ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
+ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
+# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
 RESOURCEPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/resource')
@@ -50,7 +50,7 @@ USERS = set()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension()])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX)])
 
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
