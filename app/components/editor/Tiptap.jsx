@@ -12,10 +12,24 @@ import { MentionList } from "./MentionList";
 import "./styles.css";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
+import {Image as TiptapImage} from "@tiptap/extension-image";
+import Dropcursor from "@tiptap/extension-dropcursor";
 
 
 const BASE_API = "http://localhost:8000/api/"
 
+
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const response = await fetch(BASE_API + "properties/image", {
+    method: "POST",
+    body: formData,
+  });
+  const url = await response.text();
+  console.log("url inside", url);
+  return url;
+}
 
 export default ({ onContentChange, entID, initialContent }) => {
 
@@ -44,6 +58,8 @@ export default ({ onContentChange, entID, initialContent }) => {
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),
+      TiptapImage.configure({inline: true}),
+      Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
           class: "data_mention"
@@ -99,6 +115,39 @@ export default ({ onContentChange, entID, initialContent }) => {
         },
       }),
     ],
+    editorProps: {
+      handleDrop: (view, event, slice, moved) => {
+
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) { // if dropping external files
+          
+          let file = event.dataTransfer.files[0]; // the dropped file
+          let filesize = ((file.size/1024)/1024).toFixed(4); // get the filesize in MB
+          if ((file.type === "image/jpeg" || file.type === "image/png") && filesize < 10) { // check valid image type under 10MB
+            // check the dimensions
+            let _URL = window.URL || window.webkitURL;
+            let img = new Image(); /* global Image */
+            img.src = _URL.createObjectURL(file);
+            img.onload = function () {
+              uploadImage(file).then((url) => {
+                console.log("url", url);
+                let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
+                let attrs = {src: url, alt: file.name}; // set the image attributes
+                let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
+                transaction.replaceSelectionWith(node); // replace the space with the image node
+                view.dispatch(transaction); // dispatch the transaction
+              })
+            };
+            img.onerror = function () {
+              window.alert("Invalid image. Images must be a .jpg or .png file."); // display alert
+            };
+            return true;
+          } else {
+            window.alert("Invalid image. Images must be a .jpg or .png file and less than 10MB."); // display alert
+            return true;
+          }
+        }
+      }
+    },
     onUpdate: (props) => {
       onContentChange(props.editor.getHTML());
     },
