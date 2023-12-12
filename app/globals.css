@@ -410,8 +410,8 @@ select {
 }
 
 .comment a {
-    color: #A975FF;
-    border: 1px solid black;
+    color: var(--mentionlist-selected-color);
+    border: 1px solid var(--mentionlist-selected-color);
     border-radius: .4rem;
     box-decoration-break: clone;
     padding: .1rem .3rem;
@@ -642,6 +642,27 @@ ul > li {
 .data-table tbody td {
     padding: 10px;
     border: 1px solid var(--section-divider-line-color);
+}
+
+.instance-images {
+    border-bottom: 1px solid var(--section-divider-line-color);
+    padding-bottom: 10px;
+    padding-top: 10px;
+
+    h2 {
+        color: var(--tittle-color);
+        font-size: 1.2em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    }
+
+    img {
+        text-align: center;
+        white-space: nowrap;
+        margin-top: 5px;
+        border: 1px solid var(--section-divider-line-color);
+    }
 }
 
 /* Stored Parameters */

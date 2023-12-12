@@ -1,5 +1,6 @@
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 
@@ -29,10 +30,10 @@ export async function getStoredParams(id) {
     return await response.json()
 }
 
-function RenderDictionary({ data, file, level = 0 }) {
+function RenderDictionary({ data, file, level = 1 }) {
     return (
         <div style={{ paddingLeft: `${level * 20}px` }}>
-            <h3>File: {file}</h3>
+            <h3 style={{ paddingLeft: `${(level-1) * 20}px`}} >File: {file}</h3>
             {Object.entries(data).map(([key, value], index) => {
                 if (typeof value === 'object' && value !== null) {
                     return (
@@ -73,6 +74,8 @@ export default function InstanceViewer({ entity }) {
         })
     }, []);
 
+    console.log("entity is:")
+    console.log(entity);
     return (
         <div>
             <h1 className="tittle">Instance: {entity.name}</h1>
@@ -101,6 +104,13 @@ export default function InstanceViewer({ entity }) {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="instance-images">
+                <h2>Instance Images</h2>
+                {entity.images.map((imagePath, index) => (
+                    <img key={index} src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                ))}
             </div>
 
             <div className="stored-params">
