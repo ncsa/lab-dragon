@@ -40,7 +40,8 @@ PATH_TO_UUID_INDEX = {}
 # Holds as keys the UUIDs of entities and as values the path to the TOML files
 UUID_TO_PATH_INDEX = {}
 
-# Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
+# Holds as keys the hash of an image and as value the absolute path to that image.
+#  This is used to check if an image already exists
 IMAGEINDEX = {}
 
 # Holds all of the users that exists in the notebook
@@ -219,6 +220,11 @@ def initialize_bucket(bucket_path):
     for ins_path in bucket.path_to_uuid.keys():
         instance = read_from_TOML(ins_path)
         add_ent_to_index(instance, ins_path)
+        #
+        # # add images to the image index
+        # for img_path in instance.images:
+        #     img = Image.open(img_path)
+        #     add_image_to_index(img, img_path)
 
     return bucket
 
@@ -702,6 +708,33 @@ def get_data_suggestions(ID, query="", num_matches=10):
                         matches[path.stem] = uuid
 
     return json.dumps(matches), 201
+
+
+def get_stored_params(ID):
+    """
+    Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+
+    if not isinstance(ent, Instance):
+        abort(400, f"Entity with ID {ID} is not an instance")
+
+    if ent.stored_params is None:
+        return json.dumps({}), 201
+
+    ret = {}
+    for json_path in ent.stored_params:
+        path = Path(json_path)
+        if path.suffix == '.json':
+            with path.open() as json_file:
+                data = json.load(json_file)
+                ret[path.stem] = data
+
+    return json.dumps(ret), 201
 
 
 def get_fake_mentions():

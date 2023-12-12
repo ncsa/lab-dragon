@@ -1,5 +1,6 @@
 import os
 import sys
+import copy
 import random
 import shutil
 import string
@@ -89,8 +90,11 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
             path, data = run_and_save_sweep(sweep=my_sweep,
                                             data_dir=folder_path,
                                             name=name, test_parameters=test_params)
-            image = random.choice(images)
-            shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
+            image_copy = copy.deepcopy(images)
+            for j in range(2):
+                image = random.choice(image_copy)
+                shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
+                image_copy.pop(image_copy.index(image))
 
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
