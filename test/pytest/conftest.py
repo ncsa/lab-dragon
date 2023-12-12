@@ -71,18 +71,14 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
                   "no_star",
                   ]
 
-    images = ["koalas/baby_koala.png",
-              "koalas/creepy_koala.jpg",
-              "koalas/sleepy_koala.png",
-              "pandas/baby_pandas.png",
-              "pandas/Giant_panda.jpg",
-              "pandas/panda_eating.png"]
+    images = [f"monkeys/monkey-{i}.png" for i in range(1, 14)]
 
     inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x*2, 'z'))
     outer_sweep = sweep_parameter('y', np.linspace(0, 10))
 
     my_sweep = outer_sweep @ inner_sweep
 
+    image_copy = copy.deepcopy(images)
     for name in msmt_names:
         for i in range(n_measurements):
             test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j
@@ -90,11 +86,10 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
             path, data = run_and_save_sweep(sweep=my_sweep,
                                             data_dir=folder_path,
                                             name=name, test_parameters=test_params)
-            image_copy = copy.deepcopy(images)
-            for j in range(2):
-                image = random.choice(image_copy)
-                shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
-                image_copy.pop(image_copy.index(image))
+
+            image = random.choice(image_copy)
+            shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
+            image_copy.pop(image_copy.index(image))
 
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')

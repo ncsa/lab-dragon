@@ -182,7 +182,7 @@ def add_image_to_index(image, image_path):
     if img_hash not in IMAGEINDEX:
         IMAGEINDEX[img_hash] = image_path
     # FIXME: This is a design decision that should be checked
-    elif IMAGEINDEX[img_hash] != image_path:
+    elif str(IMAGEINDEX[img_hash]) != str(image_path):
         raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
 
 
@@ -220,11 +220,11 @@ def initialize_bucket(bucket_path):
     for ins_path in bucket.path_to_uuid.keys():
         instance = read_from_TOML(ins_path)
         add_ent_to_index(instance, ins_path)
-        #
-        # # add images to the image index
-        # for img_path in instance.images:
-        #     img = Image.open(img_path)
-        #     add_image_to_index(img, img_path)
+
+        # add images to the image index
+        for img_path in instance.images:
+            img = Image.open(img_path)
+            add_image_to_index(img, img_path)
 
     return bucket
 
