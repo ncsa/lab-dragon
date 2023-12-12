@@ -606,3 +606,78 @@ ul > li {
   .items button {
     color: var(--mentionlist-font-color);
   }
+
+  /* Instance Display */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    color: var(--entity-header);
+    border: 1px solid var(--section-divider-line-color);
+}
+
+.data-table thead {
+    background-color: var(--navbar-main-color);
+    color: var(--tittle-color);
+}
+
+.data-table thead th {
+    padding: 10px;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    width: 50%;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: var(--small-entity-background-color);
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: var(--background-color);
+}
+
+.data-table tbody td {
+    padding: 10px;
+    border: 1px solid var(--section-divider-line-color);
+}
+
+/* Stored Parameters */
+
+.stored-params {
+    color: var(--entity-header);
+    font-size: 1em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params h2 {
+    color: var(--tittle-color);
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params h3 {
+    color: var(--tittle-color);
+    font-size: 1.1em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params p {
+    color: var(--entity-header);
+    font-size: 0.9em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params div {
+    padding-left: 20px;
+}

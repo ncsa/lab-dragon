@@ -18,7 +18,8 @@ export async function getEntityName(id) {
     return await response.json()
 }
 
-export default function EntityViewer({ entity, displayChildren, childrenReloader}) {
+export default function EntityViewer({ entity, displayChildren, childrenReloader }) {
+    // we get the ID, not the name of the parent entity.
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);

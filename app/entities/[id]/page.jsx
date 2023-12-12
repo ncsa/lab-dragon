@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import EntityViewer from "@/app/components/EntityViewer";
 import CommentCreator from "@/app/components/CommentCreator";
+import InstanceViewer from "@/app/components/InstanceViewer";
 
 export const BASE_API = "http://localhost:8000/api/";
 
@@ -58,6 +59,12 @@ export default function Entities( {params} ) {
 
     if (!entity) {
         return <div>Loading...</div>;
+    }
+
+    if (entity.type === "Instance") {
+        return (
+            <InstanceViewer entity={entity}/>
+        )
     }
 
     return (
