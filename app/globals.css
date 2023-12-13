@@ -409,14 +409,6 @@ select {
     border: 1px solid #ddd;
 }
 
-.comment a {
-    color: var(--mentionlist-selected-color);
-    border: 1px solid var(--mentionlist-selected-color);
-    border-radius: .4rem;
-    box-decoration-break: clone;
-    padding: .1rem .3rem;
-}
-
  .comment-buttons {
     position: absolute;
     bottom: -10px;
@@ -449,6 +441,20 @@ select {
 .comment-buttons.Step button {
     background-color: var(--step-color);
 }
+
+.data-mention {
+    color: var(--mentionlist-selected-color);
+    border: 1px solid var(--mentionlist-selected-color);
+    border-radius: .4rem;
+    box-decoration-break: clone;
+    padding: .1rem .3rem;
+}
+
+.image-link img{
+    color: var(--mentionlist-selected-color);
+    border: 5px solid var(--mentionlist-selected-color);
+}
+
 /* ENTITY POPUP */  
 
 .add-entity-button {
