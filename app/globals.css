@@ -558,7 +558,7 @@ ul > li {
     outline: 2px solid cornflowerblue;
   }
   
-  .tiptap a {
+  .tiptap .data-mention {
     color: var(--tiptap-a-color);
     border: 1px solid var(--tiptap-a-border-color);
     border-radius: .4rem;

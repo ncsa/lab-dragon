@@ -34,7 +34,6 @@ const uploadImage = async (file) => {
 
 export default ({ onContentChange, entID, initialContent }) => {
 
-  console.log("In the tiptap editor initial content is", initialContent)
   const dataMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
@@ -64,7 +63,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
-          class: "data_mention"
+          class: "data-mention"
         },
         renderLabel: ({options, node}) => {
             return `${node.attrs.label ?? node.attrs.id}`
