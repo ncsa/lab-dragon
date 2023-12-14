@@ -44,6 +44,8 @@ UUID_TO_PATH_INDEX = {}
 #  This is used to check if an image already exists
 IMAGEINDEX = {}
 
+INSTANCEIMAGE = {}
+
 # Holds all of the users that exists in the notebook
 USERS = set()
 
@@ -51,7 +53,7 @@ USERS = set()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX)])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
 
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
@@ -225,6 +227,7 @@ def initialize_bucket(bucket_path):
         for img_path in instance.images:
             img = Image.open(img_path)
             add_image_to_index(img, img_path)
+            INSTANCEIMAGE[img_path] = instance.ID
 
     return bucket
 
