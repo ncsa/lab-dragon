@@ -47,6 +47,18 @@ export async function getComments(id) {
     return parsedComments
 }
 
+export async function toogleBookmark(id) {
+    let response = await fetch(BASE_API+"entities/" + id + "/toggle_bookmark", {
+        method: 'POST',
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    return response;
+}
+
 
 export default function SmallEntityViewer({entity,
                                            onClickHandler,
@@ -83,6 +95,12 @@ export default function SmallEntityViewer({entity,
             setComments(data);
         });
         deactivateAllComments();
+    }
+
+    const handleBookmarkClick = () => {
+        toogleBookmark(entity.ID).then(data => {
+            setIsBookmarked(!isBookmarked);
+        });
     }
 
     useEffect(() => {
@@ -132,7 +150,7 @@ export default function SmallEntityViewer({entity,
                         <span>{numChildren}</span>
                         <span>{rank}</span>
                     </div>
-                    <button className="bookmark-button" onClick={() => {console.log("I am here clicking the icon")}}>
+                    <button className="bookmark-button" onClick={() => {handleBookmarkClick()}}>
                         {isBookmarked ? <i className="bookmark bi bi-bookmark-fill"/> : <i className="bookmark bi bi-bookmark"/>}
                     </button>
                 </h3>

@@ -356,9 +356,6 @@ select {
     box-shadow: none;
 }
 
-.small-entity .small-entity-tittle .bookmark {
-    display: none;
-}
 
 .small-entity .small-entity-tittle:hover .bookmark{
     display: inline-block;
