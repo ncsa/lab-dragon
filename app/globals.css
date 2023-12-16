@@ -344,6 +344,26 @@ select {
     text-decoration: none;
 }
 
+.small-entity .small-entity-tittle button.bookmark-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.small-entity .small-entity-tittle button.bookmark-button:hover{
+    background-color: none;
+    box-shadow: none;
+}
+
+.small-entity .small-entity-tittle .bookmark {
+    display: none;
+}
+
+.small-entity .small-entity-tittle:hover .bookmark{
+    display: inline-block;
+}
+
 /* Comment section */
 
 .comment {

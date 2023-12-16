@@ -66,6 +66,7 @@ export default function SmallEntityViewer({entity,
     const [showTree, setShowTree] = useState(false);
     const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 });
     const [comments, setComments] = useState(entity.comments);
+    const [isBookmarked, setIsBookmarked] = useState(entity.bookmarked);
 
     const handleMouseEnter = (event) => {
         setShowTree(true);
@@ -131,6 +132,9 @@ export default function SmallEntityViewer({entity,
                         <span>{numChildren}</span>
                         <span>{rank}</span>
                     </div>
+                    <button className="bookmark-button" onClick={() => {console.log("I am here clicking the icon")}}>
+                        {isBookmarked ? <i className="bookmark bi bi-bookmark-fill"/> : <i className="bookmark bi bi-bookmark"/>}
+                    </button>
                 </h3>
             </div>
             { Object.keys(comments).map((key) => {
