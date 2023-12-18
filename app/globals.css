@@ -145,6 +145,20 @@ select {
     background-color: white; /* Change background color */
 }
 
+.banner-options button {
+    margin-left: 10px;
+    background-color: var(--button-main-color);
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.banner-options button:hover {
+    background-color: var(--button-hover-color);
+}
 
 .sidebar{
     color: aliceblue;

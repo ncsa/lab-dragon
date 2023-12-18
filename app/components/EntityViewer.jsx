@@ -1,8 +1,9 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
+import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
 export const BASE_API = "http://localhost:8000/api/";
 export const BASE_URL = 'http://localhost:3000/entities/';
@@ -25,6 +26,7 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
     const [selectedComment, setSelectedComment] = useState(null);
     const [activatedComment, setActivatedComment] = useState(null);
     const [isHovered, setIsHovered] = useState(null);
+    const { onlyShowBookmarked } = useContext(BookmarkContext);
 
     let combinedArray = null;
 
@@ -73,6 +75,10 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
             const timeB = b.created ? new Date(b.created) : new Date(b.start_time);
             return timeA - timeB;
         });
+        
+        if (onlyShowBookmarked) {
+            combinedArray = combinedArray.filter(item => item.com_type || item.bookmarked);
+        }
     }
 
     return (
