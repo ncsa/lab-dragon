@@ -269,7 +269,6 @@ paths:
         "404":
           description: "Entity not found"
 
-
   /entities/{ID}/stored_params:
     get:
       operationId: "entities.get_stored_params"
@@ -284,6 +283,20 @@ paths:
           description: "Successfully read entity info"
         "400":
           description: "Entity type is not an Instance"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/toggle_bookmark:
+    post:
+      operationId: "entities.toggle_bookmark"
+      tags:
+        - Entities
+      summary: "Toggles the bookmark status of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully toggled bookmark"
         "404":
           description: "Entity not found"
 

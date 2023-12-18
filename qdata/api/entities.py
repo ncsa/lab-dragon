@@ -758,3 +758,22 @@ def get_fake_mentions():
 
 
 read_all()
+
+
+def toggle_bookmark(ID):
+    """
+    API function that toggles the bookmark of an entity
+
+    :param ID: The ID of the entity to toggle the bookmark
+    """
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    ent.toggle_bookmark()
+
+    # Convert uuids in the entity to paths and saves the change
+    path_copy = create_path_entity_copy(ent)
+    path_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+
+    return make_response("Bookmark toggled", 201)
