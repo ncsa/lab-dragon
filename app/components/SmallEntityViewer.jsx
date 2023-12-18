@@ -66,7 +66,6 @@ export default function SmallEntityViewer({entity,
                                            onDoubleClickHandler,
                                            activatedComment,
                                            deactivateAllComments,
-                                           reloadEntityComments,
                                            isHovered,
                                            onHoverHandler,
                                            OnHoverLeaveHandler
@@ -100,6 +99,7 @@ export default function SmallEntityViewer({entity,
     const handleBookmarkClick = () => {
         toogleBookmark(entity.ID).then(data => {
             setIsBookmarked(!isBookmarked);
+            entity.bookmarked = !entity.bookmarked;
         });
     }
 

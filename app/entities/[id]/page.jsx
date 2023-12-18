@@ -70,7 +70,7 @@ export default function Entities( {params} ) {
     return (
         <div>
             <div>
-                <EntityViewer entity={entity} displayChildren={children} childrenReloader={reloadEntityChildren}/>
+                <EntityViewer entity={entity} displayChildren={children}/>
             </div>
             <div className="addition-section">
                 <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadEntityComments}/>

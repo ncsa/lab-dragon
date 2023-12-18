@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Link from 'next/link';
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
@@ -19,7 +19,7 @@ export async function getEntityName(id) {
     return await response.json()
 }
 
-export default function EntityViewer({ entity, displayChildren, childrenReloader }) {
+export default function EntityViewer({ entity, displayChildren }) {
     // we get the ID, not the name of the parent entity.
     const [parentName, setParentName] = useState(null);
     const [childrenNames, setChildrenNames] = useState(null);
@@ -27,8 +27,8 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
     const [activatedComment, setActivatedComment] = useState(null);
     const [isHovered, setIsHovered] = useState(null);
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-
-    let combinedArray = null;
+    
+    const childrenAndComments = useRef([]);
 
     useEffect(() => {
         if (entity.parent) {
@@ -68,18 +68,31 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
         setIsHovered(null);
     }
 
-    if (entity !== null && displayChildren !== null) {
-        combinedArray = [...entity.comments, ...displayChildren];
-        combinedArray.sort((a, b) => {
-            const timeA = a.created ? new Date(a.created) : new Date(a.start_time);
-            const timeB = b.created ? new Date(b.created) : new Date(b.start_time);
-            return timeA - timeB;
-        });
+    const sortAndFilterChildren = () => {
+        let combinedArray = null;
+        if (entity !== null && displayChildren !== null) {
+            combinedArray = [...entity.comments, ...displayChildren];
+            combinedArray.sort((a, b) => {
+                const timeA = a.created ? new Date(a.created) : new Date(a.start_time);
+                const timeB = b.created ? new Date(b.created) : new Date(b.start_time);
+                return timeA - timeB;
+            });
+            
+            if (onlyShowBookmarked) {
+                combinedArray = combinedArray.filter(item => item.com_type || item.bookmarked);
+            }
         
-        if (onlyShowBookmarked) {
-            combinedArray = combinedArray.filter(item => item.com_type || item.bookmarked);
+            childrenAndComments.current = combinedArray.map((item, index) => {
+                return {index: index, obj: item}
+            });
+
         }
     }
+    sortAndFilterChildren();
+
+    useEffect(() => {
+        sortAndFilterChildren();
+    }, [onlyShowBookmarked]);
 
     return (
         <div>
@@ -93,7 +106,7 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
 
             <div className="Content">
                 {
-                    combinedArray === null ?  Object.keys(entity.comments).map((key) => {
+                    childrenAndComments.current === null ?  Object.keys(entity.comments).map((key) => {
                         return (<Comment key={entity.comments[key].ID} 
                             comment={entity.comments[key]}
                             entID={entity.ID}
@@ -108,26 +121,25 @@ export default function EntityViewer({ entity, displayChildren, childrenReloader
 
                         />)
 
-                    }) : combinedArray.map(item => {
-                        return item.com_type ? <Comment comment={item} 
+                    }) : childrenAndComments.current.map(item => {
+                        return item.obj.com_type ? <Comment comment={item.obj} 
                             entID={entity.ID} 
-                            isSelected={selectedComment === item.ID}
+                            isSelected={selectedComment === item.obj.ID}
                             onClickHandler={handleCommentClick}
-                            isActivated={activatedComment === item.ID}
+                            isActivated={activatedComment === item.obj.ID}
                             onDoubleClickHandler={handleCommentDoubleClick}
                             deactivateAllComments={deactivateAllComments}
-                            isHovered={isHovered == item.ID}
+                            isHovered={isHovered == item.obj.ID}
                             onHoverHandler={handleOnHover}
                             OnHoverLeaveHandler={handleOnHoverLeave}
                             onlyComment={entity.type === "Step" ? true : false} /> : 
                                 
-                                <SmallEntityViewer entity={item} 
+                                <SmallEntityViewer entity={item.obj} 
                                     onClickHandler={handleCommentClick}
                                     selectedComment={selectedComment}
                                     onDoubleClickHandler={handleCommentDoubleClick}
                                     activatedComment={activatedComment}
                                     deactivateAllComments={deactivateAllComments} 
-                                    reloadEntityComments={childrenReloader}
                                     isHovered={isHovered}
                                     onHoverHandler={handleOnHover}
                                     OnHoverLeaveHandler={handleOnHoverLeave}/>
