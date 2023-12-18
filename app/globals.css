@@ -145,19 +145,34 @@ select {
     background-color: white; /* Change background color */
 }
 
+.bookmark-toggle {
+    display: flex;
+    align-items: center;
+    vertical-align: auto;
+}
+
 .banner-options button {
-    margin-left: 10px;
-    background-color: var(--button-main-color);
+    background-color: transparent;
     color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
+    padding: 0;
+    margin: 0;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .banner-options button:hover {
-    background-color: var(--button-hover-color);
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.banner-options button:active{
+    transform: none;
+    border: none;
+}
+
+.banner-options button i {
+    padding-left: 5px;
+    font-size: 2em; /* Increase the size of the icon */
 }
 
 .sidebar{

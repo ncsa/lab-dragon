@@ -36,9 +36,12 @@ export default function TopBanner() {
                     ))}
                 </select>
             </div>
-            <button onClick={handleBookmarkToggle}>
-                    {onlyShowBookmarked ? 'Show all' : 'Show only bookmarked'}
-                </button>
+                <div className="bookmark-toggle">
+                    <label>Only Bookmarked</label>
+                    <button onClick={handleBookmarkToggle}>
+                            {onlyShowBookmarked ? <i className="bookmark-toggle bi bi-toggle-on" /> : <i className="bookmark-toggle bi bi-toggle-off" />}
+                    </button>
+                </div>
         </div>
     </div>
     )
