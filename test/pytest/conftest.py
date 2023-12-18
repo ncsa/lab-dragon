@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import connexion
 import numpy as np
+from jinja2 import Environment, FileSystemLoader
 
 # Tools from pfafflab
 from labcore.measurement.sweep import Sweep, sweep_parameter
@@ -78,6 +79,9 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
 
     my_sweep = outer_sweep @ inner_sweep
 
+    env = Environment(loader=FileSystemLoader(Path(r'../testing_templates').resolve()), extensions=['jinja2.ext.do'],)
+    template = env.get_template('jupyter_notebook.jinja')
+
     image_copy = copy.deepcopy(images)
     for name in msmt_names:
         for i in range(n_measurements):
@@ -94,6 +98,9 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
                 star_path.touch()
+                
+            with open(path.joinpath('jupyter_notebook.ipynb'), 'w') as f:
+                f.write(template.render(data=data))
 
     add_toml_to_data(folder_path)
     create_full_test_env(tmp_path, create_md=False, light_delete=True)

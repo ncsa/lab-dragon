@@ -16,6 +16,7 @@ tags = "List[str]"
 images = "Union[List[Path], List[str]]"
 data = "Union[List[Path], List[str]]"
 data_structure = "Dict[str, Union[Tuple[int], int]]"
+analysis = "Union[List[Path], List[str]]"
 
 [defaults]
 start_time = ""
@@ -26,6 +27,7 @@ tags = ""
 images = []
 data = []
 data_structure = {}
+analysis = []
 
 [imports]
 Path = "from pathlib import Path"
