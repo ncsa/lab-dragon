@@ -113,6 +113,17 @@ export default function InstanceViewer({ entity }) {
                 ))}
             </div>
 
+            <div className="instance-analysis">
+                <h2>Instance Analysis Files</h2>
+                {entity.analysis.map(([fileName, html], index) => (
+                    <div>
+                        <h3>{fileName}</h3>
+                        <div dangerouslySetInnerHTML={{ __html: html }} />
+                    </div>
+                
+                ))}
+            </div>
+            
             <div className="stored-params">
                 <h2>Stored Parameters</h2>
                 {Object.entries(storedParams).map(([file, data], index) => {

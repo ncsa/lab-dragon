@@ -98,8 +98,9 @@ export default function SmallEntityViewer({entity,
 
     const handleBookmarkClick = () => {
         toogleBookmark(entity.ID).then(data => {
+            entity.bookmarked = !isBookmarked;
             setIsBookmarked(!isBookmarked);
-            entity.bookmarked = !entity.bookmarked;
+            
         });
     }
 
@@ -151,7 +152,7 @@ export default function SmallEntityViewer({entity,
                         <span>{rank}</span>
                     </div>
                     <button className="bookmark-button" onClick={() => {handleBookmarkClick()}}>
-                        {isBookmarked ? <i className="bookmark bi bi-bookmark-fill"/> : <i className="bookmark bi bi-bookmark"/>}
+                        {isBookmarked ? <i className="bookmark filled bi bi-bookmark-fill"/> : <i className="bookmark empty bi bi-bookmark"/>}
                     </button>
                 </h3>
             </div>

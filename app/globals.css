@@ -703,7 +703,7 @@ ul > li {
 
     h2 {
         color: var(--tittle-color);
-        font-size: 1.2em;
+        font-size: 2em;
         font-weight: 700;
         padding: 0.5em;
         border-top: 1px solid var(--section-divider-line-color);
@@ -714,6 +714,25 @@ ul > li {
         white-space: nowrap;
         margin-top: 5px;
         border: 1px solid var(--section-divider-line-color);
+    }
+}
+
+.instance-analysis {
+    h2 {
+        color: var(--tittle-color);
+        font-size: 2em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    }
+
+    h3 {
+        color: var(--tittle-color);
+        font-size: 1.5em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    
     }
 }
 
