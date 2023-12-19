@@ -11,6 +11,7 @@ All of them are subject to change.
 The file name should be the name of the class lowered.
 - All comments in an entity should be unique. You can have the same comment in different entities but if you have 2 
 identical comments in the same entity they will not be shown.
+- all data folders that contain a jupyternotebook are assumed to be used for analysis and will be added to the generated instance.
 
 ## Rules
 

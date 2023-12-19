@@ -22,6 +22,7 @@ comments = "List[Union[Comment, Table, str]]"
 children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
 data_buckets = "List[Union[str, Path]]"
+bookmarked = "bool"
 
 # Imports is optional
 [imports]
@@ -38,6 +39,7 @@ comments = []
 children = []
 params= []
 data_buckets = []
+bookmarked = "False"
 
 # Params is optional
 [params]

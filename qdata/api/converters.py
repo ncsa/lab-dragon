@@ -1,11 +1,11 @@
 
 from urllib.parse import urlparse
+import xml.etree.ElementTree as etree
 
 from markdownify import MarkdownConverter, chomp
 
 from markdown.extensions import Extension
 from markdown.inlinepatterns import LinkInlineProcessor
-import xml.etree.ElementTree as etree
 
 from qdata import HOSTADDRESS, WEBSERVERADDRESS
 
@@ -19,6 +19,12 @@ class MyMarkdownConverter(MarkdownConverter):
 
     #TODO: Check if it is ok for me to steal the code like this so I don't have to re parse it again.
     def convert_a(self, el, text, convert_as_inline):
+        
+        # Checks if the a has an image inside. this means that the imagesw points to an Instance and we should ignore it
+        img_el = el.find('img')
+        if img_el is not None:
+            return self.convert_img(img_el, "", convert_as_inline)
+        
         prefix, suffix, text = chomp(text)
         if not text:
             return ''
@@ -47,27 +53,38 @@ class MyMarkdownConverter(MarkdownConverter):
         """
         Removes the extra localhost part of the url and replaces the %23 with a /
         """
-        el.attrs["src"] = el.attrs['src'][43:].replace("%23", "/")
-        del el.attrs['alt']
-        return super().convert_img(el, text, convert_as_inline)
+        src = el.attrs['src']
+        # Remove the 'http://localhost:8000/api/properties/image/' part from the src
+        src = src.replace('http://localhost:8000/api/properties/image/', '')
+        # Replace '%23' with '/'
+        src = src.replace('%23', '/')
+        el.attrs["src"] = src
+        if 'alt' in el.attrs:
+            del el.attrs['alt']
+
+        img_md = f"![{text}]({el.attrs['src']})"
+        return img_md
+        # return super().convert_img(el, text, convert_as_inline)
 
 
 # Markdown to HTML
 class CustomLinkExtension(Extension):
 
-    def __init__(self, uuid_index, *args, **kwargs):
+    def __init__(self, uuid_index, instance_index, *args, **kwargs):
         self.uuid_index = uuid_index
+        self.instance_index = instance_index
         super().__init__(*args, **kwargs)
 
     def extendMarkdown(self, md):
-        md.inlinePatterns.register(CustomLinkProcessor(self.uuid_index, r'!?\[(.*?)\]\((.*?)\)', md), 'link', 160)
+        md.inlinePatterns.register(CustomLinkProcessor(self.uuid_index, self.instance_index, r'!?\[(.*?)\]\((.*?)\)', md), 'link', 160)
 
 
 class CustomLinkProcessor(LinkInlineProcessor):
 
-    def __init__(self, uuid_index, *args, **kwargs):
+    def __init__(self, uuid_index, instance_index, *args, **kwargs):
         # Need the index to check if a link goes to an image or to an entity
         self.uuid_index = uuid_index
+        self.instance_index = instance_index
         super().__init__(*args, **kwargs)
 
     def handleMatch(self, m, data):
@@ -80,11 +97,26 @@ class CustomLinkProcessor(LinkInlineProcessor):
             el = etree.Element('a')
             el.text = text
             el.set('href', url)
+            el.set("class", "data-mention")
             return el, m.start(0), m.end(0)
 
         text = m.group(1)
-        url = m.group(2).replace('/', '%23')
-        url = f"{HOSTADDRESS}properties/image/{url}"
+        img_path = m.group(2).replace('/', '%23')
+        url = f"{HOSTADDRESS}properties/image/{img_path}"
+
+        # Checks if the image is in the instance index, if it is, it means it is an image that is in the instance and
+        # should have a link to it.
+        if m.group(2) in self.instance_index:
+            a_el = etree.Element('a')
+            href = f"{WEBSERVERADDRESS}entities/{self.instance_index[m.group(2)]}"
+            a_el.set('href', href)
+            a_el.set("class", "image-link")
+            img_el = etree.SubElement(a_el, 'img')
+            img_el.text = text
+            img_el.set('src', url)
+            img_el.set('alt', 'Image is loading or not available')
+            return a_el, m.start(0), m.end(0)
+
         el = etree.Element('img')
         el.text = text
         el.set('src', url)

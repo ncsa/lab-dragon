@@ -54,10 +54,11 @@ def add_toml_to_data(dir, user="testUser"):
                 except Exception as e:
                     print(f'Error reading {path.name} {e}')
 
-                # Get tags, stored params and images
+                # Get tags, stored params, images and analysis notebooks.
                 tags = []
                 stored_params = []
                 images = []
+                analysis = []
                 for file in parent.iterdir():
                     if file.suffix == ".tag":
                         # remove the leading and ending '__'
@@ -67,6 +68,8 @@ def add_toml_to_data(dir, user="testUser"):
                         stored_params.append(str(file))
                     elif file.suffix == ".png" or file.suffix == ".jpg":
                         images.append(str(file))
+                    elif file.suffix == ".ipynb":
+                        analysis.append(str(file))
 
                 # Create the instance
                 instance = Instance(name=parent.name,
@@ -76,7 +79,8 @@ def add_toml_to_data(dir, user="testUser"):
                                     tags=tags,
                                     data=[str(path)],
                                     stored_params=stored_params,
-                                    images=images)
+                                    images=images,
+                                    analysis=analysis)
 
                 # Save the instance
                 instance.to_TOML(parent)

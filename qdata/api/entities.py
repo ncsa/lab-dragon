@@ -5,9 +5,11 @@ from pathlib import Path
 from enum import Enum, auto
 from typing import Optional, Union, Tuple
 
+import nbformat
 import markdown
 import imagehash
 from PIL import Image
+from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
@@ -40,8 +42,11 @@ PATH_TO_UUID_INDEX = {}
 # Holds as keys the UUIDs of entities and as values the path to the TOML files
 UUID_TO_PATH_INDEX = {}
 
-# Inside the image index the string to identify the image is the ID of the entity + '--' + the name of the image
+# Holds as keys the hash of an image and as value the absolute path to that image.
+#  This is used to check if an image already exists
 IMAGEINDEX = {}
+
+INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
 USERS = set()
@@ -50,7 +55,7 @@ USERS = set()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX)])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
 
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
@@ -181,7 +186,7 @@ def add_image_to_index(image, image_path):
     if img_hash not in IMAGEINDEX:
         IMAGEINDEX[img_hash] = image_path
     # FIXME: This is a design decision that should be checked
-    elif IMAGEINDEX[img_hash] != image_path:
+    elif str(IMAGEINDEX[img_hash]) != str(image_path):
         raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
 
 
@@ -219,6 +224,12 @@ def initialize_bucket(bucket_path):
     for ins_path in bucket.path_to_uuid.keys():
         instance = read_from_TOML(ins_path)
         add_ent_to_index(instance, ins_path)
+
+        # add images to the image index
+        for img_path in instance.images:
+            img = Image.open(img_path)
+            add_image_to_index(img, img_path)
+            INSTANCEIMAGE[img_path] = instance.ID
 
     return bucket
 
@@ -329,6 +340,29 @@ def read_one(ID, name_only=False):
                 replaced_path = comment_path_to_uuid(comment.content[-1])
                 html_comment = markdown_to_html.convert(replaced_path)
                 comment.content[-1] = html_comment
+
+        # If it is an instance, convert the notebooks into html
+        if isinstance(ent, Instance):
+            converted_analysis = []
+            for analysis_nb in ent_copy.analysis:
+                    # Read the notebook
+                    nb = nbformat.read(analysis_nb, as_version=4)
+
+                    # Create HTML exporter
+                    html_exporter = HTMLExporter()
+                    html_exporter.theme = "dark" # Change the theme of the notebook
+                    html_exporter.template_name = 'classic'  # use classic template (you can change this)
+
+                    # Export the notebook to HTML format
+                    (body, resources) = html_exporter.from_notebook_node(nb)
+                    converted_analysis.append((Path(analysis_nb).stem, str(body)))
+
+            # TOML table does not like having a string that is as long as an html file so the conversion needs to happen
+            # after the TOML conversion.
+            serialized = dict(ent_copy.to_TOML()[ent_copy.name])
+            serialized['analysis'] = converted_analysis
+
+            return json.dumps(serialized), 201
 
         return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
     else:
@@ -704,6 +738,33 @@ def get_data_suggestions(ID, query="", num_matches=10):
     return json.dumps(matches), 201
 
 
+def get_stored_params(ID):
+    """
+    Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+
+    if not isinstance(ent, Instance):
+        abort(400, f"Entity with ID {ID} is not an instance")
+
+    if ent.stored_params is None:
+        return json.dumps({}), 201
+
+    ret = {}
+    for json_path in ent.stored_params:
+        path = Path(json_path)
+        if path.suffix == '.json':
+            with path.open() as json_file:
+                data = json.load(json_file)
+                ret[path.stem] = data
+
+    return json.dumps(ret), 201
+
+
 def get_fake_mentions():
     """
     Api function used to send a fake list of options for testing mentions
@@ -720,5 +781,23 @@ def get_fake_mentions():
 
     return json.dumps(fake_dict), 201
 
+
+def toggle_bookmark(ID):
+    """
+    API function that toggles the bookmark of an entity
+
+    :param ID: The ID of the entity to toggle the bookmark
+    """
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    ent.toggle_bookmark()
+
+    # Convert uuids in the entity to paths and saves the change
+    path_copy = create_path_entity_copy(ent)
+    path_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+
+    return make_response("Bookmark toggled", 201)
 
 read_all()
