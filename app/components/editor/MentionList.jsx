@@ -1,5 +1,5 @@
  import React from "react";
-import "./MentionList.css";
+ import '../../globals.css';
 
 export class MentionList extends React.Component {
   constructor(props) {

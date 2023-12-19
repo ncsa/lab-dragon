@@ -110,6 +110,7 @@ export default function SmallEntityViewer({entity,
 
     return (
         <div className={`small-entity ${entity.type}`}>
+            <div className={`type-indicator ${entity.type}`}></div>
             {showTree && <div className="tree" style={{
                 position: 'fixed',
                 top: hintPosition.y,

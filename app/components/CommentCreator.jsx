@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import Tiptap from './editor/Tiptap';
+import { CreationPopupContext } from '../contexts/CreationPopupContext';
 
 const BASE_API = "http://localhost:8000/api/"
 
@@ -10,6 +11,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const { user } = useContext(CreationPopupContext)
 
     const handleContentChange = (content) => {
         setContent(content);
@@ -23,7 +25,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
             content, 
         }
 
-        let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True", {
+        let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True" + "&username=" + user, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,7 +44,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
     }
 
     return (
-        <div className="CommentCreator">
+        <div className="comment-creator">
             <h2>Add a comment</h2>
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}
