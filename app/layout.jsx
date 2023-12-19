@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import TopBanner from '@/app/components/TopBanner';
 import EntityPopupWrapper from '@/app/components/EntityPopupWrapper';
 import CreationPopupProvider from '@/app/contexts/CreationPopupContext';
-
+import { BookmarkProvider } from '@/app/contexts/BookmarkContext';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,8 +23,10 @@ export default function RootLayout({ children }) {
         <body className={inter.className}>
           <div className="banner-container">
             <CreationPopupProvider>
-              <TopBanner />
-              <EntityPopupWrapper children={children}/>
+              <BookmarkProvider>
+                <TopBanner />
+                <EntityPopupWrapper children={children}/>
+              </BookmarkProvider>
             </CreationPopupProvider>
           </div>  
         </body>

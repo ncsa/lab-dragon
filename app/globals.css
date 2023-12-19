@@ -145,6 +145,35 @@ select {
     background-color: white; /* Change background color */
 }
 
+.bookmark-toggle {
+    display: flex;
+    align-items: center;
+    vertical-align: auto;
+}
+
+.banner-options button {
+    background-color: transparent;
+    color: white;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.banner-options button:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.banner-options button:active{
+    transform: none;
+    border: none;
+}
+
+.banner-options button i {
+    padding-left: 5px;
+    font-size: 2em; /* Increase the size of the icon */
+}
 
 .sidebar{
     color: aliceblue;
@@ -344,6 +373,23 @@ select {
     text-decoration: none;
 }
 
+.small-entity .small-entity-tittle button.bookmark-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.small-entity .small-entity-tittle button.bookmark-button:hover{
+    background-color: none;
+    box-shadow: none;
+}
+
+
+.small-entity .small-entity-tittle:hover .bookmark{
+    display: inline-block;
+}
+
 /* Comment section */
 
 .comment {
@@ -409,14 +455,6 @@ select {
     border: 1px solid #ddd;
 }
 
-.comment a {
-    color: #A975FF;
-    border: 1px solid black;
-    border-radius: .4rem;
-    box-decoration-break: clone;
-    padding: .1rem .3rem;
-}
-
  .comment-buttons {
     position: absolute;
     bottom: -10px;
@@ -449,6 +487,20 @@ select {
 .comment-buttons.Step button {
     background-color: var(--step-color);
 }
+
+.data-mention {
+    color: var(--mentionlist-selected-color);
+    border: 1px solid var(--mentionlist-selected-color);
+    border-radius: .4rem;
+    box-decoration-break: clone;
+    padding: .1rem .3rem;
+}
+
+.image-link img{
+    color: var(--mentionlist-selected-color);
+    border: 5px solid var(--mentionlist-selected-color);
+}
+
 /* ENTITY POPUP */  
 
 .add-entity-button {
@@ -552,7 +604,7 @@ ul > li {
     outline: 2px solid cornflowerblue;
   }
   
-  .tiptap a {
+  .tiptap .data-mention {
     color: var(--tiptap-a-color);
     border: 1px solid var(--tiptap-a-border-color);
     border-radius: .4rem;
@@ -606,3 +658,118 @@ ul > li {
   .items button {
     color: var(--mentionlist-font-color);
   }
+
+  /* Instance Display */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    color: var(--entity-header);
+    border: 1px solid var(--section-divider-line-color);
+}
+
+.data-table thead {
+    background-color: var(--navbar-main-color);
+    color: var(--tittle-color);
+}
+
+.data-table thead th {
+    padding: 10px;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    width: 50%;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: var(--small-entity-background-color);
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: var(--background-color);
+}
+
+.data-table tbody td {
+    padding: 10px;
+    border: 1px solid var(--section-divider-line-color);
+}
+
+.instance-images {
+    border-bottom: 1px solid var(--section-divider-line-color);
+    padding-bottom: 10px;
+    padding-top: 10px;
+
+    h2 {
+        color: var(--tittle-color);
+        font-size: 2em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    }
+
+    img {
+        text-align: center;
+        white-space: nowrap;
+        margin-top: 5px;
+        border: 1px solid var(--section-divider-line-color);
+    }
+}
+
+.instance-analysis {
+    h2 {
+        color: var(--tittle-color);
+        font-size: 2em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    }
+
+    h3 {
+        color: var(--tittle-color);
+        font-size: 1.5em;
+        font-weight: 700;
+        padding: 0.5em;
+        border-top: 1px solid var(--section-divider-line-color);
+    
+    }
+}
+
+/* Stored Parameters */
+
+.stored-params {
+    color: var(--entity-header);
+    font-size: 1em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params h2 {
+    color: var(--tittle-color);
+    font-size: 1.2em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params h3 {
+    color: var(--tittle-color);
+    font-size: 1.1em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params p {
+    color: var(--entity-header);
+    font-size: 0.9em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--section-divider-line-color);
+}
+
+.stored-params div {
+    padding-left: 20px;
+}

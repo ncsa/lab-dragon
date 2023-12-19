@@ -72,29 +72,31 @@ export default function Comment({comment,
         const columnNames = Object.keys(tableData);
         const numberOfRows = tableData[columnNames[0]].length;
 
-        return (
-            <div className={`comment ${isSelected ? 'selected': ''}`}
-                onClick={innerClickHandler}>
-                <table>
-                    <thead>
-                        <tr>
-                            {columnNames.map((columnName, index) => (
-                                <th key={index}>{columnName}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.from({ length: numberOfRows }).map((_, rowIndex) => (
-                            <tr key={rowIndex}>
-                                {columnNames.map((columnName, columnIndex) => (
-                                    <td key={columnIndex}>{tableData[columnName][rowIndex]}</td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ) 
+        
+        // FIXME: Tables should be rendered with everyting else directly from the markdown tables, they should not be rendered separately.
+        // return (
+            // <div className={`comment ${isSelected ? 'selected': ''}`}
+            //     onClick={innerClickHandler}>
+            //     <table className="data-table">
+            //         <thead>
+            //             <tr>
+            //                 {columnNames.map((columnName, index) => (
+            //                     <th key={index}>{columnName}</th>
+            //                 ))}
+            //             </tr>
+            //         </thead>
+            //         <tbody>
+            //             {Array.from({ length: numberOfRows }).map((_, rowIndex) => (
+            //                 <tr key={rowIndex}>
+            //                     {columnNames.map((columnName, columnIndex) => (
+            //                         <td key={columnIndex}>{tableData[columnName][rowIndex]}</td>
+            //                     ))}
+            //                 </tr>
+            //             ))}
+            //         </tbody>
+            //     </table>
+            // </div>
+        // ) 
     } else {
 
         if (isActivated) {

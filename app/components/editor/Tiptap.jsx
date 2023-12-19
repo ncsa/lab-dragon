@@ -63,7 +63,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       Dropcursor,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
-          class: "data_mention"
+          class: "data-mention"
         },
         renderLabel: ({options, node}) => {
             return `${node.attrs.label ?? node.attrs.id}`
@@ -154,6 +154,12 @@ export default ({ onContentChange, entID, initialContent }) => {
     },
     content: initialContent ? initialContent : '',
   });
+
+  useEffect(() => {
+    if (editor) {
+    editor.commands.setContent(initialContent);
+    }
+  }, [initialContent]);
 
   return (
     <div>
