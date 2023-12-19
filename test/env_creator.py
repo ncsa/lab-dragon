@@ -122,9 +122,11 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
     found_pandas_step = Step(name="Found Pandas",
                              description="I have found a lot of panda images here are a few that I found",
                              user='testUser2',
-                             comments=[str(self_path.parent.joinpath("testing_images", "pandas"))],
                              parent=get_panda_path, )
     found_pandas_path = Path(path, "Found Pandas.toml").resolve()
+    found_pandas_step.add_comment("Here is the first panda I found online: ![giant_panda](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/Giant_panda.jpg) \n\n This one is really big!")
+    found_pandas_step.add_comment("Here are some other ones: ![baby_pandas](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/baby_pandas.png) \n\n These ones are really cute!")
+    found_pandas_step.add_comment("Here is another one: ![panda_eating](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/panda_eating.png) \n\n omg look at this one eat")
     to_be_created.append((found_pandas_step, found_pandas_path))
 
     get_panda_task.add_child(found_pandas_path)
@@ -212,17 +214,13 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
         if create_md:
             generate_md(p, path)
 
+    path.joinpath("resource").mkdir(exist_ok=True)
 
-# if __name__ == "__main__":
-#
-#     root_path = Path("./env_generator/Testing Project.toml")
-#     target_path = Path("./env_generator/jupyterbook/")
-#
-#     create_full_test_env(create_md=False)
-#     generate_book(root_path, target_path)
 
 if __name__ == "__main__":
 
-    # delete_directory_contents(path, light_delete)
+    root_path = Path("./env_generator/Testing Project.toml")
+    target_path = Path("./env_generator/jupyterbook/")
 
-    generate_all_classes()
+    create_full_test_env(create_md=False)
+    generate_book(root_path, target_path)

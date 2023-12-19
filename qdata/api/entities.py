@@ -2,12 +2,16 @@ import re
 import json
 import copy
 from pathlib import Path
-from typing import Optional, Union, Tuple
 from enum import Enum, auto
+from typing import Optional, Union, Tuple
 
 import markdown
+import imagehash
+from PIL import Image
+from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
+from qdata import HOSTADDRESS
 from qdata.modules.task import Task
 from qdata.modules.step import Step
 from qdata.modules.entity import Entity
@@ -15,19 +19,19 @@ from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from converters import MyMarkdownConverter
+from converters import MyMarkdownConverter,  CustomLinkExtension
 
 ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
-
+RESOURCEPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/resource')
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
 PARENT_TYPES = ["Project", "Task"]
 ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
 # Holds all of the entity types that exists in the notebook
-ENTITY_TYPES = set()
+ENTITY_TYPES = set(("Project", "Task", "Step"))
 
 INDEX = {}
 
@@ -44,6 +48,9 @@ USERS = set()
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
+
+
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX)])
 
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
@@ -160,7 +167,43 @@ def add_ent_to_index(entity: Entity, entity_path: Union[Path, str]) -> None:
     USERS.add(entity.user)
 
     # Add the entity type to the entity type index
-    ENTITY_TYPES.add(entity.__class__.__name__)
+    # ENTITY_TYPES.add(entity.__class__.__name__)
+
+
+def add_image_to_index(image, image_path):
+    """
+    Adds an image to the image index
+
+    :param image: a PIL image instance
+    :param image_path: The path on disk of that image
+    """
+    img_hash = imagehash.average_hash(image)
+    if img_hash not in IMAGEINDEX:
+        IMAGEINDEX[img_hash] = image_path
+    # FIXME: This is a design decision that should be checked
+    elif IMAGEINDEX[img_hash] != image_path:
+        raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
+
+
+def find_equivalent_image(image, threshold=5):
+    """
+    Checks if there is an equivalent image in the system. Does this by calculating the imagehash and comparing it every
+    other image until either it finds a match or does not find any match. If no match has been found, returns None,
+    if a match has been found, returns the hash of the found image
+
+    :param image: PIL instance of an image
+    :param threshold: The bigger this is, the more different an image can be to be considered equivalent
+    """
+
+    img_hash = imagehash.average_hash(image)
+
+    ret_path = None
+    for hash, path in IMAGEINDEX.items():
+        diff = hash - img_hash
+        if diff <= threshold:
+            ret_path = path
+            break
+    return ret_path
 
 
 def initialize_bucket(bucket_path):
@@ -178,6 +221,31 @@ def initialize_bucket(bucket_path):
         add_ent_to_index(instance, ins_path)
 
     return bucket
+
+
+def process_comments(entity):
+    """
+    Function that processes the comments of an entity and checks for markdown links.
+
+    :param entity: The entity whose comments are being processed.
+    """
+    # Regular expression pattern for markdown links
+    pattern = r'\[(.*?)\]\((.*?)\)'
+
+    for comment in entity.comments:
+        for content in comment.content:
+            if isinstance(content, str):
+                matches = re.findall(pattern, content)
+                for match in matches:
+                    # Tries converting it to path and see if the path exists.
+                    # Catches all failures because we don't want to crash if the path doesn't or isn't a path format.
+                    try:
+                        path = Path(match[1]).resolve()
+                    except Exception as e:
+                        continue
+                    if path.exists() and path.suffix == '.jpg' or path.suffix == '.png':
+                        img = Image.open(path)
+                        add_image_to_index(img, path)
 
 
 def read_child_entity(entity_path: Path):
@@ -199,6 +267,9 @@ def read_child_entity(entity_path: Path):
         bucket = initialize_bucket(bucket_path)
         data_buckets.append(bucket.ID)
 
+    process_comments(ent)
+
+    # TODO: Figure out why this line is commented
     # ent.data_buckets = data_buckets
 
     ret_dict = {"id": ent.ID,
@@ -256,7 +327,7 @@ def read_one(ID, name_only=False):
         for comment in ent_copy.comments:
             if comment.com_type[-1] == SupportedCommentType.md.value or comment.com_type[-1] == SupportedCommentType.string.value:
                 replaced_path = comment_path_to_uuid(comment.content[-1])
-                html_comment = markdown.markdown(replaced_path)
+                html_comment = markdown_to_html.convert(replaced_path)
                 comment.content[-1] = html_comment
 
         return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
@@ -264,16 +335,15 @@ def read_one(ID, name_only=False):
         abort(404, f"Entity with ID {ID} not found")
 
 
-def read_image(ID, imageName):
+def read_image(imagePath):
     """
     API function that returns an image based on the ID of the entity and the name of the image
     """
-
-    if ID + '--' + imageName in IMAGEINDEX:
-        image = IMAGEINDEX[ID + '--' + imageName]
-        return send_file(image)
-    else:
-        abort(404, f"Image with ID {ID} and name {imageName} not found")
+    try:
+        path = Path(imagePath.replace('#', '/')).resolve()
+        return send_file(path)
+    except Exception as e:
+        abort(404, f"Image with path {imagePath} not found")
 
 
 def read_comment(ID, commentID, whole_comment=False, HTML=False):
@@ -307,7 +377,7 @@ def read_comment(ID, commentID, whole_comment=False, HTML=False):
             converted_content = []
             for cont in comment.content:
                 replaced_path = comment_path_to_uuid(cont)
-                html_comment = markdown.markdown(replaced_path)
+                html_comment = markdown_to_html.convert(replaced_path)
                 converted_content.append(html_comment)
             comment_copy.content = converted_content
             return json.dumps(str(comment_copy)), 201
@@ -527,6 +597,29 @@ def add_entity(**kwargs):
     ent_copy.to_TOML(ent_path)
 
     return make_response("Entity added", 201)
+
+
+def add_image(body, image):
+    """
+    Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into
+    resource.
+
+    :param body: Text of the tag being added. usually empty
+    :param image: The image you get from the flask call.
+    """
+    converted_image = Image.open(image.stream)
+    image_path = find_equivalent_image(converted_image)
+
+    if image_path is None:
+        # Save the image to the RESOURCEPATH
+        filename = secure_filename(image.filename)
+        image_path = RESOURCEPATH / filename
+        converted_image.save(image_path)
+        add_image_to_index(Image.open(image_path), image_path)
+
+    image_url = f"{HOSTADDRESS}properties/image/{str(image_path).replace('/', '%23')}"
+
+    return make_response(image_url, 201)
 
 
 def get_users():
