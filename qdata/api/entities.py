@@ -5,9 +5,11 @@ from pathlib import Path
 from enum import Enum, auto
 from typing import Optional, Union, Tuple
 
+import nbformat
 import markdown
 import imagehash
 from PIL import Image
+from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
@@ -338,6 +340,29 @@ def read_one(ID, name_only=False):
                 replaced_path = comment_path_to_uuid(comment.content[-1])
                 html_comment = markdown_to_html.convert(replaced_path)
                 comment.content[-1] = html_comment
+
+        # If it is an instance, convert the notebooks into html
+        if isinstance(ent, Instance):
+            converted_analysis = []
+            for analysis_nb in ent_copy.analysis:
+                    # Read the notebook
+                    nb = nbformat.read(analysis_nb, as_version=4)
+
+                    # Create HTML exporter
+                    html_exporter = HTMLExporter()
+                    html_exporter.theme = "dark" # Change the theme of the notebook
+                    html_exporter.template_name = 'classic'  # use classic template (you can change this)
+
+                    # Export the notebook to HTML format
+                    (body, resources) = html_exporter.from_notebook_node(nb)
+                    converted_analysis.append((Path(analysis_nb).stem, str(body)))
+
+            # TOML table does not like having a string that is as long as an html file so the conversion needs to happen
+            # after the TOML conversion.
+            serialized = dict(ent_copy.to_TOML()[ent_copy.name])
+            serialized['analysis'] = converted_analysis
+
+            return json.dumps(serialized), 201
 
         return json.dumps(ent_copy.to_TOML()[ent_copy.name]), 201
     else:
@@ -757,9 +782,6 @@ def get_fake_mentions():
     return json.dumps(fake_dict), 201
 
 
-read_all()
-
-
 def toggle_bookmark(ID):
     """
     API function that toggles the bookmark of an entity
@@ -777,3 +799,5 @@ def toggle_bookmark(ID):
     path_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
 
     return make_response("Bookmark toggled", 201)
+
+read_all()
