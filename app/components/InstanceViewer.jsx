@@ -57,6 +57,7 @@ export default function InstanceViewer({ entity }) {
     const [parentName, setParentName] = useState(null);
     const [storedParams, setStoredParams] = useState({});   
     const [structureToggle, setStructureToggle] = useState(true);
+    const [analysisToggleArray, setAnalysisToggleArray] = useState(Array(entity.analysis.length).fill(true));
 
     useEffect(() => {
         if (entity.parent) {
@@ -123,9 +124,21 @@ export default function InstanceViewer({ entity }) {
             <div className="instance-analysis">
                 <h2>Instance Analysis Files</h2>
                 {entity.analysis.map(([fileName, html], index) => (
-                    <div>
-                        <h3>{fileName}</h3>
-                        <div dangerouslySetInnerHTML={{ __html: html }} />
+                    <div className="rendered-jnotebook"
+                         key={index}>
+                        <h3>
+                            <i className={`bi-chevron-down toggle-btn ${analysisToggleArray[index] ? "" : "open"}`} 
+                               onClick={() => {
+                                      let newArray = [...analysisToggleArray];
+                                      newArray[index] = !newArray[index];
+                                      setAnalysisToggleArray(newArray);
+                                 }}
+                            />
+                            {fileName}
+                        </h3>
+                        {analysisToggleArray[index] &&
+                            <div dangerouslySetInnerHTML={{ __html: html }} />
+                        }
                     </div>
                 
                 ))}

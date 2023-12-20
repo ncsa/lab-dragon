@@ -684,7 +684,7 @@ ul > li {
 }
 
 .instance-data-display.open .toggle-btn {
-    transform: rotate(-90deg) translateX(5px);
+    transform: rotate(-90deg) translateX(5px) translateY(-5px);
 }
 
 .data-table {
@@ -743,7 +743,18 @@ ul > li {
         font-weight: 700;
         padding: 0.5em;
         border-top: 1px solid var(--section-divider-line-color);
-    
+        display: inline-block;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        padding-right: 10px;
+    }
+
+    .toggle-btn.open {
+        transform: rotate(-90deg) translateX(5px) translateY(-5px);
     }
 }
 
