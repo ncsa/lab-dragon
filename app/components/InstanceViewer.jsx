@@ -56,8 +56,11 @@ export default function InstanceViewer({ entity }) {
     
     const [parentName, setParentName] = useState(null);
     const [storedParams, setStoredParams] = useState({});   
+    
     const [structureToggle, setStructureToggle] = useState(true);
+    const [imagesToggleArray, setImagesToggleArray] = useState(Array(entity.images.length).fill(true));
     const [analysisToggleArray, setAnalysisToggleArray] = useState(Array(entity.analysis.length).fill(true));
+    const [storedParamsToggleArray, setStoredParamsToggleArray] = useState(Array(entity.stored_params.length).fill(true));
 
     useEffect(() => {
         if (entity.parent) {
@@ -116,9 +119,23 @@ export default function InstanceViewer({ entity }) {
 
             <div className="instance-images">
                 <h2>Instance Images</h2>
-                {entity.images.map((imagePath, index) => (
-                    <img key={index} src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
-                ))}
+                    {entity.images.map((imagePath, index) => {
+                        return (
+                        <div key={index} className="instance-image">
+                            <div>
+                                <i className={`bi-chevron-down toggle-btn ${imagesToggleArray[index] ? "" : "open"}`}
+                                onClick={ () => {
+                                    let newArray = [...imagesToggleArray];
+                                    newArray[index] = !newArray[index];
+                                    setImagesToggleArray(newArray);
+                                }} />
+                            </div>
+                            {imagesToggleArray[index] &&
+                                <img src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                            }
+                        </div>    
+                    )})}
+                
             </div>
 
             <div className="instance-analysis">
@@ -148,8 +165,18 @@ export default function InstanceViewer({ entity }) {
                 <h2>Stored Parameters</h2>
                 {Object.entries(storedParams).map(([file, data], index) => {
                     return (
-                    <RenderDictionary key={index} data={data} file={file} />)
-                    })}
+                    <div key={index} className="stored-params-container">
+                        <i className={`bi-chevron-down toggle-btn ${storedParamsToggleArray[index] ? "" : "open"}`}
+                            onClick={() => {
+                                 let newArray = [...storedParamsToggleArray];
+                                 newArray[index] = !newArray[index];
+                                 setStoredParamsToggleArray(newArray);
+                            }} />
+                        {storedParamsToggleArray[index] &&
+                        <RenderDictionary key={index} data={data} file={file} />
+                        }
+                    </div>
+                    )})}
             </div>
         </div>
     )

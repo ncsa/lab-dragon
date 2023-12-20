@@ -733,6 +733,25 @@ ul > li {
         margin-top: 5px;
         border: 1px solid var(--section-divider-line-color);
     }
+
+    .instance-image{
+        color: white;
+        display: flex;
+        transform-origin: center center;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        padding-right: 10px;
+        transform-origin: center center;
+    }
+
+    .toggle-btn.open {
+        transform-origin: center center;
+        transform: rotate(-90deg) translateX(5px) translateY(-5px);
+    }
 }
 
 .instance-analysis {
@@ -794,4 +813,17 @@ ul > li {
 
 .stored-params div {
     padding-left: 20px;
+}
+
+.stored-params .toggle-btn {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    padding-right: 10px;
+    transform-origin: center center;
+}
+
+.stored-params .toggle-btn.open {
+    transform-origin: center center;
+    transform: rotate(-90deg) translateX(5px) translateY(-5px);
 }
