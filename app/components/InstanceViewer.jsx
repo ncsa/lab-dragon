@@ -74,8 +74,6 @@ export default function InstanceViewer({ entity }) {
         })
     }, []);
 
-    console.log("entity is:")
-    console.log(entity);
     return (
         <div>
             <h1 className="tittle">Instance: {entity.name}</h1>

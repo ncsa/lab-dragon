@@ -49,7 +49,7 @@ export default function EntityPopupWrapper({ children }) {
             <button className="add-entity-button" onClick={() => {
                     setName("");
                     setIsPopupOpen(!isPopupOpen);
-                }}>+</button>
+                }}><i className="bi bi-journal-plus"/></button>
         </div>
     )
 

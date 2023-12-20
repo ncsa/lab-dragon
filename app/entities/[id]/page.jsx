@@ -58,7 +58,7 @@ export default function Entities( {params} ) {
     }, [entity, shouldReloadChildren]); // using children as the dependency causes infinite loop
 
     if (!entity) {
-        return <div>Loading...</div>;
+        return <div><h1>Loading...</h1></div>;
     }
 
     if (entity.type === "Instance") {
