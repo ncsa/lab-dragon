@@ -52,10 +52,15 @@ function RenderDictionary({ data, file, level = 1 }) {
     )
 }
 
+function turnBooleanIntoStr(bool){
+    return bool ? 'showing' : 'collapsed';
+}
+
 export default function InstanceViewer({ entity }) {
     
     const [parentName, setParentName] = useState(null);
-    const [storedParams, setStoredParams] = useState({});    
+    const [storedParams, setStoredParams] = useState({});   
+    const [structureToggle, setStructureToggle] = useState(true);
 
     useEffect(() => {
         if (entity.parent) {
@@ -75,33 +80,40 @@ export default function InstanceViewer({ entity }) {
     }, []);
 
     return (
-        <div>
-            <h1 className="tittle">Instance: {entity.name}</h1>
+        <div className="instance-viewer">
+            <h1 className="tittle instance">{entity.name}</h1>
 
-            <h2 className="entity-header">
+            <div className="entity-header">
             { entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={ BASE_URL + entity.parent }> {parentName} </Link></p>}
             <p><b>Created by</b>: {entity.user}</p>
             <p><b>Start Time</b>: {entity.start_time}</p>
             <p><b>End Time</b>: {entity.end_time}</p>
-            </h2>
+            </div>
 
             <div className="instance-data-display">
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Axis</th>
-                            <th>Data Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Object.entries(entity.data_structure).map(([key, value], index) => (
-                            <tr key={index}>
-                                <td>{key}</td>
-                                <td>{value}</td>
+                <h2><i className={`bi bi-triangle-fill ${turnBooleanIntoStr(structureToggle)}`}
+                        onClick={() => {setStructureToggle(!structureToggle)}}/>
+                    Data Structure
+                </h2>
+                
+                {structureToggle && 
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>Axis</th>
+                                <th>Data Points</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {Object.entries(entity.data_structure).map(([key, value], index) => (
+                                <tr key={index}>
+                                    <td>{key}</td>
+                                    <td>{value}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                }
             </div>
 
             <div className="instance-images">

@@ -662,6 +662,18 @@ ul > li {
 
   /* Instance Display */
 
+.instance-viewer h2{
+    color: var(--tittle-color);
+    font-size: 2em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-top: 1px solid var(--section-divider-line-color);
+}
+
+.tittle.instance{
+    font-size: 2em;
+}
+
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -702,14 +714,6 @@ ul > li {
     padding-bottom: 10px;
     padding-top: 10px;
 
-    h2 {
-        color: var(--tittle-color);
-        font-size: 2em;
-        font-weight: 700;
-        padding: 0.5em;
-        border-top: 1px solid var(--section-divider-line-color);
-    }
-
     img {
         text-align: center;
         white-space: nowrap;
@@ -719,13 +723,6 @@ ul > li {
 }
 
 .instance-analysis {
-    h2 {
-        color: var(--tittle-color);
-        font-size: 2em;
-        font-weight: 700;
-        padding: 0.5em;
-        border-top: 1px solid var(--section-divider-line-color);
-    }
 
     h3 {
         color: var(--tittle-color);
