@@ -52,10 +52,6 @@ function RenderDictionary({ data, file, level = 1 }) {
     )
 }
 
-function turnBooleanIntoStr(bool){
-    return bool ? 'showing' : 'collapsed';
-}
-
 export default function InstanceViewer({ entity }) {
     
     const [parentName, setParentName] = useState(null);
@@ -90,9 +86,10 @@ export default function InstanceViewer({ entity }) {
             <p><b>End Time</b>: {entity.end_time}</p>
             </div>
 
-            <div className="instance-data-display">
-                <h2><i className={`bi bi-triangle-fill ${turnBooleanIntoStr(structureToggle)}`}
-                        onClick={() => {setStructureToggle(!structureToggle)}}/>
+            <div className={`instance-data-display ${structureToggle ? "" : "open"}`}>
+                <h2>
+                    <i className="bi-chevron-down toggle-btn"
+                        onClick={() => {setStructureToggle(!structureToggle)}}></i>
                     Data Structure
                 </h2>
                 

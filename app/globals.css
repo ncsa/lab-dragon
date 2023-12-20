@@ -176,6 +176,8 @@ select {
     font-size: 2em; /* Increase the size of the icon */
 }
 
+ /* SIDEBAR */
+
 .sidebar{
     color: aliceblue;
     width: 180px;
@@ -672,6 +674,17 @@ ul > li {
 
 .tittle.instance{
     font-size: 2em;
+}
+
+.instance-data-display .toggle-btn {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    padding-right: 10px;
+}
+
+.instance-data-display.open .toggle-btn {
+    transform: rotate(-90deg) translateX(5px);
 }
 
 .data-table {
