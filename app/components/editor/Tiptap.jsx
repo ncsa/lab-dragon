@@ -46,6 +46,34 @@ export default ({ onContentChange, entID, initialContent }) => {
     dataMentionsOptionsRef.current = data;
   }
 
+  const handleEditorImage = (image, view) => {
+    let file = image; // the dropped file
+    let filesize = ((file.size/1024)/1024).toFixed(4); // get the filesize in MB
+    if ((file.type === "image/jpeg" || file.type === "image/png") && filesize < 50) { // check valid image type under 10MB
+      // check the dimensions
+      let _URL = window.URL || window.webkitURL;
+      let img = new Image(); /* global Image */
+      img.src = _URL.createObjectURL(file);
+      img.onload = function () {
+        uploadImage(file).then((url) => {
+          console.log("url", url);
+          let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
+          let attrs = {src: url, alt: file.name}; // set the image attributes
+          let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
+          transaction.replaceSelectionWith(node); // replace the space with the image node
+          view.dispatch(transaction); // dispatch the transaction
+        })
+      };
+      img.onerror = function () {
+        window.alert("Invalid image. Images must be a .jpg or .png file."); // display alert
+      };
+      return true;
+    } else {
+      window.alert("Invalid image. Images must be a .jpg or .png file and less than 50MB."); // display alert
+      return true;
+    }
+  };
+
   useEffect(() => {
     updateDataMentionsOptions();
   }, []);
@@ -118,33 +146,17 @@ export default ({ onContentChange, entID, initialContent }) => {
     ],
     editorProps: {
       handleDrop: (view, event, slice, moved) => {
-
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) { // if dropping external files
-          
-          let file = event.dataTransfer.files[0]; // the dropped file
-          let filesize = ((file.size/1024)/1024).toFixed(4); // get the filesize in MB
-          if ((file.type === "image/jpeg" || file.type === "image/png") && filesize < 10) { // check valid image type under 10MB
-            // check the dimensions
-            let _URL = window.URL || window.webkitURL;
-            let img = new Image(); /* global Image */
-            img.src = _URL.createObjectURL(file);
-            img.onload = function () {
-              uploadImage(file).then((url) => {
-                console.log("url", url);
-                let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
-                let attrs = {src: url, alt: file.name}; // set the image attributes
-                let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
-                transaction.replaceSelectionWith(node); // replace the space with the image node
-                view.dispatch(transaction); // dispatch the transaction
-              })
-            };
-            img.onerror = function () {
-              window.alert("Invalid image. Images must be a .jpg or .png file."); // display alert
-            };
-            return true;
-          } else {
-            window.alert("Invalid image. Images must be a .jpg or .png file and less than 10MB."); // display alert
-            return true;
+          return handleEditorImage(event.dataTransfer.files[0], view);
+        }
+      },
+      handlePaste: (view, event, slice, moved) => {
+        if (event.clipboardData && event.clipboardData.items) {
+          let items = event.clipboardData.items;
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              return handleEditorImage(items[i].getAsFile(), view);
+            }
           }
         }
       }
