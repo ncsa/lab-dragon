@@ -53,6 +53,14 @@ h1 {
     color: white;
 }
 
+h2 {
+    color: white;
+}
+
+h3 {
+    color: white;
+}
+
 body {
     display: flex;
     background-color: var(--background-color);
