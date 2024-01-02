@@ -9,7 +9,7 @@ export const BASE_URL = 'http://localhost:3000/entities/';
 
 
 export async function getEntityName(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "?name_only=true", {
+    let response = await fetch(BASE_API + "entities/" + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -20,7 +20,7 @@ export async function getEntityName(id) {
 }
 
 export async function getStoredParams(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "/stored_params", {
+    let response = await fetch(BASE_API + "entities/" + id + "/stored_params", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -33,7 +33,7 @@ export async function getStoredParams(id) {
 function RenderDictionary({ data, file, level = 1 }) {
     return (
         <div style={{ paddingLeft: `${level * 20}px` }}>
-            <h3 style={{ paddingLeft: `${(level-1) * 20}px`}} >File: {file}</h3>
+            <h3 style={{ paddingLeft: `${(level - 1) * 20}px` }} >File: {file}</h3>
             {Object.entries(data).map(([key, value], index) => {
                 if (typeof value === 'object' && value !== null) {
                     return (
@@ -53,14 +53,14 @@ function RenderDictionary({ data, file, level = 1 }) {
 }
 
 export default function InstanceViewer({ entity }) {
-    
+
     const [parentName, setParentName] = useState(null);
-    const [storedParams, setStoredParams] = useState({});   
-    
+    const [storedParams, setStoredParams] = useState({});
+
     const [structureToggle, setStructureToggle] = useState(true);
     const [imagesToggleArray, setImagesToggleArray] = useState(Array(entity.images.length).fill(true));
-    const [analysisToggleArray, setAnalysisToggleArray] = useState(Array(entity.analysis.length).fill(true));
-    const [storedParamsToggleArray, setStoredParamsToggleArray] = useState(Array(entity.stored_params.length).fill(true));
+    const [analysisToggleArray, setAnalysisToggleArray] = useState(Array(entity.analysis.length).fill(false));
+    const [storedParamsToggleArray, setStoredParamsToggleArray] = useState(Array(entity.stored_params.length).fill(false));
 
     useEffect(() => {
         if (entity.parent) {
@@ -74,7 +74,7 @@ export default function InstanceViewer({ entity }) {
         getStoredParams(entity.ID).then(data => {
             console.log("what the hell are you data:", typeof data);
             console.log(JSON.parse(data));
-            
+
             setStoredParams(JSON.parse(data));
         })
     }, []);
@@ -84,20 +84,20 @@ export default function InstanceViewer({ entity }) {
             <h1 className="tittle instance">{entity.name}</h1>
 
             <div className="entity-header">
-            { entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={ BASE_URL + entity.parent }> {parentName} </Link></p>}
-            <p><b>Created by</b>: {entity.user}</p>
-            <p><b>Start Time</b>: {entity.start_time}</p>
-            <p><b>End Time</b>: {entity.end_time}</p>
+                {entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={BASE_URL + entity.parent}> {parentName} </Link></p>}
+                <p><b>Created by</b>: {entity.user}</p>
+                <p><b>Start Time</b>: {entity.start_time}</p>
+                <p><b>End Time</b>: {entity.end_time}</p>
             </div>
 
             <div className={`instance-data-display ${structureToggle ? "" : "open"}`}>
                 <h2>
                     <i className="bi-chevron-down toggle-btn"
-                        onClick={() => {setStructureToggle(!structureToggle)}}></i>
+                        onClick={() => { setStructureToggle(!structureToggle) }}></i>
                     Data Structure
                 </h2>
-                
-                {structureToggle && 
+
+                {structureToggle &&
                     <table className="data-table">
                         <thead>
                             <tr>
@@ -119,37 +119,38 @@ export default function InstanceViewer({ entity }) {
 
             <div className="instance-images">
                 <h2>Instance Images</h2>
-                    {entity.images.map((imagePath, index) => {
-                        return (
+                {entity.images.map((imagePath, index) => {
+                    return (
                         <div key={index} className="instance-image">
                             <div>
                                 <i className={`bi-chevron-down toggle-btn ${imagesToggleArray[index] ? "" : "open"}`}
-                                onClick={ () => {
-                                    let newArray = [...imagesToggleArray];
-                                    newArray[index] = !newArray[index];
-                                    setImagesToggleArray(newArray);
-                                }} />
+                                    onClick={() => {
+                                        let newArray = [...imagesToggleArray];
+                                        newArray[index] = !newArray[index];
+                                        setImagesToggleArray(newArray);
+                                    }} />
                             </div>
                             {imagesToggleArray[index] &&
                                 <img src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
                             }
-                        </div>    
-                    )})}
-                
+                        </div>
+                    )
+                })}
+
             </div>
 
             <div className="instance-analysis">
                 <h2>Instance Analysis Files</h2>
                 {entity.analysis.map(([fileName, html], index) => (
                     <div className="rendered-jnotebook"
-                         key={index}>
+                        key={index}>
                         <h3>
-                            <i className={`bi-chevron-down toggle-btn ${analysisToggleArray[index] ? "" : "open"}`} 
-                               onClick={() => {
-                                      let newArray = [...analysisToggleArray];
-                                      newArray[index] = !newArray[index];
-                                      setAnalysisToggleArray(newArray);
-                                 }}
+                            <i className={`bi-chevron-down toggle-btn ${analysisToggleArray[index] ? "" : "open"}`}
+                                onClick={() => {
+                                    let newArray = [...analysisToggleArray];
+                                    newArray[index] = !newArray[index];
+                                    setAnalysisToggleArray(newArray);
+                                }}
                             />
                             {fileName}
                         </h3>
@@ -157,26 +158,27 @@ export default function InstanceViewer({ entity }) {
                             <div dangerouslySetInnerHTML={{ __html: html }} />
                         }
                     </div>
-                
+
                 ))}
             </div>
-            
+
             <div className="stored-params">
                 <h2>Stored Parameters</h2>
                 {Object.entries(storedParams).map(([file, data], index) => {
                     return (
-                    <div key={index} className="stored-params-container">
-                        <i className={`bi-chevron-down toggle-btn ${storedParamsToggleArray[index] ? "" : "open"}`}
-                            onClick={() => {
-                                 let newArray = [...storedParamsToggleArray];
-                                 newArray[index] = !newArray[index];
-                                 setStoredParamsToggleArray(newArray);
-                            }} />
-                        {storedParamsToggleArray[index] &&
-                        <RenderDictionary key={index} data={data} file={file} />
-                        }
-                    </div>
-                    )})}
+                        <div key={index} className="stored-params-container">
+                            <i className={`bi-chevron-down toggle-btn ${storedParamsToggleArray[index] ? "" : "open"}`}
+                                onClick={() => {
+                                    let newArray = [...storedParamsToggleArray];
+                                    newArray[index] = !newArray[index];
+                                    setStoredParamsToggleArray(newArray);
+                                }} />
+                            {storedParamsToggleArray[index] &&
+                                <RenderDictionary key={index} data={data} file={file} />
+                            }
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
