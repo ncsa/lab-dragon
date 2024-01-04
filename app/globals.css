@@ -549,6 +549,10 @@ select {
     z-index: 1000;
 }
 
+.entity-popup h1 {
+    color: black;
+}
+
 .entity-popup .content{
     background-color: white;
     display: inline-block;
