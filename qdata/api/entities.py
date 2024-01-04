@@ -21,7 +21,7 @@ from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from converters import MyMarkdownConverter,  CustomLinkExtension
+from .converters import MyMarkdownConverter,  CustomLinkExtension
 
 ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
