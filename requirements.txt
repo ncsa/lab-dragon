@@ -1,0 +1,16 @@
+pytest
+connexion
+numpy
+jinja2
+labcore @ git+https://github.com/toolsforexperiments/labcore.git
+nbformat
+markdown
+imagehash
+pillow
+nbconvert
+werkzeug
+flask
+markdownify
+tomlkit
+param
+setuptools
