@@ -23,11 +23,14 @@ from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
-ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/pytest/tmp/Testing Project.toml')
+# ROOTPATH = Path(r'../../test/pytest/tmp/Testing Project.toml').resolve()
+ROOTPATH = Path(r'./test/pytest/tmp/Testing Project.toml').resolve()
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
 # ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
 
-RESOURCEPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/resource')
+# RESOURCEPATH = Path(r'../../test/pytest/tmp/resource').resolve()
+RESOURCEPATH = Path(r'./test/pytest/tmp/resource').resolve()
+
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
 PARENT_TYPES = ["Project", "Task"]

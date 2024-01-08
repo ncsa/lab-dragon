@@ -11,14 +11,17 @@ ENV VIRTUALENV=/home/backend-server/venv
 RUN python3 -m venv $VIRTUALENV
 ENV PATH="$VIRTUALENV/bin:$PATH"
 
+EXPOSE 8000
+
 COPY --chown=backend-server requirements.txt ./
 RUN pip install -r requirements.txt
 
 COPY --chown=backend-server . ./qdata-mockup
 
 
-RUN echo ls
 RUN pip install uvicorn
 RUN pip install -e ./qdata-mockup
 
-CMD uvicorn 'qdata.api.starting_app:app'
+WORKDIR /home/backend-server/qdata-mockup
+
+CMD uvicorn 'qdata.api.starting_app:app' --host 0.0.0.0 --forwarded-allow-ips '*'
