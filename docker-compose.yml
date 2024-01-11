@@ -11,6 +11,12 @@ services:
       - "8080:8080"
       - "3000:3000"
       - "8000:8000"
+    labels:
+      - "traefik.http.routers.traefik.middlewares=traefik"
+      - "traefik.http.routers.traefik.service=traefik-svc"
+      - "traefik.http.middlewares.traefik.basicauth.realm=Lab Notebook"
+      - "traefik.http.services.traefik-svc.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.traefik.basicauth.users=pfafflab:$$2y$$05$$q/dphAPEb0M5Oaq4hgPcCuBUqqIAVm3EO/a7FvfJaq419c4O1uMtG"
 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -24,6 +30,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.connexion.rule=Host(`localhost`) && PathPrefix(`/api`)"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
+      - "traefik.http.routers.connexion.middlewares=traefik"
+      - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
 
     develop:
       watch:
@@ -39,7 +47,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`localhost`)"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
-
+      - "traefik.http.routers.nextjs.middlewares=traefik"
+      - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
     develop:
       watch:
         - action: rebuild
