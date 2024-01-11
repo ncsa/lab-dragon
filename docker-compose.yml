@@ -1,0 +1,47 @@
+version: '3.10'
+
+services:
+  traefik:
+
+    image: traefik:v2.10
+    container_name: "traefik"
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "3000:3000"
+      - "8000:8000"
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  connexion:
+    image: marcosf2/backend
+    build:
+      context: .
+    container_name: "backend"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.connexion.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.services.connexion.loadbalancer.server.port=8000"
+
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+
+  nextjs:
+    image: marcosf2/frontend
+    container_name: "frontend"
+    build:
+      context: ../qdata-webapp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextjs.rule=Host(`localhost`)"
+      - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
+
+    develop:
+      watch:
+        - action: rebuild
+          path: ../qdata-webapp/
+
