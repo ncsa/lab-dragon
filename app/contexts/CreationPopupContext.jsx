@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext } from 'react';
 
-const BASE_API = "http://localhost:8000/api/"
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 function isUUID(str) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;

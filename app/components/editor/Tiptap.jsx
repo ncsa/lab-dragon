@@ -17,7 +17,7 @@ import {Image as TiptapImage} from "@tiptap/extension-image";
 import Dropcursor from "@tiptap/extension-dropcursor";
 
 
-const BASE_API = "http://localhost:8000/api/"
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 
 const uploadImage = async (file) => {

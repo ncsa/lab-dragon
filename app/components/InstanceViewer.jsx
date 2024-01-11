@@ -4,8 +4,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 
-export const BASE_API = "http://localhost:8000/api/";
-export const BASE_URL = 'http://localhost:3000/entities/';
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 
 export async function getEntityName(id) {
@@ -84,7 +83,7 @@ export default function InstanceViewer({ entity }) {
             <h1 className="tittle instance">{entity.name}</h1>
 
             <div className="entity-header">
-                {entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={BASE_URL + entity.parent}> {parentName} </Link></p>}
+                {entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={ entity.parent }> { parentName } </Link></p>}
                 <p><b>Created by</b>: {entity.user}</p>
                 <p><b>Start Time</b>: {entity.start_time}</p>
                 <p><b>End Time</b>: {entity.end_time}</p>

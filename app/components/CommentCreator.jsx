@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Tiptap from './editor/Tiptap';
 import { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-const BASE_API = "http://localhost:8000/api/"
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();

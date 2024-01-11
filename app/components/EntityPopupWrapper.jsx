@@ -8,7 +8,7 @@ import Sidebar from './Sidebar';
 import EntityInput from './EntityInput';
 import CreationPopupProvider, { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-const BASE_API = "http://localhost:8000/api/";
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 async function getSidebarItems() {
     const response = await fetch(BASE_API + "entities");

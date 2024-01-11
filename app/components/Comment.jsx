@@ -4,7 +4,7 @@ import CommentEditor from "./CommentEditor"
 import CreationButtons from "./CreationButtons"
 
 
-export const BASE_API = "http://localhost:8000/api/"
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 export async function getComment(entId, commentId) {
     let response = await fetch(BASE_API+"entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {

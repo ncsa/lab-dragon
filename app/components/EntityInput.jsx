@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
-const BASE_API = "http://localhost:8000/api/"
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 function isUUID(str) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;

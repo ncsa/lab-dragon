@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const BASE_URL = 'http://localhost:3000/entities/';
 
 
 export default function SidebarItem({item}) {
@@ -16,7 +15,7 @@ export default function SidebarItem({item}) {
             <div className={open ? "sidebar-item open": "sidebar-item"}>
                 <div className="sidebar-item-title">
                     <span>
-                        <Link href={ BASE_URL + id || "#"} className="sidebar-item plain">
+                        <Link href={`/entities/${id}`} className="sidebar-item plain">
                             {name}
                         </Link>
                     </span>
@@ -35,7 +34,7 @@ export default function SidebarItem({item}) {
             <div className="sidebar-item">
                 <div className="sidebar-item-title">
                     <span>
-                        <Link href={ BASE_URL + id || "#"} className="sidebar-item plain">
+                        <Link href={`/entities/${id}`} className="sidebar-item plain">
                             {name}
                         </Link>
                     </span>

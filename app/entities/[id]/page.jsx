@@ -4,7 +4,7 @@ import EntityViewer from "@/app/components/EntityViewer";
 import CommentCreator from "@/app/components/CommentCreator";
 import InstanceViewer from "@/app/components/InstanceViewer";
 
-export const BASE_API = "http://localhost:8000/api/";
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 export async function getEntity(id, only_name = false) {
 

@@ -4,9 +4,7 @@ import Comment from './Comment';
 import CommentCreator from './CommentCreator';
 
 
-export const BASE_URL = 'http://localhost:3000/entities/';
-
-export const BASE_API = "http://localhost:8000/api/";
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API;
 
 
 export async function getInfo(id) {
@@ -142,7 +140,7 @@ export default function SmallEntityViewer({entity,
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon}/>
-                    <Link className={"Link-text"} href={BASE_URL + entity.ID}>{entity.name}</Link>
+                    <Link className={"Link-text"} href={entity.ID}>{entity.name}</Link>
                     <div 
                         className="small-entity-options"
                         onMouseEnter={handleMouseEnter}
