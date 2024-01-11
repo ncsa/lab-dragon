@@ -155,6 +155,9 @@ export default function SmallEntityViewer({entity,
                         {isBookmarked ? <i className="bookmark filled bi bi-bookmark-fill"/> : <i className="bookmark empty bi bi-bookmark"/>}
                     </button>
                 </h3>
+                <button className="add-comment-button" onClick={() => {onDoubleClickHandler(entity.ID)}}>
+                    <i className="bi bi-plus-circle" />
+                </button>
             </div>
             { Object.keys(comments).map((key) => {
                 return (<Comment key={comments[key].ID} 

@@ -339,6 +339,12 @@ select {
     background-color: var(--step-color);
 }
 
+.small-entity .small-entity-tittle{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .small-entity .small-entity-tittle h3{
     color: var(--small-entity-tittle-color);
     text-decoration: none;
@@ -363,6 +369,7 @@ select {
     font-size: 1.7em;
     padding-right: 0.5em;
     padding-left: 10px;
+    color: white;
 }
 
 .small-entity .small-entity-tittle .small-entity-options{
@@ -384,14 +391,14 @@ select {
     text-decoration: none;
 }
 
-.small-entity .small-entity-tittle button.bookmark-button {
+.small-entity .small-entity-tittle button {
     background: none;
     border: none;
     padding: 0;
     margin: 0;
 }
 
-.small-entity .small-entity-tittle button.bookmark-button:hover{
+.small-entity .small-entity-tittle button:hover{
     background-color: none;
     box-shadow: none;
 }
@@ -540,6 +547,10 @@ select {
     align-items: center;
     color: black;   
     z-index: 1000;
+}
+
+.entity-popup h1 {
+    color: black;
 }
 
 .entity-popup .content{
