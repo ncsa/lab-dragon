@@ -50,6 +50,15 @@ h1 {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 2.5rem;
+    color: white;
+}
+
+h2 {
+    color: white;
+}
+
+h3 {
+    color: white;
 }
 
 body {
@@ -174,6 +183,8 @@ select {
     padding-left: 5px;
     font-size: 2em; /* Increase the size of the icon */
 }
+
+ /* SIDEBAR */
 
 .sidebar{
     color: aliceblue;
@@ -661,6 +672,29 @@ ul > li {
 
   /* Instance Display */
 
+.instance-viewer h2{
+    color: var(--tittle-color);
+    font-size: 2em;
+    font-weight: 700;
+    padding: 0.5em;
+    border-top: 1px solid var(--section-divider-line-color);
+}
+
+.tittle.instance{
+    font-size: 2em;
+}
+
+.instance-data-display .toggle-btn {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    padding-right: 10px;
+}
+
+.instance-data-display.open .toggle-btn {
+    transform: rotate(-90deg) translateX(5px) translateY(-5px);
+}
+
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -701,30 +735,34 @@ ul > li {
     padding-bottom: 10px;
     padding-top: 10px;
 
-    h2 {
-        color: var(--tittle-color);
-        font-size: 2em;
-        font-weight: 700;
-        padding: 0.5em;
-        border-top: 1px solid var(--section-divider-line-color);
-    }
-
     img {
         text-align: center;
         white-space: nowrap;
         margin-top: 5px;
         border: 1px solid var(--section-divider-line-color);
     }
+
+    .instance-image{
+        color: white;
+        display: flex;
+        transform-origin: center center;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        padding-right: 10px;
+        transform-origin: center center;
+    }
+
+    .toggle-btn.open {
+        transform-origin: center center;
+        transform: rotate(-90deg) translateX(5px) translateY(-5px);
+    }
 }
 
 .instance-analysis {
-    h2 {
-        color: var(--tittle-color);
-        font-size: 2em;
-        font-weight: 700;
-        padding: 0.5em;
-        border-top: 1px solid var(--section-divider-line-color);
-    }
 
     h3 {
         color: var(--tittle-color);
@@ -732,7 +770,18 @@ ul > li {
         font-weight: 700;
         padding: 0.5em;
         border-top: 1px solid var(--section-divider-line-color);
-    
+        display: inline-block;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        padding-right: 10px;
+    }
+
+    .toggle-btn.open {
+        transform: rotate(-90deg) translateX(5px) translateY(-5px);
     }
 }
 
@@ -772,4 +821,17 @@ ul > li {
 
 .stored-params div {
     padding-left: 20px;
+}
+
+.stored-params .toggle-btn {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    padding-right: 10px;
+    transform-origin: center center;
+}
+
+.stored-params .toggle-btn.open {
+    transform-origin: center center;
+    transform: rotate(-90deg) translateX(5px) translateY(-5px);
 }
