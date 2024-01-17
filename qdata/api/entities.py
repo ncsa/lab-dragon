@@ -14,14 +14,25 @@ from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
 from qdata import HOSTADDRESS
-from qdata.modules.task import Task
-from qdata.modules.step import Step
-from qdata.modules.entity import Entity
-from qdata.modules.project import Project
-from qdata.modules.instance import Instance
+# FIXME: This is not the cleanest import pattern but it works for now
+try:
+    from qdata.modules.task import Task
+    from qdata.modules.step import Step
+    from qdata.modules.entity import Entity
+    from qdata.modules.project import Project
+    from qdata.modules.instance import Instance
+except ImportError:
+    from qdata.generators.meta import generate_all_classes, delete_all_modules
+    delete_all_modules()
+    generate_all_classes()
+    from qdata.modules.task import Task
+    from qdata.modules.step import Step
+    from qdata.modules.entity import Entity
+    from qdata.modules.project import Project
+    from qdata.modules.instance import Instance
+
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from qdata.generators.meta import generate_all_classes, delete_all_modules
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
 # ROOTPATH = Path(r'../../test/pytest/tmp/Testing Project.toml').resolve()
@@ -805,5 +816,3 @@ def toggle_bookmark(ID):
 
 
 read_all()
-delete_all_modules()
-generate_all_classes()

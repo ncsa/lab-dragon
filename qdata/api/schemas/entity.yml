@@ -1,0 +1,26 @@
+
+schemas:
+    Entity:
+      type: "object"
+      properties:
+        ID:
+          type: "string"
+        name:
+          type: "string"
+        parent:
+          type: "string"
+        description:
+          type: "string"
+        comments:
+          type: "array"
+        children:
+          type: "array"
+        params:
+          type: "array"
+        data_buckets:
+          type: "array"
+        bookmarked:
+
+
+
+
