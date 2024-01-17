@@ -534,12 +534,12 @@ def read_entity_info(ID):
     return make_response(json.dumps({"rank": rank, "num_children": num_children}), 201)
 
 
-def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False):
+def add_comment(ID, body, username: Optional[str] = None, HTML: bool = False):
     """
     Adds a comment to the indicated entity. It does not handle images or tables yet.
 
     :param ID: The id of the entity the comment should be added to.
-    :param comment: The text of the comment itself.
+    :param body: The text of the comment itself.
     :param username: Optional argument. If passed, the author of the comment will be that username instead of the
      user of the entity.
     :param HTML: If true, the comment text is assumed to be in html form and is converted to markdown.
@@ -553,9 +553,9 @@ def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False)
         username = ent.user
 
     if HTML:
-        content = html_to_markdown.convert(comment['content'])
+        content = html_to_markdown.convert(body)
     else:
-        content = comment['content']
+        content = body
 
     ent.add_comment(content, username)
 
@@ -567,8 +567,7 @@ def add_comment(ID, comment, username: Optional[str] = None, HTML: bool = False)
     return make_response("Comment added", 201)
 
 
-# TODO: Commments don't yet accept any other username.
-def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: bool = False):
+def edit_comment(ID, commentID, body, username: Optional[str] = None, HTML: bool = False):
 
     if ID not in INDEX:
         abort(404, f"Entity with ID {ID} not found")
@@ -576,10 +575,10 @@ def edit_comment(ID, commentID, comment, username: Optional[str] = None, HTML: b
     ent = INDEX[ID]
 
     if HTML:
-        comment = html_to_markdown.convert(comment)
+        body = html_to_markdown.convert(body)
 
     try:
-        ret = ent.modify_comment(commentID, comment, username)
+        ret = ent.modify_comment(commentID, body, username)
         if ret:
             # Convert uuids in the entity to paths
             path_copy = create_path_entity_copy(ent)
