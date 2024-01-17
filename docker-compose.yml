@@ -23,13 +23,15 @@ services:
     image: marcosf2/backend
     build:
       context: .
+    volumes:
+      - /home/marcosf2/nas:/home/pfafflab/nas
     container_name: "backend"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.connexion.rule=Host(`kaladin.ncsa.illinois.edu`) && PathPrefix(`/api`)"
       - "traefik.http.routers.connexion.middlewares=traefik"
-      - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
 
 #    develop:
 #      watch:
