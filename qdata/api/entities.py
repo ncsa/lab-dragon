@@ -21,6 +21,7 @@ from qdata.modules.project import Project
 from qdata.modules.instance import Instance
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
+from qdata.generators.meta import generate_all_classes, delete_all_modules
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
 # ROOTPATH = Path(r'../../test/pytest/tmp/Testing Project.toml').resolve()
@@ -802,4 +803,7 @@ def toggle_bookmark(ID):
 
     return make_response("Bookmark toggled", 201)
 
+
 read_all()
+delete_all_modules()
+generate_all_classes()
