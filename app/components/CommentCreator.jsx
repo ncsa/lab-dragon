@@ -23,16 +23,12 @@ export default function CommentCreator({entID, reloader, initialContent}) {
         e.preventDefault();
         setIsLoading(true);
 
-        const newComment = {
-            content, 
-        }
-
-        let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True" + "&username=" + user, {
+            let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True" + "&username=" + user, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(newComment),
+            body: JSON.stringify(content),
         });
 
         if (response.status === 201) {
