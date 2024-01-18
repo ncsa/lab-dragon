@@ -101,8 +101,9 @@ class CustomLinkProcessor(LinkInlineProcessor):
             return el, m.start(0), m.end(0)
 
         text = m.group(1)
-        img_path = m.group(2).replace('/', '%23')
-        url = f"properties/image/{img_path}"
+        base, filename = m.group(2).split('image/', 1)
+        converted_filename = m.group(2).replace('/', '%23')
+        url = f"{base}image/{converted_filename}"
 
         # Checks if the image is in the instance index, if it is, it means it is an image that is in the instance and
         # should have a link to it.
