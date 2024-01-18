@@ -55,7 +55,7 @@ class MyMarkdownConverter(MarkdownConverter):
         """
         src = el.attrs['src']
         # Remove the 'http://localhost:8000/api/properties/image/' part from the src
-        src = src.replace('http://localhost:8000/api/properties/image/', '')
+        src = src.replace(f'{HOSTADDRESS}/properties/image/', '')
         # Replace '%23' with '/'
         src = src.replace('%23', '/')
         el.attrs["src"] = src

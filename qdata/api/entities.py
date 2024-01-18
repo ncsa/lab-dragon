@@ -75,7 +75,6 @@ markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_i
 # Domain, used to convert from links to paths, to links the web browser can understand
 DOMAIN = 'http://localhost:3000'
 
-
 def get_indices():
 
     index = json.dumps(str(INDEX))

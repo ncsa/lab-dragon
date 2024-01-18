@@ -3,14 +3,6 @@ from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 
 
-def set_cors_headers_on_response(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-    response.headers['Access-Control-Allow-Headers'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers['Access-Control-Allow-Credentials'] = 'false'
-    return response
-
-
 app = connexion.App(__name__, specification_dir='./')
 app.add_middleware(
     CORSMiddleware,
@@ -29,5 +21,5 @@ app.add_api('API_specification.yaml')
 #  types.
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8000)
+    app.run(host='kaladin.ncsa.illinois.edu', port=8000)
 

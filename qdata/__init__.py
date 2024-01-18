@@ -11,6 +11,8 @@ MODULESDIR = QDATADIR.joinpath("modules")  # This should be a configuration opti
 
 TEMPLATESDIR = QDATADIR.joinpath("../templates")  # This should be a configuration option
 
-HOSTADDRESS = "http://localhost:8000/api/"  # This should be a configuration option
+# HOSTADDRESS = "http://localhost:8000/api/"  # This should be a configuration option
+HOSTADDRESS = "http://kaladin.ncsa.illinois.edu/api/"
 
-WEBSERVERADDRESS = "http://localhost:3000/"  # This should be a configuration option
+# WEBSERVERADDRESS = "http://localhost:3000/"  # This should be a configuration option
+WEBSERVERADDRESS = "http://kaladin.ncsa.illinois.edu"
