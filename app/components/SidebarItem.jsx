@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 
-
 export default function SidebarItem({item}) {
     const name = item.name;
     const type = item.type;

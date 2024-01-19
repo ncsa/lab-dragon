@@ -5,10 +5,9 @@ import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
-const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 export async function getEntityName(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "?name_only=true", {
+    let response = await fetch("/api/entities/" + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {

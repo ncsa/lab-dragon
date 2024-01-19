@@ -5,7 +5,6 @@ import { CreationPopupContext } from '@/app/contexts/CreationPopupContext';
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
 
-
 export default function TopBanner() {
 
     const { user, setUser } = useContext(CreationPopupContext);

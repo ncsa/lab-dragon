@@ -4,11 +4,8 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 
-const BASE_API = process.env.NEXT_PUBLIC_BASE_API
-
-
 export async function getEntityName(id) {
-    let response = await fetch(BASE_API + "entities/" + id + "?name_only=true", {
+    let response = await fetch("/api/entities/" + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -19,7 +16,7 @@ export async function getEntityName(id) {
 }
 
 export async function getStoredParams(id) {
-    let response = await fetch(BASE_API + "entities/" + id + "/stored_params", {
+    let response = await fetch("/api/entities/" + id + "/stored_params", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -71,9 +68,6 @@ export default function InstanceViewer({ entity }) {
 
     useEffect(() => {
         getStoredParams(entity.ID).then(data => {
-            console.log("what the hell are you data:", typeof data);
-            console.log(JSON.parse(data));
-
             setStoredParams(JSON.parse(data));
         })
     }, []);
@@ -130,7 +124,7 @@ export default function InstanceViewer({ entity }) {
                                     }} />
                             </div>
                             {imagesToggleArray[index] &&
-                                <img src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                                <img src={"/api/properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
                             }
                         </div>
                     )

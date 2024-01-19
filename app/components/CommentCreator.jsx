@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import Tiptap from './editor/Tiptap';
 import { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-const BASE_API = process.env.NEXT_PUBLIC_BASE_API
-
 export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();
     const [content, setContent] = useState("");
@@ -23,7 +21,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
         e.preventDefault();
         setIsLoading(true);
 
-            let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True" + "&username=" + user, {
+            let response = await fetch("/api/entities/" + entID + "?HTML=True" + "&username=" + user, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

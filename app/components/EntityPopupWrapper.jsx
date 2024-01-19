@@ -2,16 +2,14 @@
 
 import React, { useState, useContext, useEffect } from 'react';
 
-
 // components
 import Sidebar from './Sidebar';
 import EntityInput from './EntityInput';
 import CreationPopupProvider, { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-const BASE_API = process.env.NEXT_PUBLIC_BASE_API
 
 async function getSidebarItems() {
-    const response = await fetch(BASE_API + "entities");
+    const response = await fetch("/api/entities");
     return await response.json();
 }
 
