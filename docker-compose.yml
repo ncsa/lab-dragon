@@ -36,10 +36,10 @@ services:
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
       - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
 
-    develop:
-      watch:
-        - action: rebuild
-          path: .
+#    develop:
+#      watch:
+#        - action: rebuild
+#          path: .
 
   nextjs:
     image: marcosf2/frontend
@@ -52,8 +52,9 @@ services:
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
       - "traefik.http.routers.nextjs.middlewares=traefik"
       - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
-    develop:
-      watch:
-        - action: rebuild
-          path: ../qdata-webapp/
+
+#    develop:
+#      watch:
+#        - action: rebuild
+#          path: ../qdata-webapp/
 
