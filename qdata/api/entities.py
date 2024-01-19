@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import copy
@@ -13,35 +14,24 @@ from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
 
-from qdata import HOSTADDRESS
-# FIXME: This is not the cleanest import pattern but it works for now
-try:
-    from qdata.modules.task import Task
-    from qdata.modules.step import Step
-    from qdata.modules.entity import Entity
-    from qdata.modules.project import Project
-    from qdata.modules.instance import Instance
-except ImportError:
-    from qdata.generators.meta import generate_all_classes, delete_all_modules
-    delete_all_modules()
-    generate_all_classes()
-    from qdata.modules.task import Task
-    from qdata.modules.step import Step
-    from qdata.modules.entity import Entity
-    from qdata.modules.project import Project
-    from qdata.modules.instance import Instance
+# Refresh the modules before starting the server
+from qdata.generators.meta import generate_all_classes, delete_all_modules
+delete_all_modules()
+generate_all_classes()
+
+from qdata.modules.task import Task
+from qdata.modules.step import Step
+from qdata.modules.entity import Entity
+from qdata.modules.project import Project
+from qdata.modules.instance import Instance
 
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
-# ROOTPATH = Path(r'../../test/pytest/tmp/Testing Project.toml').resolve()
-ROOTPATH = Path(r'./test/pytest/tmp/Testing Project.toml').resolve()
-# ROOTPATH = Path(r'/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator/Testing Project.toml')
-# ROOTPATH = Path(r'/Users/marcosf2/Documents/playground/notebook_testing/notebook_files/target/First prototype.toml')
+ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
 
-# RESOURCEPATH = Path(r'../../test/pytest/tmp/resource').resolve()
-RESOURCEPATH = Path(r'./test/pytest/tmp/resource').resolve()
+RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
 
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
@@ -64,7 +54,7 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS = set()
+USERS = set(os.getenv("USERS").split(','))
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
@@ -72,8 +62,6 @@ html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
 
-# Domain, used to convert from links to paths, to links the web browser can understand
-DOMAIN = 'http://localhost:3000'
 
 def get_indices():
 
@@ -660,11 +648,11 @@ def add_image(body, image):
     if image_path is None:
         # Save the image to the RESOURCEPATH
         filename = secure_filename(image.filename)
-        image_path = RESOURCEPATH / filename
+        image_path = RESOURCEPATH.joinpath(filename)
         converted_image.save(image_path)
         add_image_to_index(Image.open(image_path), image_path)
 
-    image_url = f"{HOSTADDRESS}properties/image/{str(image_path).replace('/', '%23')}"
+    image_url = f"/api/properties/image/{str(image_path).replace('/', '%23')}"
 
     return make_response(image_url, 201)
 

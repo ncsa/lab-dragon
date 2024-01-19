@@ -7,8 +7,6 @@ from markdownify import MarkdownConverter, chomp
 from markdown.extensions import Extension
 from markdown.inlinepatterns import LinkInlineProcessor
 
-from qdata import HOSTADDRESS, WEBSERVERADDRESS
-
 
 # HTML to markdown
 class MyMarkdownConverter(MarkdownConverter):
@@ -55,7 +53,7 @@ class MyMarkdownConverter(MarkdownConverter):
         """
         src = el.attrs['src']
         # Remove the 'http://localhost:8000/api/properties/image/' part from the src
-        src = src.replace(f'{HOSTADDRESS}/properties/image/', '')
+        src = src.replace(f'/api/properties/image/', '')
         # Replace '%23' with '/'
         src = src.replace('%23', '/')
         el.attrs["src"] = src
@@ -93,7 +91,7 @@ class CustomLinkProcessor(LinkInlineProcessor):
         # mention, if not assuming it is a link to an image
         if m.group(2) in self.uuid_index:
             text = m.group(1)
-            url = f"entities/{m.group(2)}"
+            url = f"/entities/{m.group(2)}"
             el = etree.Element('a')
             el.text = text
             el.set('href', url)
@@ -101,15 +99,14 @@ class CustomLinkProcessor(LinkInlineProcessor):
             return el, m.start(0), m.end(0)
 
         text = m.group(1)
-        base, filename = m.group(2).split('image/', 1)
-        converted_filename = m.group(2).replace('/', '%23')
-        url = f"{base}image/{converted_filename}"
+        img_path = m.group(2).replace('/', '%23')
+        url = f"/api/properties/image/{img_path}"
 
         # Checks if the image is in the instance index, if it is, it means it is an image that is in the instance and
         # should have a link to it.
         if m.group(2) in self.instance_index:
             a_el = etree.Element('a')
-            href = f"entities/{self.instance_index[m.group(2)]}"
+            href = f"/entities/{self.instance_index[m.group(2)]}"
             a_el.set('href', href)
             a_el.set("class", "image-link")
             img_el = etree.SubElement(a_el, 'img')

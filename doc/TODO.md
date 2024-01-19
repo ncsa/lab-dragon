@@ -6,8 +6,8 @@ The following is simply a place to quickly write down known issues as well as ne
 * Being able to mention any other instance
 
 # Known Issues
-If the notebook cannot find some path reference, there should be some way of handling instead of just crashing.
-
+- If the notebook cannot find some path reference, there should be some way of handling instead of just crashing.
+- comments should be refactored to remove comment types
 
 # Tests
 

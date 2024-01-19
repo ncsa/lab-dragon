@@ -1,3 +1,4 @@
+import os
 import connexion
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
@@ -21,5 +22,6 @@ app.add_api('API_specification.yaml')
 #  types.
 
 if __name__ == '__main__':
-    app.run(host='kaladin.ncsa.illinois.edu', port=8000)
+    host = os.getenv('TRAEFIK_HOST')
+    app.run(host=host, port=8000)
 

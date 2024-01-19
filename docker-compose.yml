@@ -24,19 +24,22 @@ services:
     build:
       context: .
     volumes:
-      - /home/marcosf2/nas:/home/pfafflab/nas
+      # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
+      - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
     container_name: "backend"
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.connexion.rule=Host(`kaladin.ncsa.illinois.edu`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.connexion.rule=Host(`${TRAEFIK_HOST}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.connexion.middlewares=traefik"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
       - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
 
-#    develop:
-#      watch:
-#        - action: rebuild
-#          path: .
+    develop:
+      watch:
+        - action: rebuild
+          path: .
 
   nextjs:
     image: marcosf2/frontend
@@ -45,12 +48,12 @@ services:
       context: ../qdata-webapp
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`kaladin.ncsa.illinois.edu`)"
+      - "traefik.http.routers.nextjs.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
       - "traefik.http.routers.nextjs.middlewares=traefik"
       - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
-#    develop:
-#      watch:
-#        - action: rebuild
-#          path: ../qdata-webapp/
+    develop:
+      watch:
+        - action: rebuild
+          path: ../qdata-webapp/
 
