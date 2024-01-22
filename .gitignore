@@ -1,5 +1,6 @@
 # IDE
 .idea/
+.vscode/
 
 *.egg-info/
 
@@ -13,6 +14,9 @@ __pycache__/
 
 # Mac stuff
 .DS_Store
+
+# Environment variables
+.env
 
 
 # Ignore the files created by the generators

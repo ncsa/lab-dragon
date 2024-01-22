@@ -1,0 +1,69 @@
+version: '3.10'
+
+services:
+  traefik:
+
+    image: traefik:v2.10
+    container_name: "traefik"
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+    labels:
+      - "traefik.http.routers.traefik.middlewares=traefik"
+      - "traefik.http.routers.traefik.service=traefik-svc"
+      - "traefik.http.services.traefik-svc.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.traefik.basicauth.realm=Lab Notebook"
+      - "traefik.http.middlewares.traefik.basicauth.users=pfafflab:$$2y$$05$$q/dphAPEb0M5Oaq4hgPcCuBUqqIAVm3EO/a7FvfJaq419c4O1uMtG"
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  connexion:
+    image: marcosf2/backend
+    build:
+      context: .
+    volumes:
+      # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
+      - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
+    container_name: "backend"
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.connexion.rule=Host(`${TRAEFIK_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.connexion.middlewares=traefik"
+      - "traefik.http.services.connexion.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
+
+#    develop:
+#      watch:
+#        - action: rebuild
+#          path: .
+
+  nextjs:
+    image: marcosf2/frontend
+    container_name: "frontend"
+    build:
+      context: ../qdata-webapp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextjs.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
+      - "traefik.http.routers.nextjs.middlewares=traefik"
+      - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
+
+#    develop:
+#      watch:
+#        - action: rebuild
+#          path: ../qdata-webapp/
+
+networks:
+  monitor:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
+    driver_opts:
+      com.docker.network.driver.mtu: 1450

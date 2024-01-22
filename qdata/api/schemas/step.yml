@@ -1,0 +1,16 @@
+
+schemas:
+    Step:
+      type: "object"
+      - $ref: '#/components/schemas/Entity'
+      properties:
+        process:
+          type: "string"
+        start_time:
+          type: "string"
+        end_time:
+          type: "string"
+
+
+
+

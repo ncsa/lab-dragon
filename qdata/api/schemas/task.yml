@@ -1,0 +1,18 @@
+
+schemas:
+    Task:
+      type: "object"
+      - $ref: '#/components/schemas/Entity'
+      properties:
+        objective:
+          type: "string"
+        process:
+          type: "string"
+        start_time:
+          type: "string"
+        end_time:
+          type: "string"
+
+
+
+

@@ -1,0 +1,10 @@
+
+schemas:
+    Project:
+      type: "object"
+      - $ref: '#/components/schemas/Entity'
+      properties:
+
+
+
+
