@@ -4,12 +4,8 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 
-export const BASE_API = "http://localhost:8000/api/";
-export const BASE_URL = 'http://localhost:3000/entities/';
-
-
 export async function getEntityName(id) {
-    let response = await fetch(BASE_API + "entities/" + id + "?name_only=true", {
+    let response = await fetch("/api/entities/" + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -20,7 +16,7 @@ export async function getEntityName(id) {
 }
 
 export async function getStoredParams(id) {
-    let response = await fetch(BASE_API + "entities/" + id + "/stored_params", {
+    let response = await fetch("/api/entities/" + id + "/stored_params", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -72,9 +68,6 @@ export default function InstanceViewer({ entity }) {
 
     useEffect(() => {
         getStoredParams(entity.ID).then(data => {
-            console.log("what the hell are you data:", typeof data);
-            console.log(JSON.parse(data));
-
             setStoredParams(JSON.parse(data));
         })
     }, []);
@@ -84,7 +77,7 @@ export default function InstanceViewer({ entity }) {
             <h1 className="tittle instance">{entity.name}</h1>
 
             <div className="entity-header">
-                {entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={BASE_URL + entity.parent}> {parentName} </Link></p>}
+                {entity.parent && <p><b>Bucket Owner</b>: <Link className="entity-link" href={ entity.parent }> { parentName } </Link></p>}
                 <p><b>Created by</b>: {entity.user}</p>
                 <p><b>Start Time</b>: {entity.start_time}</p>
                 <p><b>End Time</b>: {entity.end_time}</p>
@@ -131,7 +124,7 @@ export default function InstanceViewer({ entity }) {
                                     }} />
                             </div>
                             {imagesToggleArray[index] &&
-                                <img src={BASE_API + "properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                                <img src={"/api/properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
                             }
                         </div>
                     )

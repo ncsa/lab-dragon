@@ -3,7 +3,6 @@ import { useEffect, useState, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
-const BASE_API = "http://localhost:8000/api/"
 
 function isUUID(str) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
@@ -42,7 +41,7 @@ export default function EntityInput( {populateSideBar} ) {
         const newEntity = {
             name, user, type, parent
         }
-        const response = await fetch(BASE_API + "entities", {
+        const response = await fetch("/api/entities", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

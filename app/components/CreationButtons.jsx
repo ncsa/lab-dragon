@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { CreationPopupContext } from "../contexts/CreationPopupContext";
 
 
-
 export default function CreationButtons({ entID, entType, newCommentActivator, onlyComment = false }) {
 
     const { setIsPopupOpen } = useContext(CreationPopupContext);

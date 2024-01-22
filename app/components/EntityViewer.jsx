@@ -5,11 +5,9 @@ import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
-export const BASE_API = "http://localhost:8000/api/";
-export const BASE_URL = 'http://localhost:3000/entities/';
 
 export async function getEntityName(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "?name_only=true", {
+    let response = await fetch("/api/entities/" + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -99,7 +97,7 @@ export default function EntityViewer({ entity, displayChildren }) {
             <h1 className="tittle">{entity.name}</h1>
 
             <h2 className="entity-header">
-                { entity.parent && <p><b>Parent</b>: <Link className="entity-link" href={ BASE_URL + entity.parent }> {parentName} </Link></p>}
+                { entity.parent && <p><b>Parent</b>: <Link className="entity-link" href={ entity.parent }> {parentName} </Link></p>}
                 <p><b>Type</b>: {entity.type}</p>
                 <p><b>User</b>: {entity.user}</p>
             </h2>

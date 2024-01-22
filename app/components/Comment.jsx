@@ -4,10 +4,8 @@ import CommentEditor from "./CommentEditor"
 import CreationButtons from "./CreationButtons"
 
 
-export const BASE_API = "http://localhost:8000/api/"
-
 export async function getComment(entId, commentId) {
-    let response = await fetch(BASE_API+"entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
+    let response = await fetch("/api/entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -64,7 +62,7 @@ export default function Comment({comment,
         return (
             <div className={`comment ${isSelected ? 'selected': ''}`}
                 onClick={innerClickHandler}>
-                <img src={BASE_API+"entities/"+entID+"/"+updatingComment.ID} alt="Image is loading" />
+                <img src={"entities/"+entID+"/"+updatingComment.ID} alt="Image is loading" />
             </div>
         )
     } else if (updatingComment.com_type[updatingComment.com_type.length - 1] == 6) {

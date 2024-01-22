@@ -2,7 +2,6 @@
 
 import { useState, useEffect, createContext } from 'react';
 
-const BASE_API = "http://localhost:8000/api/"
 
 function isUUID(str) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
@@ -27,17 +26,17 @@ export default function CreationPopupProvider({ children }) {
     const [parent, setParent] = useState("");
 
     async function getUsers() {
-        const response = await fetch(BASE_API + "properties/users");
+        const response = await fetch("/api/properties/users");
         return await response.json();
     }
     
     async function getTypes() {
-        const response = await fetch(BASE_API + "properties/types");
+        const response = await fetch("/api/properties/types");
         return await response.json();
     }
     
     async function getParents() {
-        const response = await fetch(BASE_API + "properties/parents");
+        const response = await fetch("/api/properties/parents");
         return await response.json();
     }
     

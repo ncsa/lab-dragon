@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import Tiptap from './editor/Tiptap';
 import { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-const BASE_API = "http://localhost:8000/api/"
-
 export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();
     const [content, setContent] = useState("");
@@ -23,16 +21,12 @@ export default function CommentCreator({entID, reloader, initialContent}) {
         e.preventDefault();
         setIsLoading(true);
 
-        const newComment = {
-            content, 
-        }
-
-        let response = await fetch(BASE_API + "entities/" + entID + "?HTML=True" + "&username=" + user, {
+            let response = await fetch("/api/entities/" + entID + "?HTML=True" + "&username=" + user, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(newComment),
+            body: JSON.stringify(content),
         });
 
         if (response.status === 201) {

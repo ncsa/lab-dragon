@@ -4,11 +4,9 @@ import EntityViewer from "@/app/components/EntityViewer";
 import CommentCreator from "@/app/components/CommentCreator";
 import InstanceViewer from "@/app/components/InstanceViewer";
 
-export const BASE_API = "http://localhost:8000/api/";
 
 export async function getEntity(id, only_name = false) {
-
-    let response = await fetch(BASE_API+"entities/" + id, {
+    let response = await fetch("/api/entities/" + id, {
         cache: 'no-store'
     })
 

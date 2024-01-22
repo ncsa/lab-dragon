@@ -4,14 +4,9 @@ import Comment from './Comment';
 import CommentCreator from './CommentCreator';
 
 
-export const BASE_URL = 'http://localhost:3000/entities/';
-
-export const BASE_API = "http://localhost:8000/api/";
-
-
 export async function getInfo(id) {
     /// gets the number of children and rank
-    let response = await fetch(BASE_API+"entities/" + id + "/info", {
+    let response = await fetch("/api/entities/" + id + "/info", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -22,7 +17,7 @@ export async function getInfo(id) {
 }
 
 export async function getTree(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "/tree", {
+    let response = await fetch("/api/entities/" + id + "/tree", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -33,7 +28,7 @@ export async function getTree(id) {
 }
 
 export async function getComments(id) {
-    let response = await fetch(BASE_API+"entities/" + id, {
+    let response = await fetch("/api/entities/" + id, {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -48,7 +43,7 @@ export async function getComments(id) {
 }
 
 export async function toogleBookmark(id) {
-    let response = await fetch(BASE_API+"entities/" + id + "/toggle_bookmark", {
+    let response = await fetch("/api/entities/" + id + "/toggle_bookmark", {
         method: 'POST',
         cache: 'no-store'
     })
@@ -142,7 +137,7 @@ export default function SmallEntityViewer({entity,
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon}/>
-                    <Link className={"Link-text"} href={BASE_URL + entity.ID}>{entity.name}</Link>
+                    <Link className={"Link-text"} href={entity.ID}>{entity.name}</Link>
                     <div 
                         className="small-entity-options"
                         onMouseEnter={handleMouseEnter}
