@@ -1,3 +1,8 @@
+"""
+Goes through an entire measurement directory and creates TOML files for each measurement.
+Also creates the new DataBucket for this measurement folder.
+"""
+
 from pathlib import Path
 
 from labcore.data.datadict_storage import datadict_from_hdf5

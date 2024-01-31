@@ -1,3 +1,6 @@
+"""
+Creates a single root entity. This is the first step in creating a project.
+"""
 import argparse
 from pathlib import Path
 
