@@ -20,7 +20,7 @@ import Dropcursor from "@tiptap/extension-dropcursor";
 const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
-  const response = await fetch("/api/properties/image", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image`, {
     method: "POST",
     body: formData,
   });
@@ -33,7 +33,7 @@ export default ({ onContentChange, entID, initialContent }) => {
   const dataMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
-    let url = "/api/entities/" + entID + "/data_suggestions";
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/data_suggestions";
     if (query) {
       url += "?query=" + query;
     }
@@ -53,7 +53,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       img.onload = function () {
         uploadImage(file).then((url) => {
           let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
-          let attrs = {src: url, alt: file.name}; // set the image attributes
+          let attrs = {src: `${process.env.NEXT_PUBLIC_API_BASE_URL}` + url, alt: file.name}; // set the image attributes
           let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
           transaction.replaceSelectionWith(node); // replace the space with the image node
           view.dispatch(transaction); // dispatch the transaction

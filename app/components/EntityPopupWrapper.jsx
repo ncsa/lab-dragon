@@ -9,7 +9,7 @@ import CreationPopupProvider, { CreationPopupContext } from '../contexts/Creatio
 
 
 async function getSidebarItems() {
-    const response = await fetch("/api/entities");
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities`);
     return await response.json();
 }
 

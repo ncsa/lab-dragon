@@ -21,7 +21,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
         e.preventDefault();
         setIsLoading(true);
 
-            let response = await fetch("/api/entities/" + entID + "?HTML=True" + "&username=" + user, {
+            let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "?HTML=True" + "&username=" + user, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

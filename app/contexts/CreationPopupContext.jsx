@@ -26,17 +26,17 @@ export default function CreationPopupProvider({ children }) {
     const [parent, setParent] = useState("");
 
     async function getUsers() {
-        const response = await fetch("/api/properties/users");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/users`);
         return await response.json();
     }
     
     async function getTypes() {
-        const response = await fetch("/api/properties/types");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/types`);
         return await response.json();
     }
     
     async function getParents() {
-        const response = await fetch("/api/properties/parents");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/parents`);
         return await response.json();
     }
     
