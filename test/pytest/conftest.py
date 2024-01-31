@@ -12,7 +12,7 @@ import numpy as np
 from jinja2 import Environment, FileSystemLoader
 
 # Tools from pfafflab
-from labcore.measurement.sweep import Sweep, sweep_parameter
+from labcore.measurement.sweep import sweep_parameter
 from labcore.measurement.record import record_as
 from labcore.measurement.storage import run_and_save_sweep
 
@@ -21,7 +21,7 @@ from qdata.generators.meta import read_from_TOML
 from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
 from qdata.generators.meta import generate_all_classes, delete_all_modules
 
-from ..env_creator import create_full_test_env
+from qdata.scripts.env_creator import create_full_test_env
 
 
 def count_files(path):
@@ -49,7 +49,9 @@ def module_names(refresh_modules):
 
 
 @pytest.fixture()
-def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
+def generate_msmt_folder_structure(request, tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
+    if hasattr(request, 'param'):
+        tmp_path = request.param
     if tmp_path.is_dir() and generate_each_run:
         shutil.rmtree(tmp_path)
         tmp_path.mkdir()
@@ -105,10 +107,10 @@ def generate_msmt_folder_structure(tmp_path=Path(r'./tmp').resolve(), n_measurem
     add_toml_to_data(folder_path)
     create_full_test_env(tmp_path, create_md=False, light_delete=True)
 
-    ent_path = Path("./tmp/Testing Pandas.toml").resolve()
+    ent_path = tmp_path.joinpath('Testing Pandas.toml')
     ent = read_from_TOML(ent_path)
 
-    bucket_path = Path("./tmp/data/Measurements.toml").resolve()
+    bucket_path = tmp_path.joinpath('data/Measurements.toml')
     ent.data_buckets.append(str(bucket_path))
     ent.to_TOML(ent_path)
 

@@ -2,7 +2,7 @@
 
 from qdata.generators.jupyterbook import create_relation_dict
 
-from ..env_creator import create_full_test_env
+from qdata.scripts.env_creator import create_full_test_env
 
 
 def md_path_creator(dir_path, filename):

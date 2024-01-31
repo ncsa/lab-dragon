@@ -219,8 +219,9 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
 if __name__ == "__main__":
 
-    root_path = Path("./env_generator/Testing Project.toml")
-    target_path = Path("./env_generator/jupyterbook/")
+    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator")
+    jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
+    jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 
-    create_full_test_env(create_md=False)
-    generate_book(root_path, target_path)
+    create_full_test_env(target=new_notebook_location, create_md=False)
+    # generate_book(jupyter_book_root_path, jupyter_book_target_path)
