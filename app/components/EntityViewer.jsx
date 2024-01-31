@@ -7,7 +7,7 @@ import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
 
 export async function getEntityName(id) {
-    let response = await fetch("/api/entities/" + id + "?name_only=true", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {

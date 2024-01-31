@@ -2,10 +2,11 @@
 import React, { useState } from "react"
 import CommentEditor from "./CommentEditor"
 import CreationButtons from "./CreationButtons"
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 
 export async function getComment(entId, commentId) {
-    let response = await fetch("/api/entities/" + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entId + "/" + commentId + "?whole_comment=True&HTML=True", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -62,7 +63,7 @@ export default function Comment({comment,
         return (
             <div className={`comment ${isSelected ? 'selected': ''}`}
                 onClick={innerClickHandler}>
-                <img src={"entities/"+entID+"/"+updatingComment.ID} alt="Image is loading" />
+                <img src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/`+entID+"/"+updatingComment.ID} alt="Image is loading" />
             </div>
         )
     } else if (updatingComment.com_type[updatingComment.com_type.length - 1] == 6) {

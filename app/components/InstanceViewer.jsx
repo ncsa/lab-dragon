@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 
 export async function getEntityName(id) {
-    let response = await fetch("/api/entities/" + id + "?name_only=true", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "?name_only=true", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -16,7 +16,7 @@ export async function getEntityName(id) {
 }
 
 export async function getStoredParams(id) {
-    let response = await fetch("/api/entities/" + id + "/stored_params", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "/stored_params", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -124,7 +124,7 @@ export default function InstanceViewer({ entity }) {
                                     }} />
                             </div>
                             {imagesToggleArray[index] &&
-                                <img src={"/api/properties/image/" + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                                <img src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/` + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
                             }
                         </div>
                     )

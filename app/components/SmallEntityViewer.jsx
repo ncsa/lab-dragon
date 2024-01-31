@@ -6,7 +6,7 @@ import CommentCreator from './CommentCreator';
 
 export async function getInfo(id) {
     /// gets the number of children and rank
-    let response = await fetch("/api/entities/" + id + "/info", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "/info", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -17,7 +17,7 @@ export async function getInfo(id) {
 }
 
 export async function getTree(id) {
-    let response = await fetch("/api/entities/" + id + "/tree", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "/tree", {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -28,7 +28,7 @@ export async function getTree(id) {
 }
 
 export async function getComments(id) {
-    let response = await fetch("/api/entities/" + id, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
         cache: 'no-store'
     })
     if (!response.ok) {
@@ -43,7 +43,7 @@ export async function getComments(id) {
 }
 
 export async function toogleBookmark(id) {
-    let response = await fetch("/api/entities/" + id + "/toggle_bookmark", {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "/toggle_bookmark", {
         method: 'POST',
         cache: 'no-store'
     })

@@ -6,7 +6,7 @@ import InstanceViewer from "@/app/components/InstanceViewer";
 
 
 export async function getEntity(id, only_name = false) {
-    let response = await fetch("/api/entities/" + id, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
         cache: 'no-store'
     })
 
