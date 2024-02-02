@@ -1,9 +1,9 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import EntityViewer from "@/app/components/EntityViewer";
 import CommentCreator from "@/app/components/CommentCreator";
 import InstanceViewer from "@/app/components/InstanceViewer";
-
+import {CreationPopupContext} from "@/app/contexts/CreationPopupContext";
 
 export async function getEntity(id, only_name = false) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
@@ -25,6 +25,7 @@ export default function Entities( {params} ) {
     const [entity, setEntity] = useState(null);
     const [children, setChildren] = useState(null);
     const [shouldReloadChildren, setShouldReloadChildren] = useState(false);
+    const { setParent, parentsOptions } = useContext(CreationPopupContext);
 
     async function reloadEntityComments() {
         const data = await getEntity(id);
@@ -54,6 +55,13 @@ export default function Entities( {params} ) {
     useEffect(() => {
         reloadEntityChildren()
     }, [entity, shouldReloadChildren]); // using children as the dependency causes infinite loop
+
+    // sets the current default option for newly created entities to this page
+    useEffect(() => {
+        if (parentsOptions && parentsOptions.hasOwnProperty(id)) {
+            setParent(id);
+        }
+    }, [parentsOptions])
 
     if (!entity) {
         return <div><h1>Loading...</h1></div>;
