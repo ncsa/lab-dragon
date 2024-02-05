@@ -16,3 +16,4 @@ param
 setuptools
 flask-cors
 connexion[swagger-ui]
+qcodes

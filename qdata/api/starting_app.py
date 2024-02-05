@@ -1,8 +1,14 @@
 import os
+from pathlib import Path
+
 import connexion
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 
+from qdata.scripts.env_creator import create_test_env_with_msmts
+
+if os.getenv('CREATE_TESTING_ENVIRONMENT') == 'True':
+    create_test_env_with_msmts(tmp_path=Path(os.getenv("NOTEBOOK_ROOT")).parent)
 
 app = connexion.App(__name__, specification_dir='./')
 app.add_middleware(
