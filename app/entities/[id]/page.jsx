@@ -11,9 +11,9 @@ export default function Entities( {params} ) {
     const [entity, setEntity] = useState(null);
     const [children, setChildren] = useState(null);
     const [shouldReloadChildren, setShouldReloadChildren] = useState(false);
-    const { setParent, parentsOptions } = useContext(CreationPopupContext);
+    const { setParent, parentsOptions, updatingID, setUpdatingID } = useContext(CreationPopupContext);
 
-    async function reloadEntityComments() {
+    async function reloadEntity() {
         const updatedEntity = await getEntity(id);
         setEntity(updatedEntity);
         setShouldReloadChildren(true); 
@@ -33,7 +33,7 @@ export default function Entities( {params} ) {
     }
 
     useEffect(() => {
-        reloadEntityComments();
+        reloadEntity();
     }, [id]);
 
     useEffect(() => {
@@ -46,6 +46,13 @@ export default function Entities( {params} ) {
             setParent(id);
         }
     }, [parentsOptions])
+
+    useEffect(() => {
+        if (entity && updatingID === entity.ID) {
+            reloadEntity();
+            setUpdatingID("");
+        }
+    }, [entity, updatingID])
 
     if (!entity) {
         return <div><h1>Loading...</h1></div>;
@@ -63,7 +70,7 @@ export default function Entities( {params} ) {
                 <EntityViewer entity={entity} displayChildren={children}/>
             </div>
             <div className="addition-section">
-                <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadEntityComments}/>
+                <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadEntity}/>
             </div>
         </div>
     )

@@ -3,8 +3,9 @@ import {useContext, useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
-import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 import { sortAndFilterChildren, fetchChildrenOfChildren} from './utils';
+
+import { BookmarkContext } from '@/app/contexts/BookmarkContext';
 
 export async function getEntityName(id) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "?name_only=true", {
@@ -23,10 +24,10 @@ export default function EntityViewer({ entity, displayChildren }) {
     const [selectedComment, setSelectedComment] = useState(null);
     const [activatedComment, setActivatedComment] = useState(null);
     const [isHovered, setIsHovered] = useState(null);
-    const { onlyShowBookmarked } = useContext(BookmarkContext);
     const [childrenAndComments, setChildrenAndComments] = useState([]);
     const [grandChildren, setGrandChildren] = useState({});
 
+    const { onlyShowBookmarked } = useContext(BookmarkContext);
 
     const handleCommentClick = (id) => {
         setSelectedComment(id);

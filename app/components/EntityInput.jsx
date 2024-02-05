@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
@@ -23,6 +23,7 @@ export default function EntityInput( {populateSideBar} ) {
     const { user, setUser } = useContext(CreationPopupContext);
     const { type, setType } = useContext(CreationPopupContext);
     const { parent, setParent } = useContext(CreationPopupContext);
+    const { setUpdatingID } = useContext(CreationPopupContext);
     const [isLoading, setIsLoading] = useState(false);
 
     const { isPopupOpen, setIsPopupOpen } = useContext(CreationPopupContext);
@@ -51,7 +52,7 @@ export default function EntityInput( {populateSideBar} ) {
 
         if (response.status === 201) {
             populateSideBar();
-            router.refresh();
+            setUpdatingID(parent)
             closeFunction();
         } else if (response.status === 400) {
             response.text().then(text => alert(`Something went wrong: ${JSON.parse(text)['detail']}`));
