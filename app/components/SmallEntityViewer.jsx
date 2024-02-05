@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import Comment from './Comment';
 import CommentCreator from './CommentCreator';
-
+import { BookmarkContext } from '@/app/contexts/BookmarkContext';
+import { sortAndFilterChildren, fetchChildrenOfChildren } from './utils';
 
 export async function getInfo(id) {
     /// gets the number of children and rank
@@ -56,6 +57,7 @@ export async function toogleBookmark(id) {
 
 
 export default function SmallEntityViewer({entity,
+                                           children_,
                                            onClickHandler,
                                            selectedComment,
                                            onDoubleClickHandler,
@@ -73,6 +75,12 @@ export default function SmallEntityViewer({entity,
     const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 });
     const [comments, setComments] = useState(entity.comments);
     const [isBookmarked, setIsBookmarked] = useState(entity.bookmarked);
+    const loadedChildren = children_;
+
+    const { onlyShowBookmarked } = useContext(BookmarkContext);
+
+    const childrenAndComments = useRef([]);
+    const grandChildren = useRef({});
 
     const handleMouseEnter = (event) => {
         setShowTree(true);
@@ -98,6 +106,20 @@ export default function SmallEntityViewer({entity,
             
         });
     }
+
+    useEffect(() => {
+        const sortedAndFiltered = sortAndFilterChildren(entity, loadedChildren, onlyShowBookmarked);
+        childrenAndComments.current = sortedAndFiltered;
+    }, [entity, loadedChildren, onlyShowBookmarked]);
+
+    useEffect(() => {
+        if (loadedChildren) {
+            fetchChildrenOfChildren(loadedChildren).then(data => {
+                grandChildren.current = data;
+            })
+        }
+    }, [loadedChildren]);
+
 
     useEffect(() => {
         getInfo(entity.ID).then(data => {
@@ -154,20 +176,34 @@ export default function SmallEntityViewer({entity,
                     <i className="bi bi-plus-circle" />
                 </button>
             </div>
-            { Object.keys(comments).map((key) => {
-                return (<Comment key={comments[key].ID} 
-                    comment={comments[key]} 
-                    entID={entity.ID}
-                    onClickHandler={onClickHandler}
-                    isSelected={selectedComment == comments[key].ID}
-                    onDoubleClickHandler={onDoubleClickHandler}
-                    isActivated={activatedComment == comments[key].ID}
-                    deactivateAllComments={deactivateAllComments}
-                    isHovered={isHovered == comments[key].ID}
-                    onHoverHandler={onHoverHandler}
-                    OnHoverLeaveHandler={OnHoverLeaveHandler}
-                    entType={entity.type} />)
-            })}
+            {
+                childrenAndComments.current.map(item => {
+                    return item.obj.com_type ? <Comment key={item.obj.ID}
+                        comment={item.obj}
+                        entID={entity.ID} 
+                        isSelected={selectedComment === item.obj.ID}
+                        onClickHandler={onClickHandler}
+                        isActivated={activatedComment === item.obj.ID}
+                        onDoubleClickHandler={onDoubleClickHandler}
+                        deactivateAllComments={deactivateAllComments}
+                        isHovered={isHovered == item.obj.ID}
+                        onHoverHandler={onHoverHandler}
+                        OnHoverLeaveHandler={OnHoverLeaveHandler}
+                        onlyComment={entity.type === "Step" ? true : false} /> : 
+                            
+                            <SmallEntityViewer key={item.obj.ID}
+                                entity={item.obj}
+                                children_={grandChildren.current[item.obj.ID] ? grandChildren.current[item.obj.ID] : []}
+                                onClickHandler={onClickHandler}
+                                selectedComment={selectedComment}
+                                onDoubleClickHandler={onDoubleClickHandler}
+                                activatedComment={activatedComment}
+                                deactivateAllComments={deactivateAllComments} 
+                                isHovered={isHovered}
+                                onHoverHandler={onHoverHandler}
+                                OnHoverLeaveHandler={OnHoverLeaveHandler}/>
+                })
+            }
 
             {activatedComment == entity.ID && 
             <div>
