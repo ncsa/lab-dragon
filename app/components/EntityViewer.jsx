@@ -24,9 +24,9 @@ export default function EntityViewer({ entity, displayChildren }) {
     const [activatedComment, setActivatedComment] = useState(null);
     const [isHovered, setIsHovered] = useState(null);
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-    
-    const childrenAndComments = useRef([]);
-    const grandChildren = useRef({});
+    const [childrenAndComments, setChildrenAndComments] = useState([]);
+    const [grandChildren, setGrandChildren] = useState({});
+
 
     const handleCommentClick = (id) => {
         setSelectedComment(id);
@@ -63,17 +63,13 @@ export default function EntityViewer({ entity, displayChildren }) {
 
     useEffect(() => {
         const sortedAndFiltered = sortAndFilterChildren(entity, displayChildren, onlyShowBookmarked);
-        childrenAndComments.current = sortedAndFiltered;
+        setChildrenAndComments(sortedAndFiltered);
     }, [entity, displayChildren, onlyShowBookmarked]);
-
-    // useEffect(() => {
-    //     sortAndFilterChildren(entity, displayChildren, onlyShowBookmarked);
-    // }, [onlyShowBookmarked]);
 
     useEffect(() => {
         if (displayChildren) {
              fetchChildrenOfChildren(displayChildren).then(data => {
-                grandChildren.current = data;
+                setGrandChildren(data);
              });
         }
     }, [displayChildren]);
@@ -104,7 +100,7 @@ export default function EntityViewer({ entity, displayChildren }) {
 
                         />)
 
-                    }) : childrenAndComments.current.map(item => {
+                    }) : childrenAndComments.map(item => {
                         return item.obj.com_type ? <Comment key={item.obj.ID}
                             comment={item.obj}
                             entID={entity.ID} 
@@ -120,7 +116,7 @@ export default function EntityViewer({ entity, displayChildren }) {
                                 
                                 <SmallEntityViewer key={item.obj.ID}
                                     entity={item.obj}
-                                    children_={grandChildren.current[item.obj.ID] ? grandChildren.current[item.obj.ID] : []}
+                                    children_={grandChildren[item.obj.ID] ? grandChildren[item.obj.ID] : []}
                                     onClickHandler={handleCommentClick}
                                     selectedComment={selectedComment}
                                     onDoubleClickHandler={handleCommentDoubleClick}

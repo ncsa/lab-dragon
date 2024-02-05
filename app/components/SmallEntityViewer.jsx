@@ -75,12 +75,13 @@ export default function SmallEntityViewer({entity,
     const [hintPosition, setHintPosition] = useState({ x: 0, y: 0 });
     const [comments, setComments] = useState(entity.comments);
     const [isBookmarked, setIsBookmarked] = useState(entity.bookmarked);
-    const loadedChildren = children_;
+    const [loadedChildren, setLoadedChildren] = useState(children_);
+    const [childrenAndComments, setChildrenAndComments] = useState([]);
+    const [grandChildren, setGrandChildren] = useState({});                                        
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-
-    const childrenAndComments = useRef([]);
-    const grandChildren = useRef({});
 
     const handleMouseEnter = (event) => {
         setShowTree(true);
@@ -109,16 +110,21 @@ export default function SmallEntityViewer({entity,
 
     useEffect(() => {
         const sortedAndFiltered = sortAndFilterChildren(entity, loadedChildren, onlyShowBookmarked);
-        childrenAndComments.current = sortedAndFiltered;
+        setChildrenAndComments(sortedAndFiltered);
     }, [entity, loadedChildren, onlyShowBookmarked]);
 
     useEffect(() => {
-        if (loadedChildren) {
-            fetchChildrenOfChildren(loadedChildren).then(data => {
-                grandChildren.current = data;
-            })
-        }
-    }, [loadedChildren]);
+        setLoadedChildren(children_);
+        // Since we're updating loadedChildren, we need to fetch new grandChildren as well
+        setIsLoading(true);
+        fetchChildrenOfChildren(children_).then(data => {
+            setGrandChildren(data);
+            setIsLoading(false);
+        }).catch(error => {
+            console.error("Failed to fetch children of children:", error);
+            setIsLoading(false);
+        });
+    }, [children_]);// Make sure to include any other dependencies here if necessary
 
 
     useEffect(() => {
@@ -143,6 +149,10 @@ export default function SmallEntityViewer({entity,
         icon = "bi bi-clipboard"
     } else if (EntType === "Step") {
         icon = "bi bi-circle"
+    }
+
+    if (isLoading) {
+        return <div>Loading...</div>
     }
 
     return (
@@ -177,7 +187,7 @@ export default function SmallEntityViewer({entity,
                 </button>
             </div>
             {
-                childrenAndComments.current.map(item => {
+                childrenAndComments.map(item => {
                     return item.obj.com_type ? <Comment key={item.obj.ID}
                         comment={item.obj}
                         entID={entity.ID} 
@@ -193,7 +203,7 @@ export default function SmallEntityViewer({entity,
                             
                             <SmallEntityViewer key={item.obj.ID}
                                 entity={item.obj}
-                                children_={grandChildren.current[item.obj.ID] ? grandChildren.current[item.obj.ID] : []}
+                                children_={grandChildren[item.obj.ID] ? grandChildren[item.obj.ID] : []}
                                 onClickHandler={onClickHandler}
                                 selectedComment={selectedComment}
                                 onDoubleClickHandler={onDoubleClickHandler}
