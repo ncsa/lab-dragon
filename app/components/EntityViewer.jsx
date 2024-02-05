@@ -1,10 +1,10 @@
 "use client"
-import { useState, useEffect, useContext, useRef } from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
-
+import { sortAndFilterChildren, fetchChildrenOfChildren} from './utils';
 
 export async function getEntityName(id) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "?name_only=true", {
@@ -20,27 +20,13 @@ export async function getEntityName(id) {
 export default function EntityViewer({ entity, displayChildren }) {
     // we get the ID, not the name of the parent entity.
     const [parentName, setParentName] = useState(null);
-    const [childrenNames, setChildrenNames] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
     const [activatedComment, setActivatedComment] = useState(null);
     const [isHovered, setIsHovered] = useState(null);
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-    
-    const childrenAndComments = useRef([]);
+    const [childrenAndComments, setChildrenAndComments] = useState([]);
+    const [grandChildren, setGrandChildren] = useState({});
 
-    useEffect(() => {
-        if (entity.parent) {
-            getEntityName(entity.parent).then(data => {
-                setParentName(data);
-            });
-        }
-
-        if (entity.children) {
-            Promise.all(entity.children.map(child => getEntityName(child))).then(data => {
-                setChildrenNames(data);
-            });
-        }
-    }, [entity.parent, entity.children]);
 
     const handleCommentClick = (id) => {
         setSelectedComment(id);
@@ -66,31 +52,27 @@ export default function EntityViewer({ entity, displayChildren }) {
         setIsHovered(null);
     }
 
-    const sortAndFilterChildren = () => {
-        let combinedArray = null;
-        if (entity !== null && displayChildren !== null) {
-            combinedArray = [...entity.comments, ...displayChildren];
-            combinedArray.sort((a, b) => {
-                const timeA = a.created ? new Date(a.created) : new Date(a.start_time);
-                const timeB = b.created ? new Date(b.created) : new Date(b.start_time);
-                return timeA - timeB;
+    useEffect(() => {
+        if (entity.parent) {
+            getEntityName(entity.parent).then(data => {
+                setParentName(data);
             });
-            
-            if (onlyShowBookmarked) {
-                combinedArray = combinedArray.filter(item => item.com_type || item.bookmarked);
-            }
-        
-            childrenAndComments.current = combinedArray.map((item, index) => {
-                return {index: index, obj: item}
-            });
-
         }
-    }
-    sortAndFilterChildren();
+
+    }, [entity.parent, entity.children]);
 
     useEffect(() => {
-        sortAndFilterChildren();
-    }, [onlyShowBookmarked]);
+        const sortedAndFiltered = sortAndFilterChildren(entity, displayChildren, onlyShowBookmarked);
+        setChildrenAndComments(sortedAndFiltered);
+    }, [entity, displayChildren, onlyShowBookmarked]);
+
+    useEffect(() => {
+        if (displayChildren) {
+             fetchChildrenOfChildren(displayChildren).then(data => {
+                setGrandChildren(data);
+             });
+        }
+    }, [displayChildren]);
 
     return (
         <div>
@@ -101,7 +83,6 @@ export default function EntityViewer({ entity, displayChildren }) {
                 <p><b>Type</b>: {entity.type}</p>
                 <p><b>User</b>: {entity.user}</p>
             </h2>
-
             <div className="Content">
                 {
                     childrenAndComments.current === null ?  Object.keys(entity.comments).map((key) => {
@@ -119,8 +100,9 @@ export default function EntityViewer({ entity, displayChildren }) {
 
                         />)
 
-                    }) : childrenAndComments.current.map(item => {
-                        return item.obj.com_type ? <Comment comment={item.obj} 
+                    }) : childrenAndComments.map(item => {
+                        return item.obj.com_type ? <Comment key={item.obj.ID}
+                            comment={item.obj}
                             entID={entity.ID} 
                             isSelected={selectedComment === item.obj.ID}
                             onClickHandler={handleCommentClick}
@@ -132,7 +114,9 @@ export default function EntityViewer({ entity, displayChildren }) {
                             OnHoverLeaveHandler={handleOnHoverLeave}
                             onlyComment={entity.type === "Step" ? true : false} /> : 
                                 
-                                <SmallEntityViewer entity={item.obj} 
+                                <SmallEntityViewer key={item.obj.ID}
+                                    entity={item.obj}
+                                    children_={grandChildren[item.obj.ID] ? grandChildren[item.obj.ID] : []}
                                     onClickHandler={handleCommentClick}
                                     selectedComment={selectedComment}
                                     onDoubleClickHandler={handleCommentDoubleClick}
