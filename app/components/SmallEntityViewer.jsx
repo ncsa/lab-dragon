@@ -96,7 +96,7 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
                         {bookmarked ? <i className="bookmark filled bi bi-bookmark-fill"/> : <i className="bookmark empty bi bi-bookmark"/>}
                     </button>
                 </h3>
-                <button className="add-comment-button" onClick={() => {}}>
+                <button className="add-comment-button" onClick={() => {setActivatedCommentOrChildID(entity.ID)}}>
                     <i className="bi bi-plus-circle" />
                 </button>
             </div>
