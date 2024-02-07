@@ -28,6 +28,9 @@ export default function CreationPopupProvider({ children }) {
     // Variable holding the ID of the entity that needs to update
     const [updatingID, setUpdatingID] = useState("");
 
+    // Holds the root entity for the logo to find the correct URL
+    const [rootEntity, setRootEntity] = useState({"ID": ""});
+
     async function getUsers() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/users`);
         return await response.json();
@@ -101,6 +104,8 @@ export default function CreationPopupProvider({ children }) {
         setParentsOptions,
         updatingID,
         setUpdatingID,
+        rootEntity,
+        setRootEntity
     };
 
     return (
