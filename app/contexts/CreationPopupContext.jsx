@@ -25,6 +25,9 @@ export default function CreationPopupProvider({ children }) {
     const [type, setType] = useState("");
     const [parent, setParent] = useState("");
 
+    // Variable holding the ID of the entity that needs to update
+    const [updatingID, setUpdatingID] = useState("");
+
     async function getUsers() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/users`);
         return await response.json();
@@ -58,7 +61,7 @@ export default function CreationPopupProvider({ children }) {
         getParents().then(data => {
             setParentsOptions(JSON.parse(data));
         });
-    }, []);
+    }, [updatingID]);
 
 
     useEffect(() => {
@@ -96,6 +99,8 @@ export default function CreationPopupProvider({ children }) {
         setParent,
         parentsOptions,
         setParentsOptions,
+        updatingID,
+        setUpdatingID,
     };
 
     return (

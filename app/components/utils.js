@@ -30,22 +30,18 @@ export async function getEntity(id, only_name = false) {
     return parsedEnt
 }
 
-// Accepts a list of children, goes through it and fetches the details of each grandchild.
-// Returns a list where the key are the children and the values are a list of all of the grandchildren.
-export async function fetchChildrenOfChildren(children) {
-    let childrenDict = {};
-    for (let child of children) { // Iterate through the passed children argument
-        if (!child.children || child.children.length === 0) {
-            childrenDict[child.ID] = null;
-            continue;
-        }
-        
-        let grandChildren = [];
-        for (let grandChild of child.children) {
-            const grandChildDetails = await getEntity(grandChild);
-            grandChildren.push(grandChildDetails);
-        }
-        childrenDict[child.ID] = grandChildren;
+// Function to get all the comments from an entity.
+export async function getComments(id) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
     }
-    return childrenDict;
+
+    const ent = await response.json()
+    const parsedEnt = JSON.parse(ent)
+    const parsedComments = parsedEnt.comments.map(comment => JSON.parse(comment))
+
+    return parsedComments
 }

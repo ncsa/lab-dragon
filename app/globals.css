@@ -21,9 +21,11 @@
 
     --small-entity-background-color: #393B40;
     --small-entity-tittle-color: white;
+    --small-entity-tittle-button-hover-color: rgb(215, 215, 215);
     --comment-text-color: white;
 
     --comment-creator-color: white;
+    --comment-hover: cornflowerblue;
 
     --tiptap-border-color: white;
     --tiptap-font-color: white;
@@ -401,6 +403,15 @@ select {
 .small-entity .small-entity-tittle button:hover{
     background-color: none;
     box-shadow: none;
+    transform: scale(0.90);
+}
+
+.small-entity .small-entity-tittle button:active{
+    transform: scale(0.80);
+}
+
+.small-entity .small-entity-tittle i:active{
+    color: var(--button-main-color)
 }
 
 
@@ -424,9 +435,7 @@ select {
 }
 
 .comment:hover{
-    padding: 15px;
-    border: 2px solid black;
-    padding-bottom: 20px;
+    border: 1px solid var(--comment-hover);
     z-index: 6;
     
 }
