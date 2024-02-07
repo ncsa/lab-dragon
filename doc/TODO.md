@@ -7,6 +7,7 @@ The following is simply a place to quickly write down known issues as well as ne
 
 # Known Issues
 
+- Projects don't have time stamps. This is a problem that needs to be fixed quickly.
 - If the notebook cannot find some path reference, there should be some way of handling instead of just crashing.
 - comments should be refactored to remove comment types
 - I need to add comments in convertes to specify what each section of the code is doing. 

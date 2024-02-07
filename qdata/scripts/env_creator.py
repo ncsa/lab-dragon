@@ -1,9 +1,22 @@
+import copy
+import string
+import shutil
+import random
 from pathlib import Path
 from typing import Union, Optional
 
+import numpy as np
+from jinja2 import Environment, FileSystemLoader
+
+# Tools from pfafflab
+from labcore.measurement.sweep import sweep_parameter
+from labcore.measurement.record import record_as
+from labcore.measurement.storage import run_and_save_sweep
+
 from qdata.components.table import Table
-from qdata.generators.meta import generate_all_classes
-from qdata.generators.jupyterbook import generate_book
+from qdata.generators.meta import read_from_TOML
+from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
+from qdata.generators.meta import generate_all_classes, delete_all_modules
 
 
 def delete_directory_contents(directory_path, light_delete=False):
@@ -36,7 +49,7 @@ def delete_directory_contents(directory_path, light_delete=False):
 
 
 # TODO: When we have a better plan for how to handle the instance object, add the images into the instance object.
-def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: bool = True, light_delete=False) -> None:
+def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md: bool = True, light_delete=False) -> None:
     """
     Creates a standard notebook used for testing in the target path.
 
@@ -55,6 +68,8 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
 
     generate_all_classes()
     to_be_created = []
+
+    env_creator_path = Path(__file__)
 
     from qdata.generators.display import generate_md
     from qdata.modules.project import Project
@@ -124,9 +139,10 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
                              user='testUser2',
                              parent=get_panda_path, )
     found_pandas_path = Path(path, "Found Pandas.toml").resolve()
-    found_pandas_step.add_comment("Here is the first panda I found online: ![giant_panda](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/Giant_panda.jpg) \n\n This one is really big!")
-    found_pandas_step.add_comment("Here are some other ones: ![baby_pandas](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/baby_pandas.png) \n\n These ones are really cute!")
-    found_pandas_step.add_comment("Here is another one: ![panda_eating](/Users/marcosf2/Documents/github/qdata-mockup/test/testing_images/pandas/panda_eating.png) \n\n omg look at this one eat")
+    found_pandas_step.add_comment(f"Here is the first panda I found online: ![giant_panda]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'pandas' ,'Giant_panda.jpg')}) \n\n This one is really big!")
+    found_pandas_step.add_comment(f"Here are some other ones: ![baby_pandas]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'pandas', 'baby_pandas.png')}) \n\n These ones are really cute!")
+    found_pandas_step.add_comment(f"Here is another one: ![panda_eating]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'pandas', 'panda_eating.png')}) \n\n omg look at this one eat")
+
     to_be_created.append((found_pandas_step, found_pandas_path))
 
     get_panda_task.add_child(found_pandas_path)
@@ -217,11 +233,79 @@ def create_full_test_env(target: Optional[Union[Path, str]] = None, create_md: b
     path.joinpath("resource").mkdir(exist_ok=True)
 
 
+# FIXME: What exactly does the request param do?
+def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
+
+    if hasattr(request, 'param'):
+        tmp_path = request.param
+    if tmp_path.is_dir() and generate_each_run:
+        shutil.rmtree(tmp_path)
+        tmp_path.mkdir()
+
+    folder_path = tmp_path.joinpath('data')
+    if folder_path.is_dir():
+        return None
+
+    script_path = Path(__file__)
+
+    msmt_names = ["test_through",
+                  "pulsed_resonator_spec",
+                  "qA_power_rabi",
+                  "qB_power_rabi",
+                  "qA_T1",
+                  "qB_T1",
+                  "qA_T2_echo",
+                  "qB_T2_echo",
+                  "ssb_spec_pi",
+                  "no_star",
+                  ]
+
+    images = [f"monkeys/monkey-{i}.png" for i in range(1, 14)]
+
+    inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x * 2, 'z'))
+    outer_sweep = sweep_parameter('y', np.linspace(0, 10))
+
+    my_sweep = outer_sweep @ inner_sweep
+
+    env = Environment(loader=FileSystemLoader(script_path.parent.parent.parent.joinpath("test", "testing_templates")),
+                      extensions=['jinja2.ext.do'], )
+    template = env.get_template('jupyter_notebook.jinja')
+
+    folder_path.mkdir()
+
+    image_copy = copy.deepcopy(images)
+    for name in msmt_names:
+        for i in range(n_measurements):
+            test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j
+                           in range(1, 11)}
+            path, data = run_and_save_sweep(sweep=my_sweep,
+                                            data_dir=folder_path,
+                                            name=name, test_parameters=test_params)
+
+            image = random.choice(image_copy)
+            shutil.copy(script_path.parent.parent.parent.joinpath('test', 'testing_images', image), path)
+            image_copy.pop(image_copy.index(image))
+            if i == 0 and name != 'no_star':
+                star_path = path.joinpath('__star__.tag')
+                star_path.touch()
+            with open(path.joinpath('jupyter_notebook.ipynb'), 'w') as f:
+                f.write(template.render(data=data))
+
+    add_toml_to_data(folder_path)
+    create_simple_test_env(tmp_path, create_md=False, light_delete=True)
+    ent_path = tmp_path.joinpath('Testing Pandas.toml')
+    ent = read_from_TOML(ent_path)
+
+    bucket_path = tmp_path.joinpath('data/Measurements.toml')
+    ent.data_buckets.append(str(bucket_path))
+    ent.to_TOML(ent_path)
+
+
 if __name__ == "__main__":
 
     new_notebook_location = Path(r"/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator")
     jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
     jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 
-    create_full_test_env(target=new_notebook_location, create_md=False)
+    create_simple_test_env(target=new_notebook_location, create_md=False)
     # generate_book(jupyter_book_root_path, jupyter_book_target_path)

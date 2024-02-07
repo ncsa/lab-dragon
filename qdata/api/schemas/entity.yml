@@ -9,6 +9,7 @@ schemas:
           type: "string"
         parent:
           type: "string"
+        deleted:
         description:
           type: "string"
         comments:

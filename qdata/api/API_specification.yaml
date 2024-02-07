@@ -88,6 +88,17 @@ components:
           type: "boolean"
 
 paths:
+
+  /reset:
+    post:
+      operationId: "qdata.api.entities.reset"
+      tags:
+        - Reset
+      summary: "Resets the notebook to its initial state"
+      responses:
+        "200":
+          description: "Successfully reset notebook"
+
   /entities:
     get:
       operationId: "qdata.api.entities.read_all"

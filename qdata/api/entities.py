@@ -29,16 +29,18 @@ from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
-ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+ROOTPATH = Path()
 
-RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+ROOTPATH = Path()
+
+RESOURCEPATH = Path()
 
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
-PARENT_TYPES = ["Project", "Task"]
-ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+PARENT_TYPES = []
+ALL_TYPES = {}
 # Holds all of the entity types that exists in the notebook
-ENTITY_TYPES = set(("Project", "Task", "Step"))
+ENTITY_TYPES = set()
 
 INDEX = {}
 
@@ -54,13 +56,58 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS = set(os.getenv("USERS").split(','))
+USERS = set()
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
 markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
+
+
+def set_initial_indices():
+    global ROOTPATH
+    global RESOURCEPATH
+    global PARENT_TYPES
+    global ALL_TYPES
+    global ENTITY_TYPES
+    global INDEX
+    global PATH_TO_UUID_INDEX
+    global UUID_TO_PATH_INDEX
+    global IMAGEINDEX
+    global INSTANCEIMAGE
+    global USERS
+
+    ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+
+    RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+
+    # List of classes that can contain children. Only Project and Task can contain children for now.
+    PARENT_TYPES = ["Project", "Task"]
+    ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+    # Holds all of the entity types that exists in the notebook
+    ENTITY_TYPES = set(("Project", "Task", "Step"))
+
+    INDEX = {}
+
+    # Holds as keys the paths to the TOML files and as values the UUID of the entity
+    PATH_TO_UUID_INDEX = {}
+    # Holds as keys the UUIDs of entities and as values the path to the TOML files
+    UUID_TO_PATH_INDEX = {}
+
+    # Holds as keys the hash of an image and as value the absolute path to that image.
+    #  This is used to check if an image already exists
+    IMAGEINDEX = {}
+
+    INSTANCEIMAGE = {}
+
+    # Holds all of the users that exists in the notebook
+    USERS = set(os.getenv("USERS").split(','))
+
+
+def reset():
+    set_initial_indices()
+    read_all()
 
 
 def get_indices():
@@ -802,4 +849,4 @@ def toggle_bookmark(ID):
     return make_response("Bookmark toggled", 201)
 
 
-read_all()
+reset()
