@@ -61,7 +61,7 @@ export default function CreationPopupProvider({ children }) {
         getParents().then(data => {
             setParentsOptions(JSON.parse(data));
         });
-    }, []);
+    }, [updatingID]);
 
 
     useEffect(() => {

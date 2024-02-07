@@ -1,11 +1,15 @@
 "use client"
-import {useContext, useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Link from 'next/link';
-import Comment from './Comment';
-import SmallEntityViewer from './SmallEntityViewer';
-import { sortAndFilterChildren, fetchChildrenOfChildren} from './utils';
 
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
+import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
+
+import Comment from './Comment';
+import SmallEntityViewer from './SmallEntityViewer';
+import { sortAndFilterChildren, getEntity, getComments } from './utils';
+import CommentCreator from "@/app/components/CommentCreator";
+
 
 export async function getEntityName(id) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id + "?name_only=true", {
@@ -18,41 +22,33 @@ export async function getEntityName(id) {
     return await response.json()
 }
 
-export default function EntityViewer({ entity, displayChildren }) {
-    // we get the ID, not the name of the parent entity.
+export default function EntityViewer({ entityID }) {
+    const [entity, setEntity] = useState({"name": "Loading...", "type": "Loading...", "user": "Loading..." });
     const [parentName, setParentName] = useState(null);
-    const [selectedComment, setSelectedComment] = useState(null);
-    const [activatedComment, setActivatedComment] = useState(null);
-    const [isHovered, setIsHovered] = useState(null);
-    const [childrenAndComments, setChildrenAndComments] = useState([]);
-    const [grandChildren, setGrandChildren] = useState({});
+    const [entityChildren, setEntityChildren] = useState([{}]);
+    const [orderedChildrenAndComments, setOrderedChildrenAndComments] = useState(null); // Combined array with the comments and children that is sorted for displaying
+    // Used to track what comment or entity should be editable/comment creator on
+    const [activatedCommentOrChildID, setActivatedCommentOrChildID] = useState(null);
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
+    const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
 
-    const handleCommentClick = (id) => {
-        setSelectedComment(id);
+    const ID = entityID;
+
+    const reloadComments = () => {
+        getComments(ID).then(data => {
+            setEntity({...entity, comments: data})
+        });
     }
 
-    const handleCommentDoubleClick = (id) => {
-        setActivatedComment(id);
-    }
+    // Loads the currently shown entity
+    useEffect(() => {
+        getEntity(ID).then(data => {
+            setEntity(data);
+        });
+    }, [entityID]);
 
-    const handleOnHover = (id) => {
-        setIsHovered(id);
-    }
-
-    const deactivateAllComments = () => {
-        setActivatedComment(null);
-    }
-
-    const unselectAllComments = () => {
-        setSelectedComment(null);
-    }
-
-    const handleOnHoverLeave = (id) => {
-        setIsHovered(null);
-    }
-
+    // The parent of the entity is stored as the ID, so we need to get the name of it.
     useEffect(() => {
         if (entity.parent) {
             getEntityName(entity.parent).then(data => {
@@ -60,20 +56,36 @@ export default function EntityViewer({ entity, displayChildren }) {
             });
         }
 
-    }, [entity.parent, entity.children]);
+    }, [entity.parent]);
 
+    // Loads the children of the entity.
+    // This is done in the parent of the entity because the times are needed to order them with the comments.
     useEffect(() => {
-        const sortedAndFiltered = sortAndFilterChildren(entity, displayChildren, onlyShowBookmarked);
-        setChildrenAndComments(sortedAndFiltered);
-    }, [entity, displayChildren, onlyShowBookmarked]);
-
-    useEffect(() => {
-        if (displayChildren) {
-             fetchChildrenOfChildren(displayChildren).then(data => {
-                setGrandChildren(data);
-             });
+        if (entity.children) {
+            Promise.all(entity.children.map(childId => getEntity(childId)))
+                .then(childEntities => {
+                    setEntityChildren(childEntities);
+                });
         }
-    }, [displayChildren]);
+    }, [entity.children]);
+
+    // Sorts and filters the comments and children entities by time and bookmark status.
+    useEffect(() => {
+        if (entity && entityChildren && entity.comments) {
+            const sortedAndFiltered = sortAndFilterChildren(entity, entityChildren, onlyShowBookmarked);
+            setOrderedChildrenAndComments(sortedAndFiltered);
+        }
+    }, [entity, entityChildren, onlyShowBookmarked]);
+
+    // Checks if this is the entity that needs an update for new children.
+    useEffect(() => {
+        if (entity && updatingID === entity.ID) {
+            getEntity(entity.ID).then(data => {
+                setEntity(data);
+            });
+            setUpdatingID("");
+        }
+    }, [entity, updatingID, setUpdatingID])
 
     return (
         <div>
@@ -86,49 +98,16 @@ export default function EntityViewer({ entity, displayChildren }) {
             </h2>
             <div className="Content">
                 {
-                    childrenAndComments.current === null ?  Object.keys(entity.comments).map((key) => {
-                        return (<Comment key={entity.comments[key].ID} 
-                            comment={entity.comments[key]}
-                            entID={entity.ID}
-                            isSelected={selectedComment == entity.comments[key].ID}
-                            onClickHandler={handleCommentClick}
-                            isActivated={activatedComment == entity.comments[key].ID}
-                            onDoubleClickHandler={handleCommentDoubleClick}
-                            isHovered={isHovered == entity.comments[key].ID}
-                            onHoverHandler={handleOnHover}
-                            OnHoverLeaveHandler={handleOnHoverLeave}
-                            onlyComment={entity.type === "Step" ? true : false}
-
-                        />)
-
-                    }) : childrenAndComments.map(item => {
-                        return item.obj.com_type ? <Comment key={item.obj.ID}
-                            comment={item.obj}
-                            entID={entity.ID} 
-                            isSelected={selectedComment === item.obj.ID}
-                            onClickHandler={handleCommentClick}
-                            isActivated={activatedComment === item.obj.ID}
-                            onDoubleClickHandler={handleCommentDoubleClick}
-                            deactivateAllComments={deactivateAllComments}
-                            isHovered={isHovered == item.obj.ID}
-                            onHoverHandler={handleOnHover}
-                            OnHoverLeaveHandler={handleOnHoverLeave}
-                            onlyComment={entity.type === "Step" ? true : false} /> : 
-                                
-                                <SmallEntityViewer key={item.obj.ID}
-                                    entity={item.obj}
-                                    children_={grandChildren[item.obj.ID] ? grandChildren[item.obj.ID] : []}
-                                    onClickHandler={handleCommentClick}
-                                    selectedComment={selectedComment}
-                                    onDoubleClickHandler={handleCommentDoubleClick}
-                                    activatedComment={activatedComment}
-                                    deactivateAllComments={deactivateAllComments} 
-                                    isHovered={isHovered}
-                                    onHoverHandler={handleOnHover}
-                                    OnHoverLeaveHandler={handleOnHoverLeave}/>
-                    })
-
+                    orderedChildrenAndComments && orderedChildrenAndComments.length > 0 &&
+                    orderedChildrenAndComments.map(item => (
+                        item.obj.com_type ? 
+                            <Comment key={`comment-${item.obj.ID}`} entID={entity.ID} com={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/> :
+                            <SmallEntityViewer key={`entity-${item.obj.ID}`} ent={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/>
+                    ))
                 }
+            </div>
+            <div className="addition-section">
+                <CommentCreator className="comment-creator" entID={ID} reloader={reloadComments} />
             </div>
         </div>
     )

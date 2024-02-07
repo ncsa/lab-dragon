@@ -25,6 +25,7 @@ export default function TopBanner() {
             <div className="user-selection">
                 <label htmlFor="user-select">Selected User:</label>
                 <select
+                    id="user-select"
                     onChange={(e) => setUser(e.target.value)}
                     value={user}>
                     {
@@ -34,8 +35,8 @@ export default function TopBanner() {
                 </select>
             </div>
                 <div className="bookmark-toggle">
-                    <label>Only Bookmarked</label>
-                    <button onClick={handleBookmarkToggle}>
+                    <label htmlFor="bookmark-toggle">Only Bookmarked</label>
+                    <button onClick={handleBookmarkToggle} id="bookmark-toggle">
                             {onlyShowBookmarked ? <i className="bookmark-toggle bi bi-toggle-on" /> : <i className="bookmark-toggle bi bi-toggle-off" />}
                     </button>
                 </div>
