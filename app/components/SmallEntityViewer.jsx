@@ -21,6 +21,19 @@ export async function toggleBookmark(id) {
     return response;
 }
 
+export async function deleteEntity(id) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
+        method: 'DELETE',
+        cache: 'no-store'
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+
+    return response;
+}
+
+
 export default function SmallEntityViewer({ent, activatedCommentOrChildID, setActivatedCommentOrChildID}) {
 
     const [entity, setEntity] = useState(ent);
@@ -86,9 +99,9 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
             <div className={`type-indicator ${entity.type}`}></div>
             <div className='small-entity-tittle'>
                 <h3>
-                    <i className={icon}/>
+                    <i className={icon} title={`${entity.type}`}/>
                     <Link className={"Link-text"} href={`${entity.ID}`}>{entity.name}</Link>
-                    <button className="bookmark-button" onClick={() => {toggleBookmark(entity.ID).then(data => {
+                    <button className="bookmark-button" title={`Toggle book mark for "${entity.name}"`} onClick={() => {toggleBookmark(entity.ID).then(data => {
                         entity.bookmarked = !bookmarked;
                         setBookmarked(!bookmarked);
 
@@ -96,9 +109,20 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
                         {bookmarked ? <i className="bookmark filled bi bi-bookmark-fill"/> : <i className="bookmark empty bi bi-bookmark"/>}
                     </button>
                 </h3>
-                <button className="add-comment-button" onClick={() => {setActivatedCommentOrChildID(entity.ID)}}>
-                    <i className="bi bi-plus-circle" />
-                </button>
+                <div className="extra-actions">
+                    <button className="delete-button" title={`Delete "${entity.name}"`} onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this entity?")) {
+                                deleteEntity(entity.ID).then(data => {
+                                    setUpdatingID(entity.parent);
+                                });
+                            }
+                        }}>
+                        <i className="bi bi-x-circle" />
+                    </button>
+                    <button className="add-comment-button" title={`Add a comment to "${entity.name}" \n (look at the opened textbox below)`} onClick={() => {setActivatedCommentOrChildID(entity.ID)}}>
+                        <i className="bi bi-plus-circle" />
+                    </button>
+                </div>
             </div>
             {
                 orderedChildrenAndComments && orderedChildrenAndComments.length > 0 &&

@@ -426,6 +426,14 @@ select {
     margin: 0;
 }
 
+.small-entity .small-entity-tittle .extra-actions .delete-button i{
+    color: red;
+}
+
+.small-entity .small-entity-tittle .extra-actions .delete-button i:active{
+    color: darkred;
+}
+
 .small-entity .small-entity-tittle button:hover{
     background-color: none;
     box-shadow: none;

@@ -46,7 +46,7 @@ export default function EntityPopupWrapper({ children }) {
                     {children}
                 </div>
             </div>
-            <button className="add-entity-button" onClick={() => {
+            <button className="add-entity-button" title="Adds new entity to the notebook" onClick={() => {
                     setName("");
                     setIsPopupOpen(!isPopupOpen);
                 }}><i className="bi bi-journal-plus"/></button>
