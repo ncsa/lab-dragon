@@ -151,7 +151,7 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                              user='testUser2',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
-                                 str(self_path.parent.joinpath("testing_images", "pandas", "Giant_panda.jpg"))],
+                                 f'![giant_panda]({env_creator_path.parent.parent.parent.joinpath("test", "testing_images", "pandas", "Giant_panda.jpg")})'],
                              parent=get_panda_path, )
     choose_panda_path = Path(path, "Choose Panda.toml").resolve()
     to_be_created.append((choose_panda_step, choose_panda_path))
@@ -194,9 +194,12 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
     found_koalas_step = Step(name="Found Koalas",
                              description="I have found a lot of koala images here are a few that I found",
                              user='testUser3',
-                             comments=[str(self_path.parent.joinpath("testing_images", "koalas"))],
                              parent=get_koala_path, )
     found_koalas_path = Path(path, "Found Koalas.toml").resolve()
+    found_koalas_step.add_comment(f"Here is the first koala I found online: ![creepy_koala]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'koalas', 'creepy_koala.jpg')}) \n\n This one is freakishly creepy!")
+    found_koalas_step.add_comment(f"Here are some other ones: ![baby_koala]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'koalas', 'baby_koala.png')}) \n\n These ones are really cute!")
+    found_koalas_step.add_comment(f"Here is another one: ![sleepy_koala]({env_creator_path.parent.parent.parent.joinpath('test', 'testing_images', 'koalas', 'sleepy_koala.png')}) \n\n omg look at this one sleep")
+
     to_be_created.append((found_koalas_step, found_koalas_path))
 
     get_koala_task.add_child(found_koalas_path)
@@ -206,7 +209,7 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                              user='testUser3',
                              comments=[
                                  'They are all so cute, this is a difficult choice. I think I will choose this one:',
-                                 str(self_path.parent.joinpath("testing_images", "koalas", "creepy_koala.jpg"))],
+                                 f'![creepy_koala]({env_creator_path.parent.parent.parent.joinpath("test", "testing_images", "koalas", "creepy_koala.jpg")})'],
                              parent=get_koala_path, )
     choose_koala_path = Path(path, "Choose Koala.toml").resolve()
     to_be_created.append((choose_koala_step, choose_koala_path))

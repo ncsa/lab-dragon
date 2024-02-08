@@ -4,10 +4,6 @@ schemas:
       type: "object"
       - $ref: '#/components/schemas/Entity'
       properties:
-        objective:
-          type: "string"
-        process:
-          type: "string"
 
 
 
