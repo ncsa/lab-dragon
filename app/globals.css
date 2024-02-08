@@ -400,6 +400,17 @@ select {
     color: white;
 }
 
+.small-entity .small-entity-tittle input[type="text"] {
+    background-color: var(--comment-background-color);
+    border: 1px solid var(--section-divider-line-color);
+    color: var(--small-entity-tittle-color);
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    font-size: 1rem; /* Adjust size as needed */
+    outline: none; /* Removes the default focus outline */
+}
+
 .small-entity .small-entity-tittle .small-entity-options{
     display: flex;
     align-items: center;

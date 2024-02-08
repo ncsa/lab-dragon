@@ -33,6 +33,21 @@ export async function deleteEntity(id) {
     return response;
 }
 
+export async function changeEntityName(id, newName) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + id, {
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"new_name": newName})
+    })
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+    return response;
+}
+
 
 export default function SmallEntityViewer({ent, activatedCommentOrChildID, setActivatedCommentOrChildID}) {
 
@@ -40,6 +55,9 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
     const [entityChildren, setEntityChildren] = useState([{}]);
     const [bookmarked, setBookmarked] = useState(entity.bookmarked);
     const [orderedChildrenAndComments, setOrderedChildrenAndComments] = useState(null); // Combined array with the comments and children that is sorted for displaying
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [newName, setNewName] = useState(ent.name);
+
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
     const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
@@ -62,6 +80,23 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
         setActivatedCommentOrChildID(null);
     }
 
+    // Handle the submission of the edit
+    const handleEditSubmit = (e) => {
+        if (e.key === 'Enter') {
+            if (newName !== entity.name) {
+                changeEntityName(entity.ID, newName)
+                    .then(() => {
+                        setEntity({...entity, name: newName});
+                    })
+                    .catch(error => {
+                        alert("Failed to change the entity name. Please try again.");
+                        setNewName(entity.name);
+                    });
+            }
+            setIsEditingName(false); // Exit editing mode
+        }
+    };
+
     // Checks if this is the entity that needs an update for new children.
     useEffect(() => {
         if (entity && updatingID === entity.ID) {
@@ -83,6 +118,19 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
         }
     }, [entity.children]);
 
+    // Handle clicking outside to revert back to viewing mode
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setIsEditingName(false);
+        };
+        if (isEditingName) {
+            window.addEventListener('click', handleClickOutside);
+        }
+        return () => {
+            window.removeEventListener('click', handleClickOutside);
+        };
+    }, [isEditingName]);
+
     // Sorts and filters the comments and children entities by time and bookmark status.
     useEffect(() => {
         if (entity && entityChildren && entity.comments) {
@@ -100,7 +148,21 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon} title={`${entity.type}`}/>
-                    <Link className={"Link-text"} href={`${entity.ID}`}>{entity.name}</Link>
+                    {isEditingName ? <input
+                                        type="text"
+                                        value={newName} 
+                                        onChange={(e) => setNewName(e.target.value)} 
+                                        onKeyDown={handleEditSubmit} onClick={(e) => e.stopPropagation()} 
+                                        autoFocus/> :
+
+                                    <Link className={"Link-text"} href={`${entity.ID}`}>{entity.name}</Link> 
+                    }
+                    <button className="edit-button" title="Edit name" onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering click outside
+                        setIsEditingName(true);
+                    }}>
+                        <i className="bi bi-pencil" />
+                    </button>
                     <button className="bookmark-button" title={`Toggle book mark for "${entity.name}"`} onClick={() => {toggleBookmark(entity.ID).then(data => {
                         entity.bookmarked = !bookmarked;
                         setBookmarked(!bookmarked);
