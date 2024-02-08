@@ -717,6 +717,54 @@ def delete_entity(ID):
     return make_response("Entity deleted", 201)
 
 
+def change_entity_name(ID, body):
+    """
+    Changes the name of an entity and updates the TOML file.
+
+    :param ID: id of the entity
+    :param body[new_name]: new name of the entity
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+    if "new_name" not in body or body['new_name'] == "":
+        abort(400, "New name of entity is required")
+
+    new_name = body['new_name']
+
+    ent = INDEX[ID]
+    ent.change_name(new_name)
+    old_ent_path = Path(UUID_TO_PATH_INDEX[ID])
+    new_ent_path = old_ent_path.parent.joinpath(new_name + '.toml')
+
+    # Update the UUID indexes
+    del PATH_TO_UUID_INDEX[str(old_ent_path)]
+    PATH_TO_UUID_INDEX[str(new_ent_path)] = ID
+    UUID_TO_PATH_INDEX[ID] = str(new_ent_path)
+
+    # Update the TOML file
+    ent_copy = create_path_entity_copy(ent)
+    ent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+
+    # Update parents
+    parent = INDEX[ent.parent]
+    parent_copy = create_path_entity_copy(parent)
+    parent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[parent.ID]))
+
+    # Update the children
+    for child in ent.children:
+        child_ent = INDEX[child]
+        child_ent_copy = create_path_entity_copy(child_ent)
+        child_ent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[child]))
+
+    if new_ent_path.is_file():
+        old_ent_path.unlink()
+    else:
+        abort(400, f"Could not find the file {old_ent_path}")
+
+    return make_response("Entity name changed", 201)
+
+
 def add_image(body, image):
     """
     Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into

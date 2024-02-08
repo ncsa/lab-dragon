@@ -193,6 +193,30 @@ paths:
             "404":
               description: "Entity not found"
 
+    patch:
+      operationId: "qdata.api.entities.change_entity_name"
+      tags:
+        - Entities
+      summary: "Change the name of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody: # Define the request body here
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_name: # Specify the new_name field expected in the JSON body
+                  type: string
+      responses:
+        "200":
+          description: "Successfully changed entity name"
+        "400":
+          description: "Invalid name"
+        "404":
+          description: "Entity not found"
+
   /entities/{ID}/{commentID}:
     get:
       operationId: "qdata.api.entities.read_comment"

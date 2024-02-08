@@ -261,10 +261,16 @@ class {{class_name}}({{ inherits_from }}):
 
         return matches
 
-
     def toggle_bookmark(self):
         """
         Changes the value in the bookmark field to the opposite of what it currently is.
         """
         self.bookmarked = not self.bookmarked
+
+    def change_name(self, new_name: str):
+        """
+        Changes the name of the entity to the new name passed.
+        """
+        self.previous_names.append(self.name)
+        self.name = new_name
     {% endif %}
