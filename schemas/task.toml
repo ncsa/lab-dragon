@@ -10,17 +10,8 @@ version = "0.1"
 inherits_from = "Entity"  # This is read only field.
 
 [definitions] # Keys in the dictionary + the type
-objective = "str"
-process = "str"
-start_time = "str"
-end_time = "str"
 
 [defaults] # Default values for the keys
-objective = ""
-process = ""
-parent_class = "Entity"
-start_time = 0
-end_time = 0
 
 [properties] # Read only
 linkable = "yes"

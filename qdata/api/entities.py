@@ -29,17 +29,20 @@ from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension
 
-ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+ROOTPATH = Path()
 
-RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+ROOTPATH = Path()
+
+RESOURCEPATH = Path()
 
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
-PARENT_TYPES = ["Project", "Task"]
-ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+PARENT_TYPES = []
+ALL_TYPES = {}
 # Holds all of the entity types that exists in the notebook
-ENTITY_TYPES = set(("Project", "Task", "Step"))
+ENTITY_TYPES = set()
 
+# Holds all of the entities that exists in the notebook, uuid as key and the entity as value.
 INDEX = {}
 
 # Holds as keys the paths to the TOML files and as values the UUID of the entity
@@ -54,13 +57,58 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS = set(os.getenv("USERS").split(','))
+USERS = set()
 
 # Instantiates the HTML to Markdon converter object
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
 markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
+
+
+def set_initial_indices():
+    global ROOTPATH
+    global RESOURCEPATH
+    global PARENT_TYPES
+    global ALL_TYPES
+    global ENTITY_TYPES
+    global INDEX
+    global PATH_TO_UUID_INDEX
+    global UUID_TO_PATH_INDEX
+    global IMAGEINDEX
+    global INSTANCEIMAGE
+    global USERS
+
+    ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+
+    RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+
+    # List of classes that can contain children. Only Project and Task can contain children for now.
+    PARENT_TYPES = ["Project", "Task"]
+    ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
+    # Holds all of the entity types that exists in the notebook
+    ENTITY_TYPES = set(("Project", "Task", "Step"))
+
+    INDEX = {}
+
+    # Holds as keys the paths to the TOML files and as values the UUID of the entity
+    PATH_TO_UUID_INDEX = {}
+    # Holds as keys the UUIDs of entities and as values the path to the TOML files
+    UUID_TO_PATH_INDEX = {}
+
+    # Holds as keys the hash of an image and as value the absolute path to that image.
+    #  This is used to check if an image already exists
+    IMAGEINDEX = {}
+
+    INSTANCEIMAGE = {}
+
+    # Holds all of the users that exists in the notebook
+    USERS = set(os.getenv("USERS").split(','))
+
+
+def reset():
+    set_initial_indices()
+    read_all()
 
 
 def get_indices():
@@ -634,6 +682,41 @@ def add_entity(**kwargs):
     return make_response("Entity added", 201)
 
 
+def delete_entity(ID):
+    """
+    Deletes an entity from the system. It will remove the entity from the parent and delete the TOML file
+     immediately.
+
+    :param ID: The ID of the entity to delete
+    """
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    parent = INDEX[ent.parent]
+
+    # Flag the entity as deleted
+    ent.deleted = True
+    ent_copy = create_path_entity_copy(ent)
+    ent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+
+    # Remove the entity from the parent
+    parent.children.remove(ID)
+    parent_copy = create_path_entity_copy(parent)
+    parent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[parent.ID]))
+
+    # Remove the entity from the index
+    del INDEX[ID]
+
+    # Remove the entity from the path to UUID index
+    del PATH_TO_UUID_INDEX[UUID_TO_PATH_INDEX[ID]]
+
+    # Remove the entity from the UUID to path index
+    del UUID_TO_PATH_INDEX[ID]
+
+    return make_response("Entity deleted", 201)
+
+
 def add_image(body, image):
     """
     Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into
@@ -802,4 +885,4 @@ def toggle_bookmark(ID):
     return make_response("Bookmark toggled", 201)
 
 
-read_all()
+reset()

@@ -88,6 +88,17 @@ components:
           type: "boolean"
 
 paths:
+
+  /reset:
+    post:
+      operationId: "qdata.api.entities.reset"
+      tags:
+        - Reset
+      summary: "Resets the notebook to its initial state"
+      responses:
+        "200":
+          description: "Successfully reset notebook"
+
   /entities:
     get:
       operationId: "qdata.api.entities.read_all"
@@ -168,6 +179,19 @@ paths:
           application/json:
             schema:
               type: "string"
+
+    delete:
+        operationId: "qdata.api.entities.delete_entity"
+        tags:
+            - Entities
+        summary: "Deletes the entity with the given ID"
+        parameters:
+            - $ref: "#/components/parameters/ID"
+        responses:
+            "200":
+              description: "Successfully deleted entity"
+            "404":
+              description: "Entity not found"
 
   /entities/{ID}/{commentID}:
     get:

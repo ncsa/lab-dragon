@@ -4,10 +4,6 @@ schemas:
       type: "object"
       - $ref: '#/components/schemas/Entity'
       properties:
-        start_time:
-          type: "string"
-        end_time:
-          type: "string"
         version:
           type: "integer"
         stored_params:

@@ -17,12 +17,15 @@ ID = "Optional[str]"
 name = "str"
 parent = "Union[str, Path]"
 user = "str"
+deleted = "bool"
 description = "str"
 comments = "List[Union[Comment, Table, str]]"
 children = "List[Union[str, Path]]"
 params = "List[Tuple[str]]"
 data_buckets = "List[Union[str, Path]]"
 bookmarked = "bool"
+start_time = "str"
+end_time = "str"
 
 # Imports is optional
 [imports]
@@ -34,12 +37,15 @@ bookmarked = "bool"
 ID = "None"
 name = ''
 parent = ''
+deleted = "False"
 description = ''
 comments = []
 children = []
 params= []
 data_buckets = []
 bookmarked = "False"
+start_time = ""
+end_time = ""
 
 # Params is optional
 [params]
