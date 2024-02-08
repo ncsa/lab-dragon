@@ -119,6 +119,8 @@ select {
     padding-left: 185px; /* Adjust this value to the width of your Sidebar */
 }
 
+/* TOP BANNER */
+
 .banner-container {
     display: flex;
     flex-direction: column;
@@ -160,6 +162,30 @@ select {
     display: flex;
     align-items: center;
     vertical-align: auto;
+}
+
+.banner-right {
+    display: flex;
+    align-items: center;
+}
+
+.banner-right .reset-button {
+    background: none;
+    border: none;
+    margin: 0;
+    padding-right: 20px;
+    font-size: 50px;
+}
+
+.banner-right .reset-button:hover{
+    background-color: none;
+    box-shadow: none;
+    transform: rotate(45deg);
+}
+
+.banner-right .reset-button:active{
+    transition: transform 0.5s ease;
+    transform: rotate(360deg);
 }
 
 .banner-options button {
@@ -374,6 +400,17 @@ select {
     color: white;
 }
 
+.small-entity .small-entity-tittle input[type="text"] {
+    background-color: var(--comment-background-color);
+    border: 1px solid var(--section-divider-line-color);
+    color: var(--small-entity-tittle-color);
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    font-size: 1rem; /* Adjust size as needed */
+    outline: none; /* Removes the default focus outline */
+}
+
 .small-entity .small-entity-tittle .small-entity-options{
     display: flex;
     align-items: center;
@@ -398,6 +435,14 @@ select {
     border: none;
     padding: 0;
     margin: 0;
+}
+
+.small-entity .small-entity-tittle .extra-actions .delete-button i{
+    color: red;
+}
+
+.small-entity .small-entity-tittle .extra-actions .delete-button i:active{
+    color: darkred;
 }
 
 .small-entity .small-entity-tittle button:hover{
