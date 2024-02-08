@@ -2,7 +2,7 @@
 
 from qdata.generators.jupyterbook import create_relation_dict
 
-from qdata.scripts.env_creator import create_full_test_env
+from qdata.scripts.env_creator import create_simple_test_env
 
 
 def md_path_creator(dir_path, filename):
@@ -17,7 +17,7 @@ def toml_path_creator(dir_path, filename):
 def test_correctly_creating_dict(tmp_path):
 
     testing_project_toml = toml_path_creator(tmp_path, "Testing Project.toml")
-    create_full_test_env(tmp_path, True)
+    create_simple_test_env(tmp_path, True)
 
     correct_dict = {
         ("Testing_Pandas", 1): {
