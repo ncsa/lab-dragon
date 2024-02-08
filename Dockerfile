@@ -2,6 +2,7 @@ FROM python:3.11.7-slim
 
 RUN apt-get update && apt-get upgrade --yes
 RUN yes | apt-get install git
+RUN apt-get update -y && apt-get install -y gcc
 
 RUN useradd --create-home pfafflab
 USER pfafflab
@@ -14,6 +15,7 @@ ENV PATH="$VIRTUALENV/bin:$PATH"
 EXPOSE 8000
 
 COPY --chown=pfafflab requirements.txt ./
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY --chown=pfafflab . ./qdata-mockup

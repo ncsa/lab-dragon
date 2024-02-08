@@ -1,27 +1,13 @@
 import os
 import sys
-import copy
-import random
-import shutil
-import string
 from pathlib import Path
 
 import pytest
 import connexion
-import numpy as np
-from jinja2 import Environment, FileSystemLoader
-
-# Tools from pfafflab
-from labcore.measurement.sweep import sweep_parameter
-from labcore.measurement.record import record_as
-from labcore.measurement.storage import run_and_save_sweep
 
 import qdata
-from qdata.generators.meta import read_from_TOML
-from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
+from qdata.scripts.env_creator import create_test_env_with_msmts
 from qdata.generators.meta import generate_all_classes, delete_all_modules
-
-from qdata.scripts.env_creator import create_full_test_env
 
 
 def count_files(path):
@@ -50,69 +36,7 @@ def module_names(refresh_modules):
 
 @pytest.fixture()
 def generate_msmt_folder_structure(request, tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
-    if hasattr(request, 'param'):
-        tmp_path = request.param
-    if tmp_path.is_dir() and generate_each_run:
-        shutil.rmtree(tmp_path)
-        tmp_path.mkdir()
-
-    folder_path = tmp_path.joinpath('data')
-    if folder_path.is_dir():
-        return None
-
-    folder_path.mkdir()
-
-    msmt_names = ["test_through",
-                  "pulsed_resonator_spec",
-                  "qA_power_rabi",
-                  "qB_power_rabi",
-                  "qA_T1",
-                  "qB_T1",
-                  "qA_T2_echo",
-                  "qB_T2_echo",
-                  "ssb_spec_pi",
-                  "no_star",
-                  ]
-
-    images = [f"monkeys/monkey-{i}.png" for i in range(1, 14)]
-
-    inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x*2, 'z'))
-    outer_sweep = sweep_parameter('y', np.linspace(0, 10))
-
-    my_sweep = outer_sweep @ inner_sweep
-
-    env = Environment(loader=FileSystemLoader(Path(r'../testing_templates').resolve()), extensions=['jinja2.ext.do'],)
-    template = env.get_template('jupyter_notebook.jinja')
-
-    image_copy = copy.deepcopy(images)
-    for name in msmt_names:
-        for i in range(n_measurements):
-            test_params = {f'param{j}': ''.join(random.choices(string.ascii_letters + string.digits, k=5)) for j
-                           in range(1, 11)}
-            path, data = run_and_save_sweep(sweep=my_sweep,
-                                            data_dir=folder_path,
-                                            name=name, test_parameters=test_params)
-
-            image = random.choice(image_copy)
-            shutil.copy(Path("../testing_images").resolve().joinpath(image), path)
-            image_copy.pop(image_copy.index(image))
-
-            if i == 0 and name != 'no_star':
-                star_path = path.joinpath('__star__.tag')
-                star_path.touch()
-                
-            with open(path.joinpath('jupyter_notebook.ipynb'), 'w') as f:
-                f.write(template.render(data=data))
-
-    add_toml_to_data(folder_path)
-    create_full_test_env(tmp_path, create_md=False, light_delete=True)
-
-    ent_path = tmp_path.joinpath('Testing Pandas.toml')
-    ent = read_from_TOML(ent_path)
-
-    bucket_path = tmp_path.joinpath('data/Measurements.toml')
-    ent.data_buckets.append(str(bucket_path))
-    ent.to_TOML(ent_path)
+    create_test_env_with_msmts(request, tmp_path, n_measurements, generate_each_run)
 
 
 # -- Testing the server -- #
