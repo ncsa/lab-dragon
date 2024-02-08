@@ -15,6 +15,7 @@ inherits_from = "object"  # Can also be a list for multiple inheritance
 # Must be either imported classes or primitive types.
 ID = "Optional[str]"
 name = "str"
+previous_names = "List[str]"
 parent = "Union[str, Path]"
 user = "str"
 deleted = "bool"
@@ -36,6 +37,7 @@ end_time = "str"
 # Default values for each of the fields
 ID = "None"
 name = ''
+previous_names = []
 parent = ''
 deleted = "False"
 description = ''

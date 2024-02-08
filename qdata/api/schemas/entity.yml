@@ -7,6 +7,8 @@ schemas:
           type: "string"
         name:
           type: "string"
+        previous_names:
+          type: "array"
         parent:
           type: "string"
         deleted:
