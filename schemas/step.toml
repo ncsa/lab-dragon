@@ -10,14 +10,10 @@ inherits_from = "Entity"
 
 [definitions]
 process = "str"
-start_time = "str"
-end_time = "str"
 
 
 [defaults]
 process=""
-start_time = ""
-end_time = ""
 
 [properties]
 linkable = "yes"

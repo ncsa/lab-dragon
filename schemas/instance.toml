@@ -8,8 +8,6 @@ version = "0.1"
 inherits_from = "Entity"
 
 [definitions]
-start_time = "str"
-end_time = "str"
 version = "int"
 stored_params = "Union[List[Path], List[str]]"
 tags = "List[str]"
@@ -19,8 +17,6 @@ data_structure = "Dict[str, Union[Tuple[int], int]]"
 analysis = "Union[List[Path], List[str]]"
 
 [defaults]
-start_time = ""
-end_time = ""
 version = 0
 stored_params = ""
 tags = ""

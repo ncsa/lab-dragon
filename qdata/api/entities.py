@@ -42,6 +42,7 @@ ALL_TYPES = {}
 # Holds all of the entity types that exists in the notebook
 ENTITY_TYPES = set()
 
+# Holds all of the entities that exists in the notebook, uuid as key and the entity as value.
 INDEX = {}
 
 # Holds as keys the paths to the TOML files and as values the UUID of the entity
@@ -679,6 +680,41 @@ def add_entity(**kwargs):
     ent_copy.to_TOML(ent_path)
 
     return make_response("Entity added", 201)
+
+
+def delete_entity(ID):
+    """
+    Deletes an entity from the system. It will remove the entity from the parent and delete the TOML file
+     immediately.
+
+    :param ID: The ID of the entity to delete
+    """
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    parent = INDEX[ent.parent]
+
+    # Flag the entity as deleted
+    ent.deleted = True
+    ent_copy = create_path_entity_copy(ent)
+    ent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[ID]))
+
+    # Remove the entity from the parent
+    parent.children.remove(ID)
+    parent_copy = create_path_entity_copy(parent)
+    parent_copy.to_TOML(Path(UUID_TO_PATH_INDEX[parent.ID]))
+
+    # Remove the entity from the index
+    del INDEX[ID]
+
+    # Remove the entity from the path to UUID index
+    del PATH_TO_UUID_INDEX[UUID_TO_PATH_INDEX[ID]]
+
+    # Remove the entity from the UUID to path index
+    del UUID_TO_PATH_INDEX[ID]
+
+    return make_response("Entity deleted", 201)
 
 
 def add_image(body, image):

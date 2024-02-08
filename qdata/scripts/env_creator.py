@@ -117,7 +117,6 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                           comments=['I wonder what pandas images I can find online',
                                     "we want to find pandas because they are very cute"],
                           parent=panda_project_path,
-                          objective="Find a panda online",
                           )
     get_panda_path = Path(path, "Get Panda.toml").resolve()
     to_be_created.append((get_panda_task, get_panda_path))
@@ -176,7 +175,6 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                           comments=['I wonder what Koalas images I can find online',
                                     "we want to find Koalas because they are very cute"],
                           parent=koala_project_path,
-                          objective="Find a Koala online",
                           )
     get_koala_path = Path(path, "Get Koala.toml").resolve()
     to_be_created.append((get_koala_task, get_koala_path))

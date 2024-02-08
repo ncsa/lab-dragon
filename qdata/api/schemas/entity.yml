@@ -21,6 +21,10 @@ schemas:
         data_buckets:
           type: "array"
         bookmarked:
+        start_time:
+          type: "string"
+        end_time:
+          type: "string"
 
 
 
