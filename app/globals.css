@@ -10,6 +10,8 @@
     --step-color: #e0e1dd;
 
     --navbar-main-color: #1e223d;
+    --sidebar-content-resizer-color: gray;
+    --sidebar-content-resizer-hover-color: #417b5a;
     --sidebar-main-color: #14172b;
     --button-main-color: #417b5a;
     --button-hover-color: #335240;
@@ -208,14 +210,13 @@ select {
 }
 
 .Resizer {
-    background: #535353;
+    background: var(--sidebar-content-resizer-color);
     opacity: 0.2;
     z-index: 1;
     box-sizing: border-box;
     background-clip: padding-box;
 }
 
-/* Vertical resizer style */
 .Resizer.vertical {
     width: 15px;
     margin: 0 -5px;
@@ -224,13 +225,22 @@ select {
     cursor: col-resize;
 }
 
-/* Adjustments for sidebar-wrapper and children-wrapper */
+.Resizer.vertical:hover {
+    transition-delay: 0.5s;
+    background-color: var(--sidebar-content-resizer-hover-color);
+    opacity: 0.6;
+}
+
+.Resizer.vertical:active {
+    background-color: var(--sidebar-content-resizer-hover-color);
+    opacity: 1;
+}
+
 .sidebar-wrapper, .children-wrapper {
     height: 100vh; /* Adjust based on your layout */
     overflow: auto; /* Adds scroll to each pane if content overflows */
 }
 
-/* Remove fixed positioning from sidebar-wrapper to allow resizing */
 .sidebar-wrapper {
     position: relative;
     width: auto; /* Let SplitPane control the width */
