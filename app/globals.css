@@ -106,19 +106,6 @@ select {
     margin-left: 10px;
 }
 
-.flex-container {
-    display: flex;
-}
-
-.sidebar-wrapper {
-    position: fixed;
-    width: 180px; /* Adjust this value to the width of your Sidebar */
-}
-
-.children-wrapper {
-    padding-left: 185px; /* Adjust this value to the width of your Sidebar */
-}
-
 /* TOP BANNER */
 
 .banner-container {
@@ -130,7 +117,7 @@ select {
     position: sticky;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     background-color: var(--navbar-main-color);
     color: white;
     text-align: center;
@@ -139,6 +126,7 @@ select {
     display: flex; /* Added to align items in a row */
     justify-content: space-between; /* Added to give space between items */
     align-items: center;
+    box-sizing: border-box;
 }
 
 .user-selection{
@@ -212,12 +200,52 @@ select {
     font-size: 2em; /* Increase the size of the icon */
 }
 
+/* END TOP BANNER */
+
+.split-pane {
+    position: relative;
+    height: 100vh;
+}
+
+.Resizer {
+    background: #535353;
+    opacity: 0.2;
+    z-index: 1;
+    box-sizing: border-box;
+    background-clip: padding-box;
+}
+
+/* Vertical resizer style */
+.Resizer.vertical {
+    width: 15px;
+    margin: 0 -5px;
+    border-left: 5px solid rgba(255, 255, 255, 0);
+    border-right: 5px solid rgba(255, 255, 255, 0);
+    cursor: col-resize;
+}
+
+/* Adjustments for sidebar-wrapper and children-wrapper */
+.sidebar-wrapper, .children-wrapper {
+    height: 100vh; /* Adjust based on your layout */
+    overflow: auto; /* Adds scroll to each pane if content overflows */
+}
+
+/* Remove fixed positioning from sidebar-wrapper to allow resizing */
+.sidebar-wrapper {
+    position: relative;
+    width: auto; /* Let SplitPane control the width */
+}
+
+.children-wrapper {
+    padding-left: 0; /* Remove padding-left as it's no longer needed */
+}
+
  /* SIDEBAR */
 
 .sidebar{
     color: aliceblue;
-    width: 180px;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
     background-color: var(--sidebar-main-color);
     position: sticky;
@@ -283,6 +311,8 @@ select {
     display: inline-block;
     width: 1.7em;
 }
+
+/* END SIDEBAR */
 
 .tittle{
     color: var(--tittle-color);
