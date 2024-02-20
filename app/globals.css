@@ -11,7 +11,7 @@
 
     --navbar-main-color: #1e223d;
     --sidebar-content-resizer-color: gray;
-    --sidebar-content-resizer-hover-color: #417b5a;
+    --sidebar-content-resizer-hover-color: #2fc2f6;
     --sidebar-main-color: #14172b;
     --button-main-color: #417b5a;
     --button-hover-color: #335240;
@@ -236,17 +236,9 @@ select {
     opacity: 1;
 }
 
-.sidebar-wrapper, .children-wrapper {
-    height: 100vh; /* Adjust based on your layout */
-    overflow: auto; /* Adds scroll to each pane if content overflows */
-}
-
-.sidebar-wrapper {
-    position: relative;
-    width: auto; /* Let SplitPane control the width */
-}
-
 .children-wrapper {
+    height: 100vh;
+    overflow: auto;
     padding-left: 0; /* Remove padding-left as it's no longer needed */
 }
 
@@ -262,30 +254,22 @@ select {
     top: 122px;
 }
 
-.sidebar-content {
-    overflow-y: auto;
-    max-height: calc(100vh - 50px); /* Adjust this value based on the height of your button */
-}
-
 .sidebar-item{
-    padding: 0.5em;
+    padding: 0.1em;
     display: block;
-    border-radius: 5px;
 }
 
-.sidebar-item:hover{
-    background-color: rgba(255, 255, 255, 0.1);
-}
 
 .sidebar-item-title{
     display: flex;
-    font-size: 1.2em;
-    justify-content: space-between;
+    font-size: 1em;
+    align-items: center;
 }
 
 .sidebar-item-title span i{
     display: inline-block;
     width: 1.5em;
+
 }
 
 .sidebar-item-title .toggle-btn{
@@ -293,8 +277,9 @@ select {
     transition: transform 0.3s ease;
 }
 
-.sidebar-item.open > .sidebar-item-title .toggle-btn{
-    transform: rotate(180deg)
+.sidebar-type-icon {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .sidebar-item-content {

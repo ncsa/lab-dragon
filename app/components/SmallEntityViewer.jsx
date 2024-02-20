@@ -6,7 +6,7 @@ import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
 import Comment from "@/app/components/Comment";
 import CommentCreator from "@/app/components/CommentCreator";
-import { getEntity, sortAndFilterChildren, getComments } from "@/app/components/utils";
+import { getEntity, sortAndFilterChildren, getComments, getEntityTypeIcon } from "@/app/components/utils";
 
 
 export async function toggleBookmark(id) {
@@ -64,14 +64,7 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
 
     // selects the icon it will display next to the name of the small entity
     const EntType = entity.type;
-    let icon = "bi bi-question-octagon";
-    if (EntType === "Project") {
-        icon = "bi bi-book"
-    } else if (EntType === "Task") {
-        icon = "bi bi-clipboard"
-    } else if (EntType === "Step") {
-        icon = "bi bi-circle"
-    }
+    const icon = getEntityTypeIcon(EntType);
 
     const reloadComments = () => {
         getComments(entity.ID).then(data => {

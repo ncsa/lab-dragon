@@ -35,9 +35,7 @@ export default function EntityPopupWrapper({ children }) {
         <div>
             {isPopupOpen ? <EntityInput populateSideBar={populateSidebarItems}/> : null}
             <SplitPane split="vertical" defaultSize="50%">
-                <div className="sidebar-wrapper">
-                    <Sidebar entities={entities}/>
-                </div>
+                <Sidebar entities={entities}/>
                 <div className="children-wrapper">
                     {children}
                 </div>
