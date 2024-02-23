@@ -68,6 +68,7 @@ h3 {
 body {
     display: flex;
     background-color: var(--background-color);
+    height: 100vh;
 }
 
 .main{
@@ -123,8 +124,7 @@ select {
     background-color: var(--navbar-main-color);
     color: white;
     text-align: center;
-    padding: 20px; /* Increased padding */
-    z-index: 10;
+    z-index: 100;
     display: flex; /* Added to align items in a row */
     justify-content: space-between; /* Added to give space between items */
     align-items: center;
@@ -226,12 +226,12 @@ select {
 }
 
 .Resizer.vertical:hover {
-    transition-delay: 0.5s;
     background-color: var(--sidebar-content-resizer-hover-color);
     opacity: 0.6;
 }
 
 .Resizer.vertical:active {
+    transition-delay: 0s;
     background-color: var(--sidebar-content-resizer-hover-color);
     opacity: 1;
 }
@@ -849,6 +849,13 @@ ul > li {
     .toggle-btn.open {
         transform-origin: center center;
         transform: rotate(-90deg) translateX(5px) translateY(-5px);
+    }
+
+    iframe {
+        width: 50%;
+        height: 100%;
+        min-height: 400px;
+        border: 1px solid var(--section-divider-line-color);
     }
 }
 

@@ -33,9 +33,9 @@ export default ({ onContentChange, entID, initialContent }) => {
   const dataMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
-    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/data_suggestions";
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/data_suggestions/` + entID ;
     if (query) {
-      url += "?query=" + query;
+      url += "?query_filter=" + query;
     }
     const response = await fetch(url);
     const data = JSON.parse(await response.json());

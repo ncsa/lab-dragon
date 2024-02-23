@@ -15,10 +15,17 @@ async function getSidebarItems() {
 }
 
 export default function EntityPopupWrapper({ children }) {
+    const childrenMinSize = 300;
+
     const [entities, setEntities] = useState([]); // The entities that will be displayed in the sidebar
+    const [maxLeftPaneSize, setMaxLeftPaneSize] = useState(null); // Adjust the size of the left pane based on the window size. We can only specify the max length of the left side of the pane
     const { isPopupOpen, setIsPopupOpen, setRootEntity, setName } = useContext(CreationPopupContext);
 
     const closePopup = () => { setIsPopupOpen(false) }
+
+    const updateMaxLeftPaneSize = () => {
+        setMaxLeftPaneSize(window.innerWidth - childrenMinSize);
+    };
 
     function populateSidebarItems() {
         getSidebarItems().then(data => {
@@ -28,13 +35,18 @@ export default function EntityPopupWrapper({ children }) {
     }
 
     useEffect(() => {
+        window.addEventListener('resize', updateMaxLeftPaneSize);
+        return () => window.removeEventListener('resize', updateMaxLeftPaneSize);
+    }, []);
+
+    useEffect(() => {
         populateSidebarItems();
     }, []);
 
     return (
         <div>
             {isPopupOpen ? <EntityInput populateSideBar={populateSidebarItems}/> : null}
-            <SplitPane split="vertical" defaultSize="50%">
+            <SplitPane split="vertical" defaultSize="10%" minSize={80} maxSize={maxLeftPaneSize}>
                 <Sidebar entities={entities}/>
                 <div className="children-wrapper">
                     {children}

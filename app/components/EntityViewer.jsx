@@ -7,6 +7,7 @@ import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
 import Comment from './Comment';
 import SmallEntityViewer from './SmallEntityViewer';
+import InstanceViewer from './InstanceViewer';
 import { sortAndFilterChildren, getEntity, getComments } from './utils';
 import CommentCreator from "@/app/components/CommentCreator";
 
@@ -86,6 +87,10 @@ export default function EntityViewer({ entityID }) {
             setUpdatingID("");
         }
     }, [entity, updatingID, setUpdatingID])
+
+    if (entity.type && entity.type === "Instance") {
+        return <InstanceViewer entity={entity} />
+    }
 
     return (
         <div>
