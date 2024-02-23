@@ -59,12 +59,6 @@ INSTANCEIMAGE = {}
 # Holds all of the users that exists in the notebook
 USERS = set()
 
-# Instantiates the HTML to Markdon converter object
-html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
-
-
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
-
 
 def set_initial_indices():
     global ROOTPATH
@@ -277,9 +271,14 @@ def initialize_bucket(bucket_path):
 
         # add images to the image index
         for img_path in instance.images:
-            img = Image.open(img_path)
-            add_image_to_index(img, img_path)
-            INSTANCEIMAGE[img_path] = instance.ID
+            path = Path(img_path).resolve()
+            # Only need to add image if it is an actual image, not html plot
+            if path.suffix == '.jpg' or path.suffix == '.png':
+                img = Image.open(path)
+                add_image_to_index(img, img_path)
+                INSTANCEIMAGE[img_path] = instance.ID
+            elif path.suffix == '.html':
+                pass
 
     return bucket
 
@@ -832,7 +831,7 @@ def _search_parents_with_buckets(ent):
 
 
 # FIXME: The return value should have the keys and value of the dictionary flipped.
-def get_data_suggestions(ID, query="", num_matches=10):
+def get_data_suggestions(ID, query_filter="", num_matches=10):
     """
     Returns matched datasets in a bucket with the query.
     If the entity does not have a bucket, it will search the parents for buckets or return None if no buckets are found.
@@ -844,7 +843,6 @@ def get_data_suggestions(ID, query="", num_matches=10):
     :return: Dictionary with the name of data as keys and the id as values
     """
     matches = {}
-
     ent = INDEX[ID]
     if len(ent.data_buckets) == 0:
         ent = _search_parents_with_buckets(ent)
@@ -854,14 +852,14 @@ def get_data_suggestions(ID, query="", num_matches=10):
     for bucket_path in ent.data_buckets:
         bucket_id = PATH_TO_UUID_INDEX[str(bucket_path)]
         bucket = INDEX[bucket_id]
-        pattern = re.compile(query)
+        pattern = re.compile(query_filter)
         for p, uuid in bucket.path_to_uuid.items():
             if len(matches) >= num_matches:
                 break
             path = Path(p)
             instance = INDEX[uuid]
             if 'star' in instance.tags:
-                if query == "" or query is None:
+                if query_filter == "" or query_filter is None:
                     matches[path.stem] = uuid
                 else:
                     if pattern.search(path.stem):
@@ -934,3 +932,10 @@ def toggle_bookmark(ID):
 
 
 reset()
+
+# Converters need to be defined at the bottom so they access the indices after they have been instantiated
+# Instantiates the HTML to Markdon converter object
+html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
+
+
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])

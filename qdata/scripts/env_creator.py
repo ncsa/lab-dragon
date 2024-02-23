@@ -96,7 +96,7 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                             description="This is the pandas project.",
                             user='testUser',
                             parent=top_project_path,
-                            comments=['This project is about pandas, we will get a panda online a qualify the panda', testing_table_panda]
+                            comments=['This project is about pandas, we will get a panda online a qualify the panda'] #, testing_table_panda]
                             )
     panda_project_path = Path(path, "Testing Pandas.toml").resolve()
     to_be_created.append((panda_project, panda_project_path))
@@ -107,7 +107,7 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
                             description="This is the koalas project.",
                             user='testUser',
                             parent=top_project_path,
-                            comments=['This project is about koalas, we will get a koala online a qualify the koala', testing_table_koala]
+                            comments=['This project is about koalas, we will get a koala online a qualify the koala',] #testing_table_koala]
                             )
     koala_project_path = Path(path, "Testing Koalas.toml").resolve()
     to_be_created.append((koala_project, koala_project_path))
