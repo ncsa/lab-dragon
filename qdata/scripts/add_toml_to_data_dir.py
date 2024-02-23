@@ -1,6 +1,8 @@
 """
 Goes through an entire measurement directory and creates TOML files for each measurement.
 Also creates the new DataBucket for this measurement folder.
+
+Assumes that html files are images and that ipynb files are analysis notebooks.
 """
 
 from pathlib import Path
@@ -71,7 +73,7 @@ def add_toml_to_data(dir, user="testUser"):
                     # Assuming that any param for now its stored in a JSON file
                     elif file.suffix == ".json":
                         stored_params.append(str(file))
-                    elif file.suffix == ".png" or file.suffix == ".jpg":
+                    elif file.suffix == ".png" or file.suffix == ".jpg" or file.suffix == ".html":
                         images.append(str(file))
                     elif file.suffix == ".ipynb":
                         analysis.append(str(file))

@@ -12,6 +12,10 @@ from jinja2 import Environment, FileSystemLoader
 from labcore.measurement.sweep import sweep_parameter
 from labcore.measurement.record import record_as
 from labcore.measurement.storage import run_and_save_sweep
+from labcore.data.datadict_storage import load_as_xr
+# Needed to generate hvplot from a script
+import hvplot.xarray
+import hvplot as hv
 
 from qdata.components.table import Table
 from qdata.generators.meta import read_from_TOML
@@ -263,8 +267,8 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
 
     images = [f"monkeys/monkey-{i}.png" for i in range(1, 14)]
 
-    inner_sweep = sweep_parameter('x', np.linspace(0, 10), record_as(lambda x: x * 2, 'z'))
-    outer_sweep = sweep_parameter('y', np.linspace(0, 10))
+    inner_sweep = sweep_parameter('x', np.linspace(-10, 10), record_as(lambda x, y: x*2 + y*2, 'z'))
+    outer_sweep = sweep_parameter('y', np.linspace(-10, 10))
 
     my_sweep = outer_sweep @ inner_sweep
 
@@ -286,6 +290,11 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
             image = random.choice(image_copy)
             shutil.copy(script_path.parent.parent.parent.joinpath('test', 'testing_images', image), path)
             image_copy.pop(image_copy.index(image))
+
+            xr_data = load_as_xr(folder=path)
+            plot = xr_data.hvplot()
+            hv.save(plot, path.joinpath('plot.html'))
+
             if i == 0 and name != 'no_star':
                 star_path = path.joinpath('__star__.tag')
                 star_path.touch()
@@ -308,5 +317,7 @@ if __name__ == "__main__":
     jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
     jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 
-    create_simple_test_env(target=new_notebook_location, create_md=False)
+    # create_simple_test_env(target=new_notebook_location, create_md=False)
+    create_test_env_with_msmts(tmp_path=new_notebook_location, n_measurements=1, generate_each_run=True)
+
     # generate_book(jupyter_book_root_path, jupyter_book_target_path)
