@@ -9,6 +9,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
     const router = useRouter();
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [reloadEditor, setReloadEditor] = useState(false);
     // Onl;y use to set the text of the editor to nothing once the submit button is pressed.
     const [initial, setInitial] = useState(initialContent);
     const { user } = useContext(CreationPopupContext)
@@ -34,6 +35,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
             setContent("");
             setInitial("");
             setIsLoading(false);
+            setReloadEditor(prev => prev+1);
         } else {
             alert ("Something went wrong, please try again.")
             setIsLoading(false)
@@ -47,6 +49,7 @@ export default function CommentCreator({entID, reloader, initialContent}) {
                 <Tiptap onContentChange={handleContentChange}
                  entID={entID}
                  initialContent={initial}
+                 reloadEditor={reloadEditor}
                  />
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit" className="submitButton">Submit</button>}

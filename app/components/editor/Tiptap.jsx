@@ -14,6 +14,7 @@ import { MentionList } from "./MentionList";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
 import { createPlotMention } from "./extensions/PlotMention";
+import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
 import Dropcursor from "@tiptap/extension-dropcursor";
 
@@ -29,7 +30,7 @@ const uploadImage = async (file) => {
   return url;
 }
 
-export default ({ onContentChange, entID, initialContent }) => {
+export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
 
   const dataMentionsOptionsRef = useRef({});
   const plotMentionsOptionsRef = useRef({});
@@ -100,6 +101,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       }),
       TiptapImage.configure({inline: true}),
       Dropcursor,
+      Iframe,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
           class: "data-mention"
@@ -237,6 +239,13 @@ export default ({ onContentChange, entID, initialContent }) => {
     editor.commands.setContent(initialContent);
     }
   }, [initialContent]);
+
+  useEffect(() => {
+    if (reloadEditor) {
+      editor.commands.setContent("");
+    }
+  
+  }, [reloadEditor,])
 
   return (
     <div>

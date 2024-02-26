@@ -1,11 +1,9 @@
 import { mergeAttributes } from '@tiptap/core'
 import Mention from "@tiptap/extension-mention";
 
-
 export const createPlotMention = (plotMentionsOptionsRef) => {
-  
   return Mention.extend({
-
+    name: 'plotMention', // Unique name for the PlotMention extension
     renderHTML({node, HTMLAttributes}) {
       return [
         'iframe',
