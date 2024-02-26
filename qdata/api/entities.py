@@ -868,6 +868,40 @@ def get_data_suggestions(ID, query_filter="", num_matches=10):
     return json.dumps(matches), 201
 
 
+def get_plot_suggestions(ID, query_filter="", num_matches=10):
+    """
+    Look for plots inside of a data bucket. A plot is an html file containing a bokeh plot as of now.
+
+    :param ID: The ID of the instance you are searching
+    :param query_filter: A query to find matches to
+    :param num_matches: How many matches until the function stops looking for matches.
+
+    :return: Dictionary with the name of data + plots as keys and paths to the plots as values
+    """
+    matches = {}
+    ent = INDEX[ID]
+    if len(ent.data_buckets) == 0:
+        ent = _search_parents_with_buckets(ent)
+        if ent is None:
+            return json.dumps({}), 201
+    
+    for bucket_path in ent.data_buckets:
+        bucket_id = PATH_TO_UUID_INDEX[str(bucket_path)]
+        bucket = INDEX[bucket_id]
+        pattern = re.compile(query_filter)
+        for p, uuid in bucket.path_to_uuid.items():
+            if len(matches) >= num_matches:
+                break
+            instance = INDEX[uuid]
+            if 'star' in instance.tags:
+                for im_p in instance.images:
+                    p_obj = Path(im_p)
+                    plot_name = p_obj.parts[-2] + "/" + p_obj.parts[-1] # The folder name + the plot
+                    if p_obj.suffix == '.html' and pattern.search(plot_name):
+                        matches[plot_name] = im_p.replace('/', '%23')
+                    
+    return json.dumps(matches), 201
+
 def get_stored_params(ID):
     """
     Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.

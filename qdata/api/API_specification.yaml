@@ -416,6 +416,23 @@ paths:
         "404":
           description: "Entity not found"
 
+  /properties/plot_suggestions/{ID}:
+    get:
+      operationId: "qdata.api.entities.get_plot_suggestions"
+      tags:
+        - Properties
+        - Suggestions
+      summary: "Returns a dictionary of plot suggestions for a specified query. If no query is specified,
+       all plot suggestions are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/query_filter"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
   /testing/indices:
     get:
       operationId: "qdata.api.entities.get_indices"

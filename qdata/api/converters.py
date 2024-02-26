@@ -68,6 +68,11 @@ class MyMarkdownConverter(MarkdownConverter):
         return img_md
         # return super().convert_img(el, text, convert_as_inline)
 
+    def convert_iframe(self, el, text, convert_as_inline):
+        """
+        Handles the incoming html iframes and converts the link from html into the markdown pointing to the path of the iframe.
+        """
+        return str(el)
 
 # Markdown to HTML
 class CustomLinkExtension(Extension):
