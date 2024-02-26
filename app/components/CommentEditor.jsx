@@ -40,7 +40,7 @@ export default function CommentEditor({entID, comment, refresh}) {
         }
 
     }
-
+    console.log("Creating the comment editor", comment, content)
     return (
         <div className="CommentEditor">
             <form onSubmit={handleSubmit}>
