@@ -234,7 +234,7 @@ def add_image_to_index(image, image_path):
         raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
 
 
-def find_equivalent_image(image, threshold=5):
+def find_equivalent_image(image, threshold=0.1):
     """
     Checks if there is an equivalent image in the system. Does this by calculating the imagehash and comparing it every
     other image until either it finds a match or does not find any match. If no match has been found, returns None,
