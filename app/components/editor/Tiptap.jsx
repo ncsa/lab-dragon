@@ -13,6 +13,8 @@ import Link from "@tiptap/extension-link";
 import { MentionList } from "./MentionList";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
+import { createPlotMention } from "./extensions/PlotMention";
+import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
 import Dropcursor from "@tiptap/extension-dropcursor";
 
@@ -28,18 +30,29 @@ const uploadImage = async (file) => {
   return url;
 }
 
-export default ({ onContentChange, entID, initialContent }) => {
+export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
 
   const dataMentionsOptionsRef = useRef({});
+  const plotMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
-    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/data_suggestions";
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/data_suggestions/` + entID ;
     if (query) {
-      url += "?query=" + query;
+      url += "?query_filter=" + query;
     }
     const response = await fetch(url);
     const data = JSON.parse(await response.json());
     dataMentionsOptionsRef.current = data;
+  }
+
+  const updatePlotMentionsOptions = async (query) => {
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/plot_suggestions/` + entID ;
+    if (query) {
+      url += "?query_filter=" + query;
+    }
+    const response = await fetch(url);
+    const data = JSON.parse(await response.json());
+    plotMentionsOptionsRef.current = data;
   }
 
   const handleEditorImage = (image, view) => {
@@ -73,6 +86,10 @@ export default ({ onContentChange, entID, initialContent }) => {
     updateDataMentionsOptions();
   }, []);
 
+  useEffect(() => {
+    updatePlotMentionsOptions();
+  }, []);
+
   const editor = useEditor({
     extensions: [
       Document,
@@ -84,6 +101,7 @@ export default ({ onContentChange, entID, initialContent }) => {
       }),
       TiptapImage.configure({inline: true}),
       Dropcursor,
+      Iframe,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
           class: "data-mention"
@@ -138,6 +156,60 @@ export default ({ onContentChange, entID, initialContent }) => {
           }
         },
       }),
+      createPlotMention(plotMentionsOptionsRef).configure({
+        HTMLAttributes: {
+          class: "plot-mention"
+        },
+        renderLabel: ({options, node}) => {
+            return `${node.attrs.label ?? node.attrs.id}`
+        },
+        suggestion: {
+          items: async ({ query }) => {
+            await updatePlotMentionsOptions(query);
+            const keys = Object.keys(plotMentionsOptionsRef.current);
+            return keys;
+          },
+          char: "~",
+          pluginKey: new PluginKey("tildeKey"),
+          render: () => {
+            let reactRenderer;
+            let popup;
+
+            return {
+              onStart: (props) => {
+                reactRenderer = new ReactRenderer(MentionList, {
+                  props,
+                  editor: props.editor
+                });
+
+                popup = tippy("body", {
+                  getReferenceClientRect: props.clientRect,
+                  appendTo: () => document.body,
+                  content: reactRenderer.element,
+                  showOnCreate: true,
+                  interactive: true,
+                  trigger: "manual",
+                  placement: "bottom-start"
+                });
+              },
+              onUpdate(props) {
+                reactRenderer.updateProps(props);
+
+                popup[0].setProps({
+                  getReferenceClientRect: props.clientRect
+                });
+              },
+              onKeyDown(props) {
+                return reactRenderer.ref?.onKeyDown(props);
+              },
+              onExit() {
+                popup[0].destroy();
+                reactRenderer.destroy();
+              }
+            };
+          }
+        },
+      })
     ],
     editorProps: {
       handleDrop: (view, event, slice, moved) => {
@@ -167,6 +239,13 @@ export default ({ onContentChange, entID, initialContent }) => {
     editor.commands.setContent(initialContent);
     }
   }, [initialContent]);
+
+  useEffect(() => {
+    if (reloadEditor) {
+      editor.commands.setContent("");
+    }
+  
+  }, [reloadEditor,])
 
   return (
     <div>

@@ -113,6 +113,7 @@ export default function InstanceViewer({ entity }) {
             <div className="instance-images">
                 <h2>Instance Images</h2>
                 {entity.images.map((imagePath, index) => {
+                    const isHTML = imagePath.endsWith(".html");
                     return (
                         <div key={index} className="instance-image">
                             <div>
@@ -123,8 +124,11 @@ export default function InstanceViewer({ entity }) {
                                         setImagesToggleArray(newArray);
                                     }} />
                             </div>
-                            {imagesToggleArray[index] &&
+                            {imagesToggleArray[index] && !isHTML &&
                                 <img src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/` + imagePath.replace(/\//g, '%23')} alt="Instance Image" />
+                            }
+                            {imagesToggleArray[index] && isHTML &&
+                                <iframe src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/` + imagePath.replace(/\//g, '%23')} />
                             }
                         </div>
                     )

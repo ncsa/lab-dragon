@@ -1,11 +1,9 @@
 import { mergeAttributes } from '@tiptap/core'
 import Mention from "@tiptap/extension-mention";
 
-
 export const createDataMention = (dataMentionsOptionsRef) => {
-  
   return Mention.extend({
-
+    name: 'dataMention', // Unique name for the DataMention extension
     renderHTML({node, HTMLAttributes}) {
       return [
         'a',

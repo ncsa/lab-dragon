@@ -45,3 +45,16 @@ export async function getComments(id) {
 
     return parsedComments
 }
+
+export function getEntityTypeIcon(type) {
+    let icon = "bi bi-question-octagon";
+    if (type === "Project") {
+        icon = "bi bi-book"
+    } else if (type === "Task") {
+        icon = "bi bi-clipboard"
+    } else if (type === "Step") {
+        icon = "bi bi-circle"
+    }
+
+    return icon
+}
