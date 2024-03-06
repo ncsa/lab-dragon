@@ -16,7 +16,11 @@ The following is simply a place to quickly write down known issues as well as ne
 - If the entity is not long enough the text in the buttons gets smaller and runs off in the background
 - Make the editing of comments as well as adding more comments behave like the editing of titles instead of relying on state variables
 
+- For now all the configuration of the notebook integration is done as module variables. I might want to at some point figure out how to do it using the options class.
+- The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
+
 # Tests
 
+- How do we handle a dataset with a failed msmt, like an incomplete msmt
 
 
