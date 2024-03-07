@@ -344,7 +344,7 @@ paths:
                 properties:
                   bucket_ID:
                     type: "string"
-                  data_path:
+                  data_loc:
                     type: "string"
                   username:
                     type: "string"
@@ -354,7 +354,7 @@ paths:
                     type: "string"
                 required:
                   - bucket_ID
-                  - data_path
+                  - data_loc
                   - username
       responses:
         "200":

@@ -910,7 +910,7 @@ def add_instance(body):
 
     body should be a dictionary with the following keys
         * bucket_ID: The ID of the bucket to add the instance to
-        * data_path: The path of the data that the instance is based on
+        * data_loc: The path of the data that the instance is based on
         * username: The user that created the instance
         * start_time: The start time of the instance
         * end_time: The end time of the instance
@@ -919,9 +919,9 @@ def add_instance(body):
     if "bucket_ID" not in body or body['bucket_ID'] == "":
         abort(404, f"Bucket ID is required")
     bucket_ID = body['bucket_ID']
-    if "data_path" not in body or body['data_path'] == "":
-        abort(404, f"Data path is required")
-    data_path = body['data_path']
+    if "data_loc" not in body or body['data_loc'] == "":
+        abort(404, f"Data loc is required")
+    data_path = body['data_loc']
     if "username" not in body or body['username'] == "":
         abort(404, f"Username is required")
     username = body['username']
