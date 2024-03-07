@@ -20,6 +20,11 @@ The following is simply a place to quickly write down known issues as well as ne
 - The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
 - The way the data structure section in the instance is stored might not be great. The naming of the table is wierd
 
+# Assumptions
+
+- every msmt folder contains only a single TOML file and that TOML file is a valid entity
+- all instance file names are the folder name + .toml
+
 # Tests
 
 - How do we handle a dataset with a failed msmt, like an incomplete msmt

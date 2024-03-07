@@ -377,6 +377,24 @@ paths:
         "200":
           description: "Successfully read buckets"
 
+  /data/toggle_star:
+    patch:
+      operationId: "qdata.api.entities.toggle_star"
+      tags:
+          - Data
+      summary: "Toggles the star status of the instance with the given ID"
+      parameters:
+        - in: query
+          name: "data_loc"
+          schema:
+            type: "string"
+          description: "The location of the data. An entity should exist with this data_loc"
+      responses:
+          "200":
+            description: "Successfully toggled star"
+          "404":
+            description: "Instance not found"
+
   /properties/users:
     get:
       operationId: "qdata.api.entities.get_users"

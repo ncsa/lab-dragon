@@ -965,6 +965,49 @@ def add_instance(body):
     return make_response("Instance added", 201)
 
 
+def toggle_star(data_loc: str):
+    """
+    Toggles the star tag of an instance.This changes both the parameter in the folder containing the instance as well as the TOML file.
+
+    :param data_loc: A path containing the instance. This can be either the path to the TOML file, the data file or the folder containing the data file.
+    """
+
+    data_path = Path(data_loc)
+    if data_path.name == 'data.ddh5':
+        instance_path = data_path.parent.joinpath(data_path.parent.name + '.toml')
+    elif data_path.is_dir():
+        instance_path = data_path.joinpath(data_path.name + '.toml')
+    elif data_path.suffix == '.toml':
+        instance_path = data_path
+    else:
+        abort(404, f"Data with path {data_path} not found")
+
+    if not instance_path.is_file():
+        abort(404, f"Instance with path {instance_path} not found")
+
+    # FIXME: there definitely is a more efficient way to do this.
+    if str(instance_path) not in PATH_TO_UUID_INDEX or PATH_TO_UUID_INDEX[str(instance_path)] not in INDEX:
+        abort(404, f"Instance with path {instance_path} not found")
+
+    instance = INDEX[PATH_TO_UUID_INDEX[str(instance_path)]]
+    star_path = instance_path.parent.joinpath('__star__.tag')
+
+    if star_path.is_file():
+        star_path.unlink()
+        if "star" in instance.tags:
+            instance.tags.remove("star")
+            instance_copy = create_path_entity_copy(instance)
+            instance_copy.to_TOML(instance_path)
+    else:
+        star_path.touch()
+        if "star" not in instance.tags:
+            instance.tags.append("star")
+            instance_copy = create_path_entity_copy(instance)
+            instance_copy.to_TOML(instance_path)
+
+    return make_response("Star toggled", 201)
+
+
 def get_buckets():
     """
     API function that returns a dictionary of all the buckets
