@@ -248,6 +248,7 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
         tmp_path.mkdir()
 
     folder_path = tmp_path.joinpath('data')
+    # If the data folder exists, don't generate anything to not rewrite data
     if folder_path.is_dir():
         return None
 

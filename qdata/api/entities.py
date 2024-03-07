@@ -21,6 +21,7 @@ generate_all_classes()
 
 from qdata.modules.task import Task
 from qdata.modules.step import Step
+from qdata.modules.bucket import Bucket
 from qdata.modules.entity import Entity
 from qdata.modules.project import Project
 from qdata.modules.instance import Instance
@@ -901,6 +902,68 @@ def get_plot_suggestions(ID, query_filter="", num_matches=10):
                         matches[plot_name] = im_p.replace('/', '%23')
                     
     return json.dumps(matches), 201
+
+
+def add_instance(body):
+    """
+    API function that adds an instance to a bucket
+
+    body should be a dictionary with the following keys
+        * bucket_ID: The ID of the bucket to add the instance to
+        * data_path: The path of the data that the instance is based on
+        * username: The user that created the instance
+        * start_time: The start time of the instance
+        * end_time: The end time of the instance
+    """
+
+    if "bucket_ID" not in body or body['bucket_ID'] == "":
+        abort(404, f"Bucket ID is required")
+    bucket_ID = body['bucket_ID']
+    if "data_path" not in body or body['data_path'] == "":
+        abort(404, f"Data path is required")
+    data_path = body['data_path']
+    if "username" not in body or body['username'] == "":
+        abort(404, f"Username is required")
+    username = body['username']
+
+    start_time = body.get('start_time', None)
+    end_time = body.get('end_time', None)
+
+    if bucket_ID not in INDEX:
+        abort(404, f"Entity with ID {bucket_ID} not found")
+
+    bucket = INDEX[bucket_ID]
+
+    if not isinstance(bucket, Bucket):
+        abort(400, f"Entity with ID {bucket_ID} is not a bucket")
+
+    # Path to the folder containing the data file
+    data_path = Path(data_path)
+    if not Path(data_path).is_dir():
+        abort(403, f"Data with path {data_path} not found")
+
+    data_file = data_path.joinpath('data.ddh5')
+    if not data_file.is_file():
+        abort(403, f"Data with path {data_file} not found")
+
+    instance_path = data_path.joinpath(data_path.name + '.toml')
+    if instance_path.is_file():
+        abort(400, f"Instance with path {instance_path} already exists")
+
+    instance = Instance(name=data_path.name, data=[str(data_file)], user=username, start_time=start_time, end_time=end_time)
+
+    bucket.add_instance(instance_path, instance.ID)
+
+    bucket_copy = create_path_entity_copy(bucket)
+    bucket_copy.to_TOML(Path(UUID_TO_PATH_INDEX[bucket_ID]))
+
+    instance_copy = create_path_entity_copy(instance)
+    instance_copy.to_TOML(instance_path)
+
+    add_ent_to_index(instance, instance_path)
+
+    return make_response("Instance added", 201)
+
 
 def get_stored_params(ID):
     """

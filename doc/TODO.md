@@ -18,6 +18,7 @@ The following is simply a place to quickly write down known issues as well as ne
 
 - For now all the configuration of the notebook integration is done as module variables. I might want to at some point figure out how to do it using the options class.
 - The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
+- The way the data structure section in the instance is stored might not be great. The naming of the table is wierd
 
 # Tests
 

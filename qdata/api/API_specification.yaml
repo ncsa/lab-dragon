@@ -37,7 +37,6 @@ components:
           type: "string"
           description: "Text of the comment"
 
-
   parameters:
     ID:
       name: "ID"
@@ -330,6 +329,43 @@ paths:
         "404":
           description: "Entity not found"
 
+  /data:
+    post:
+      operationId: "qdata.api.entities.add_instance"
+      tags:
+        - Data
+      summary: "Adds a new instance to the lab notebook"
+      description: "The data_path should be the directory in which the data is located. Goes in that directory and creates an instance based on the files present. The name of the new Instance is the name of the directory"
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  bucket_ID:
+                    type: "string"
+                  data_path:
+                    type: "string"
+                  username:
+                    type: "string"
+                  start_time:
+                    type: "string"
+                  end_time:
+                    type: "string"
+                required:
+                  - bucket_ID
+                  - data_path
+                  - username
+      responses:
+        "200":
+          description: "Successfully added instance"
+        "400":
+          description: "Invalid instance"
+        "403":
+          description: "Data folder not found"
+        "404":
+          description: "Bucket not found"
+
   /properties/users:
     get:
       operationId: "qdata.api.entities.get_users"
@@ -404,7 +440,7 @@ paths:
       operationId: "qdata.api.entities.get_data_suggestions"
       tags:
         - Properties
-        - Suggestions
+        - Data
       summary: "Returns a dictionary of suggestions for a specified query. If no query is specified,
        all suggestions are returned."
       parameters:
@@ -421,7 +457,7 @@ paths:
       operationId: "qdata.api.entities.get_plot_suggestions"
       tags:
         - Properties
-        - Suggestions
+        - Data
       summary: "Returns a dictionary of plot suggestions for a specified query. If no query is specified,
        all plot suggestions are returned."
       parameters:
