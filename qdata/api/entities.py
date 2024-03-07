@@ -965,6 +965,18 @@ def add_instance(body):
     return make_response("Instance added", 201)
 
 
+def get_buckets():
+    """
+    API function that returns a dictionary of all the buckets
+    :return: json with keys being the ID of the bucket and the value its name.
+    """
+    ret = {}
+    for k, v in INDEX.items():
+        if isinstance(v, Bucket):
+            ret[k] = v.name
+    return ret, 201
+
+
 def get_stored_params(ID):
     """
     Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.

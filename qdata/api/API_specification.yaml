@@ -366,6 +366,17 @@ paths:
         "404":
           description: "Bucket not found"
 
+  /data/buckets:
+    get:
+      operationId: "qdata.api.entities.get_buckets"
+      tags:
+        - Data
+        - Properties
+      summary: "Returns all buckets present in the notebook in a dictionary with bucket_ID as keys and name as values"
+      responses:
+        "200":
+          description: "Successfully read buckets"
+
   /properties/users:
     get:
       operationId: "qdata.api.entities.get_users"
