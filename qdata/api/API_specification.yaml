@@ -88,6 +88,16 @@ components:
 
 paths:
 
+  /health:
+    get:
+      operationId: "qdata.api.entities.health_check"
+      tags:
+        - Health
+      summary: "Returns the health of the server"
+      responses:
+        "201":
+          description: "Server is healthy"
+
   /reset:
     post:
       operationId: "qdata.api.entities.reset"
@@ -303,6 +313,7 @@ paths:
       operationId: "qdata.api.entities.get_stored_params"
       tags:
         - Entities
+        - Data
       summary: "Returns a dictionary of stored parameters for a specified query. If no query is specified,
        all stored parameters are returned."
       parameters:
@@ -365,6 +376,34 @@ paths:
           description: "Data folder not found"
         "404":
           description: "Bucket not found"
+
+    patch:
+      operationId: "qdata.api.entities.add_analysis_files_to_instance"
+      tags:
+          - Data
+      summary: "Adds analysis files to the instance with the given data loc"
+      description: "Accepts a list of file paths pointing to analysis files. The files are sorted into the respective field depending on their extension"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                data_loc:
+                  type: "string"
+                analysis_files:
+                  type: "array"
+              required:
+                - data_loc
+                - analysis_files
+      responses:
+          "200":
+              description: "Successfully added analysis files"
+          "400":
+              description: "No analysis files provided"
+          "404":
+              description: "Instance not found"
+
 
   /data/buckets:
     get:

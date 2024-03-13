@@ -232,7 +232,7 @@ def add_image_to_index(image, image_path):
         IMAGEINDEX[img_hash] = image_path
     # FIXME: This is a design decision that should be checked
     elif str(IMAGEINDEX[img_hash]) != str(image_path):
-        raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
+        print(f'duplicated image has been found, will ignore the new image {image_path}')
 
 
 def find_equivalent_image(image, threshold=0.1):
@@ -340,6 +340,13 @@ def read_child_entity(entity_path: Path):
                 }
 
     return ret_dict
+
+
+def health_check():
+    """
+    Function that checks if the server is running
+    """
+    return make_response("Server is running", 201)
 
 
 def read_all():
@@ -965,6 +972,56 @@ def add_instance(body):
     return make_response("Instance added", 201)
 
 
+def add_analysis_files_to_instance(body):
+    """
+    Adds a list of analysis files to the specified instance. The body should be a dictionary with the following keys:
+        * data_loc: The path to the instance. We use path instead of ID because the measurement setups should not know what the ids are.
+        * analysis_files: A list of paths to the analysis files to add to the instance. The function will check if the files exists and sort them correctly.
+    """
+
+    if "data_loc" not in body or body['data_loc'] == "":
+        abort(404, f"Data loc is required")
+    data_path = Path(body['data_loc'])
+    if str(data_path) not in PATH_TO_UUID_INDEX:
+        abort(404, f"Data with path {data_path} not found")
+    uuid_ = PATH_TO_UUID_INDEX[str(data_path)]
+    if uuid_ not in INDEX:
+        abort(404, f"Instance with path {data_path} not found")
+    instance = INDEX[uuid_]
+
+    if "analysis_files" not in body or body['analysis_files'] == "":
+        abort(400, f"No analysis files are provided")
+
+    analysis_files = body['analysis_files']
+    if not isinstance(analysis_files, list):
+        abort(400, f"Analysis files should be a list")
+
+    for analysis_file in analysis_files:
+        path = Path(analysis_file)
+        if not path.is_file():
+            abort(404, f"Analysis file with path {path} not found")
+
+        if path.suffix == '.jpg' or path.suffix == '.png':
+            if path not in instance.images and analysis_file not in instance.images:
+                img = Image.open(path)
+                add_image_to_index(img, path)
+                instance.images.append(str(path))
+        elif path.suffix == '.html':
+            if path not in instance.analysis and analysis_file not in instance.analysis:
+                instance.images.append(str(path))
+        elif path.suffix == '.ipynb':
+            if path not in instance.analysis and analysis_file not in instance.analysis:
+                instance.analysis.append(str(path))
+        elif path.suffix == '.json':
+            if path not in instance.stored_params and analysis_file not in instance.stored_params:
+                instance.stored_params.append(str(path))
+
+    instance_copy = create_path_entity_copy(instance)
+    instance_copy.to_TOML(data_path)
+
+    return make_response("Analysis files added", 201)
+
+
 def toggle_star(data_loc: str):
     """
     Toggles the star tag of an instance.This changes both the parameter in the folder containing the instance as well as the TOML file.
@@ -1025,6 +1082,30 @@ def get_stored_params(ID):
     Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.
     """
 
+    def convert_inf_to_string(data):
+        """
+        fit parameters in json sometimes store inf as a float, this function converts them to string
+        """
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, float):
+                    if value == float('inf'):
+                        data[key] = "Infinity"
+                    elif value == float('-inf'):
+                        data[key] = "-Infinity"
+                else:
+                    convert_inf_to_string(value)
+        elif isinstance(data, list):
+            for index, item in enumerate(data):
+                if isinstance(item, float):
+                    if item == float('inf'):
+                        data[index] = "Infinity"
+                    elif item == float('-inf'):
+                        data[index] = "-Infinity"
+                else:
+                    convert_inf_to_string(item)
+        return data
+
     if ID not in INDEX:
         abort(404, f"Entity with ID {ID} not found")
 
@@ -1044,7 +1125,7 @@ def get_stored_params(ID):
                 data = json.load(json_file)
                 ret[path.stem] = data
 
-    return json.dumps(ret), 201
+    return json.dumps(convert_inf_to_string(ret)), 201
 
 
 def get_fake_mentions():
