@@ -72,6 +72,29 @@ export default function InstanceViewer({ entity }) {
         })
     }, []);
 
+    function RenderDataStructureTable({ data, title }) {
+        return (
+            <div>
+                <h3>{title}</h3>
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Object.entries(data).map(([key, value], index) => (
+                            <tr key={index}>
+                                <td>{key}</td>
+                                <td>{typeof value === 'object' ? JSON.stringify(value) : value}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
     return (
         <div className="instance-viewer">
             <h1 className="tittle instance">{entity.name}</h1>
@@ -91,22 +114,9 @@ export default function InstanceViewer({ entity }) {
                 </h2>
 
                 {structureToggle &&
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Axis</th>
-                                <th>Data Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.entries(entity.data_structure).map(([key, value], index) => (
-                                <tr key={index}>
-                                    <td>{key}</td>
-                                    <td>{value}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                Object.entries(entity.data_structure).map(([title, data], index) => (
+                    <RenderDataStructureTable key={index} data={data} title={title} />
+                    ))
                 }
             </div>
 

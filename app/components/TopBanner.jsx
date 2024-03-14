@@ -27,6 +27,10 @@ export default function TopBanner() {
         setOnlyShowBookmarked(!onlyShowBookmarked);
     }
 
+    if (!rootEntity) {
+        return <div>Loading...</div>
+    }
+
     return (
     <div className="top-banner">
         <a href={"/entities/" + rootEntity.id}>
