@@ -20,6 +20,8 @@ The following is simply a place to quickly write down known issues as well as ne
 - The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
 - The way the data structure section in the instance is stored might not be great. The naming of the table is wierd
 
+- when an entity is deleted, the notebook marks the TOML file as deleted and removes it from the parent. But there is no history left there that the entity was a child of someone 
+
 # Assumptions
 
 - every msmt folder contains only a single TOML file and that TOML file is a valid entity

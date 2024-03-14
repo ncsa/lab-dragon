@@ -35,6 +35,11 @@ from qdata.components import Comment, SupportedCommentType, Table
 
 
 class {{class_name}}({{ inherits_from }}):
+
+    {% if class_name == 'Entity' %}
+    # If True, checks everytime the entity is saved to_TOML if the filename starts with the first 8 digits of the ID. If it doesn't it adds them.
+    START_FILENAME_WITH_ID = True
+    {% endif %}
     def __init__(self,
                  {% for key, val in definition.items() -%}
                  {# This is to check what items should not have default and need to come before any other argument #}
@@ -147,6 +152,8 @@ class {{class_name}}({{ inherits_from }}):
             path = Path(path)
             if path.is_dir():
                 path = path.joinpath(self.name + '.toml')
+            if self.START_FILENAME_WITH_ID and not path.name.startswith(self.ID[:8] + '_'):
+                path = path.parent.joinpath(self.ID[:8] + '_' + path.name)
             with open(path, 'w') as f:
                 f.write(doc.as_string())
 

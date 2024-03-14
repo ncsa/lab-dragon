@@ -669,7 +669,7 @@ def add_entity(**kwargs):
     ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
     parent = INDEX[body['parent']]
     parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
-    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
+    ent_path = parent_path.parent.joinpath(ent.ID[:8] + '_' + ent.name + '.toml')
 
     # Because the children do not have a path yet, you need to make a path copy before adding the child
     parent_copy = create_path_entity_copy(parent)

@@ -63,6 +63,8 @@ class Bucket(Entity):
             path = Path(path)
             if path.is_dir():
                 path = path.joinpath(self.name + '.toml')
+            if self.START_FILENAME_WITH_ID and not path.name.startswith(self.ID[:8] + '_'):
+                path = path.parent.joinpath(self.ID[:8] + '_' + path.name)
             with open(path, 'w') as f:
                 f.write(doc.as_string())
 
