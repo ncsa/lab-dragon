@@ -25,6 +25,9 @@ from typing import List, Tuple, Dict, Optional, Union
 {% for key, val in imports.items() -%}
 {{ val }} as {{ key }}
 {% endfor %}
+{% if class_name == 'Instance' -%}
+from labcore.data.datadict_storage import datadict_from_hdf5
+{% endif -%}
 
 from qdata.utils import create_timestamp
 from qdata.components import Comment, SupportedCommentType, Table
@@ -32,6 +35,11 @@ from qdata.components import Comment, SupportedCommentType, Table
 
 
 class {{class_name}}({{ inherits_from }}):
+
+    {% if class_name == 'Entity' %}
+    # If True, checks everytime the entity is saved to_TOML if the filename starts with the first 8 digits of the ID. If it doesn't it adds them.
+    START_FILENAME_WITH_ID = True
+    {% endif %}
     def __init__(self,
                  {% for key, val in definition.items() -%}
                  {# This is to check what items should not have default and need to come before any other argument #}
@@ -105,7 +113,13 @@ class {{class_name}}({{ inherits_from }}):
 
         self.{{ key }} = {{ key }}
         {% endif -%}
-        {% endfor %}
+        {% endfor -%}
+        {% if class_name == 'Instance' -%}
+        # If you start with data, populate itself by loading values from file system.
+        if len(data) != 0:
+            self.populate_itself()
+        {% endif %}
+
     def to_TOML(self, path: Optional[Union[str,Path]] = None):
 
         if hasattr(super(), 'to_TOML'):
@@ -138,6 +152,8 @@ class {{class_name}}({{ inherits_from }}):
             path = Path(path)
             if path.is_dir():
                 path = path.joinpath(self.name + '.toml')
+            if self.START_FILENAME_WITH_ID and not path.name.startswith(self.ID[:8] + '_'):
+                path = path.parent.joinpath(self.ID[:8] + '_' + path.name)
             with open(path, 'w') as f:
                 f.write(doc.as_string())
 
@@ -273,4 +289,65 @@ class {{class_name}}({{ inherits_from }}):
         """
         self.previous_names.append(self.name)
         self.name = new_name
+    {% endif %}
+
+    {# Only need to populate itself based on the files around the entity if its an Instance #}
+    {% if class_name == 'Instance' -%}
+    def populate_itself(self):
+        """
+        Populates itself based on the files around the Instance.
+
+        Fields that this function populates are:
+        * data_structure: Loads the ddh5 file with structure only and saves the structure
+        * tags: Creates a tag for every .tag file in a parent folder, removes the first and last 2 characters of the tag, usually '__'
+        * stored_params: Saves the path to every .json file in a parent folder
+        * images: Saves the path to every .png, .jpg, and .html file in a parent folder
+        * analysis: Saves the path to every .ipynb file in a parent folder
+
+        :param data_path: The path to the data folder.
+        """
+        # multiple datasets can be in the same parent folder or different.
+        # Keeps track of the parent folders to avoid duplicates
+        revised_parents = []
+        data_structure = {}
+        tags = []
+        stored_params = []
+        images = []
+        analysis = []
+        for data_path in self.data:
+            parent = Path(data_path).parent
+            if parent not in revised_parents:
+                for file in parent.rglob('*'):
+                    if file.suffix == ".ddh5":
+                        try:
+                            dd = datadict_from_hdf5(str(file), structure_only=True)
+                            specific_data_structure = {}
+                            for name, value in dd.data_items():
+                                full_name = name
+                                if len(value["axes"]) > 0:
+                                    full_name += f"[{', '.join(value['axes'])}]"
+                                if value["unit"] != "":
+                                    full_name += f"[{value['unit']}]"
+                                specific_data_structure[full_name] = value["__shape__"]
+                            data_structure[str(file.name)] = specific_data_structure
+                        except Exception as e:
+                            print(f'Error reading {file.name} {e}')
+
+                    elif file.suffix == ".tag":
+                        # remove the leading and ending '__'
+                        tags.append(file.stem[2:-2])
+                    # Assuming that any param for now its stored in a JSON file
+                    elif file.suffix == ".json":
+                        stored_params.append(str(file))
+                    elif file.suffix == ".png" or file.suffix == ".jpg" or file.suffix == ".html":
+                        images.append(str(file))
+                    elif file.suffix == ".ipynb":
+                        analysis.append(str(file))
+
+        self.data_structure = data_structure
+        self.tags = tags
+        self.stored_params = stored_params
+        self.images = images
+        self.analysis = analysis
+
     {% endif %}

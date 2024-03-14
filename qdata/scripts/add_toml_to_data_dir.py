@@ -36,66 +36,27 @@ def add_toml_to_data(dir, user="testUser"):
     # Create the data bucket
     bucket = Bucket(name="Measurements",
                         user=user)
-    bucket_path = dir.joinpath(bucket.name + '.toml')
+    bucket_path = dir.joinpath(bucket.ID[:8] + '_' +bucket.name + '.toml')
 
     counter = 0
     for path in dir.rglob('*'):
         if path.suffix == '.ddh5':
             parent = path.parent
+            # If there already is a toml file present in this directory, skip this one
             if any(child.suffix == '.toml' for child in parent.iterdir()):
                 continue
-            else:
-                # Read the data
-                data_structure = {}
+            instance = Instance(name=parent.name,
+                                user=user,
+                                parent=bucket_path,
+                                data=[str(path)],)
+            # Save the instance
+            instance.to_TOML(parent)
 
-                try:
-                    dd = datadict_from_hdf5(str(path), structure_only=True)
-                    for name, value in dd.data_items():
-                        full_name = name
-                        if len(value["axes"]) > 0:
-                            full_name += f"[{', '.join(value['axes'])}]"
-                        if value["unit"] != "":
-                            full_name += f"[{value['unit']}]"
-
-                        data_structure[full_name] = value["__shape__"]
-                except Exception as e:
-                    print(f'Error reading {path.name} {e}')
-
-                # Get tags, stored params, images and analysis notebooks.
-                tags = []
-                stored_params = []
-                images = []
-                analysis = []
-                for file in parent.iterdir():
-                    if file.suffix == ".tag":
-                        # remove the leading and ending '__'
-                        tags.append(file.stem[2:-2])
-                    # Assuming that any param for now its stored in a JSON file
-                    elif file.suffix == ".json":
-                        stored_params.append(str(file))
-                    elif file.suffix == ".png" or file.suffix == ".jpg" or file.suffix == ".html":
-                        images.append(str(file))
-                    elif file.suffix == ".ipynb":
-                        analysis.append(str(file))
-
-                # Create the instance
-                instance = Instance(name=parent.name,
-                                    user=user,
-                                    parent=bucket_path,
-                                    data_structure=data_structure,
-                                    tags=tags,
-                                    data=[str(path)],
-                                    stored_params=stored_params,
-                                    images=images,
-                                    analysis=analysis)
-
-                # Save the instance
-                instance.to_TOML(parent)
-
-                bucket.add_instance(parent.joinpath(instance.name + '.toml'), instance.ID)
-                counter += 1
+            bucket.add_instance(parent.joinpath(instance.ID[:8] + '_' + instance.name + '.toml'), instance.ID)
+            counter += 1
 
     print(f'Done creating {counter} TOML files')
     # Save the bucket
     bucket.to_TOML(bucket_path)
     print(f'bucket created all done')
+    return bucket_path

@@ -16,7 +16,19 @@ The following is simply a place to quickly write down known issues as well as ne
 - If the entity is not long enough the text in the buttons gets smaller and runs off in the background
 - Make the editing of comments as well as adding more comments behave like the editing of titles instead of relying on state variables
 
+- For now all the configuration of the notebook integration is done as module variables. I might want to at some point figure out how to do it using the options class.
+- The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
+- The way the data structure section in the instance is stored might not be great. The naming of the table is wierd
+
+- when an entity is deleted, the notebook marks the TOML file as deleted and removes it from the parent. But there is no history left there that the entity was a child of someone 
+
+# Assumptions
+
+- every msmt folder contains only a single TOML file and that TOML file is a valid entity
+- all instance file names are the folder name + .toml
+
 # Tests
 
+- How do we handle a dataset with a failed msmt, like an incomplete msmt
 
 

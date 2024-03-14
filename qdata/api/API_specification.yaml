@@ -37,7 +37,6 @@ components:
           type: "string"
           description: "Text of the comment"
 
-
   parameters:
     ID:
       name: "ID"
@@ -88,6 +87,16 @@ components:
           type: "boolean"
 
 paths:
+
+  /health:
+    get:
+      operationId: "qdata.api.entities.health_check"
+      tags:
+        - Health
+      summary: "Returns the health of the server"
+      responses:
+        "201":
+          description: "Server is healthy"
 
   /reset:
     post:
@@ -304,6 +313,7 @@ paths:
       operationId: "qdata.api.entities.get_stored_params"
       tags:
         - Entities
+        - Data
       summary: "Returns a dictionary of stored parameters for a specified query. If no query is specified,
        all stored parameters are returned."
       parameters:
@@ -329,6 +339,100 @@ paths:
           description: "Successfully toggled bookmark"
         "404":
           description: "Entity not found"
+
+  /data:
+    post:
+      operationId: "qdata.api.entities.add_instance"
+      tags:
+        - Data
+      summary: "Adds a new instance to the lab notebook"
+      description: "The data_path should be the directory in which the data is located. Goes in that directory and creates an instance based on the files present. The name of the new Instance is the name of the directory"
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  bucket_ID:
+                    type: "string"
+                  data_loc:
+                    type: "string"
+                  username:
+                    type: "string"
+                  start_time:
+                    type: "string"
+                  end_time:
+                    type: "string"
+                required:
+                  - bucket_ID
+                  - data_loc
+                  - username
+      responses:
+        "200":
+          description: "Successfully added instance"
+        "400":
+          description: "Invalid instance"
+        "403":
+          description: "Data folder not found"
+        "404":
+          description: "Bucket not found"
+
+    patch:
+      operationId: "qdata.api.entities.add_analysis_files_to_instance"
+      tags:
+          - Data
+      summary: "Adds analysis files to the instance with the given data loc"
+      description: "Accepts a list of file paths pointing to analysis files. The files are sorted into the respective field depending on their extension"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                data_loc:
+                  type: "string"
+                analysis_files:
+                  type: "array"
+              required:
+                - data_loc
+                - analysis_files
+      responses:
+          "200":
+              description: "Successfully added analysis files"
+          "400":
+              description: "No analysis files provided"
+          "404":
+              description: "Instance not found"
+
+
+  /data/buckets:
+    get:
+      operationId: "qdata.api.entities.get_buckets"
+      tags:
+        - Data
+        - Properties
+      summary: "Returns all buckets present in the notebook in a dictionary with bucket_ID as keys and name as values"
+      responses:
+        "200":
+          description: "Successfully read buckets"
+
+  /data/toggle_star:
+    patch:
+      operationId: "qdata.api.entities.toggle_star"
+      tags:
+          - Data
+      summary: "Toggles the star status of the instance with the given ID"
+      parameters:
+        - in: query
+          name: "data_loc"
+          schema:
+            type: "string"
+          description: "The location of the data. An entity should exist with this data_loc"
+      responses:
+          "200":
+            description: "Successfully toggled star"
+          "404":
+            description: "Instance not found"
 
   /properties/users:
     get:
@@ -404,7 +508,7 @@ paths:
       operationId: "qdata.api.entities.get_data_suggestions"
       tags:
         - Properties
-        - Suggestions
+        - Data
       summary: "Returns a dictionary of suggestions for a specified query. If no query is specified,
        all suggestions are returned."
       parameters:
@@ -421,7 +525,7 @@ paths:
       operationId: "qdata.api.entities.get_plot_suggestions"
       tags:
         - Properties
-        - Suggestions
+        - Data
       summary: "Returns a dictionary of plot suggestions for a specified query. If no query is specified,
        all plot suggestions are returned."
       parameters:

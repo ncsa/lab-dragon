@@ -21,6 +21,7 @@ generate_all_classes()
 
 from qdata.modules.task import Task
 from qdata.modules.step import Step
+from qdata.modules.bucket import Bucket
 from qdata.modules.entity import Entity
 from qdata.modules.project import Project
 from qdata.modules.instance import Instance
@@ -231,7 +232,7 @@ def add_image_to_index(image, image_path):
         IMAGEINDEX[img_hash] = image_path
     # FIXME: This is a design decision that should be checked
     elif str(IMAGEINDEX[img_hash]) != str(image_path):
-        raise ValueError(f"The image {image_path} is already in the index with the path {IMAGEINDEX[img_hash]}")
+        print(f'duplicated image has been found, will ignore the new image {image_path}')
 
 
 def find_equivalent_image(image, threshold=0.1):
@@ -339,6 +340,13 @@ def read_child_entity(entity_path: Path):
                 }
 
     return ret_dict
+
+
+def health_check():
+    """
+    Function that checks if the server is running
+    """
+    return make_response("Server is running", 201)
 
 
 def read_all():
@@ -661,7 +669,7 @@ def add_entity(**kwargs):
     ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
     parent = INDEX[body['parent']]
     parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
-    ent_path = parent_path.parent.joinpath(ent.name + '.toml')
+    ent_path = parent_path.parent.joinpath(ent.ID[:8] + '_' + ent.name + '.toml')
 
     # Because the children do not have a path yet, you need to make a path copy before adding the child
     parent_copy = create_path_entity_copy(parent)
@@ -902,10 +910,201 @@ def get_plot_suggestions(ID, query_filter="", num_matches=10):
                     
     return json.dumps(matches), 201
 
+
+def add_instance(body):
+    """
+    API function that adds an instance to a bucket
+
+    body should be a dictionary with the following keys
+        * bucket_ID: The ID of the bucket to add the instance to
+        * data_loc: The path of the data that the instance is based on
+        * username: The user that created the instance
+        * start_time: The start time of the instance
+        * end_time: The end time of the instance
+    """
+
+    if "bucket_ID" not in body or body['bucket_ID'] == "":
+        abort(404, f"Bucket ID is required")
+    bucket_ID = body['bucket_ID']
+    if "data_loc" not in body or body['data_loc'] == "":
+        abort(404, f"Data loc is required")
+    data_path = body['data_loc']
+    if "username" not in body or body['username'] == "":
+        abort(404, f"Username is required")
+    username = body['username']
+
+    start_time = body.get('start_time', None)
+    end_time = body.get('end_time', None)
+
+    if bucket_ID not in INDEX:
+        abort(404, f"Entity with ID {bucket_ID} not found")
+
+    bucket = INDEX[bucket_ID]
+
+    if not isinstance(bucket, Bucket):
+        abort(400, f"Entity with ID {bucket_ID} is not a bucket")
+
+    # Path to the folder containing the data file
+    data_path = Path(data_path)
+    if not Path(data_path).is_dir():
+        abort(403, f"Data with path {data_path} not found")
+
+    data_file = data_path.joinpath('data.ddh5')
+    if not data_file.is_file():
+        abort(403, f"Data with path {data_file} not found")
+
+    instance_path = data_path.joinpath(data_path.name + '.toml')
+    if instance_path.is_file():
+        abort(400, f"Instance with path {instance_path} already exists")
+
+    instance = Instance(name=data_path.name, data=[str(data_file)], user=username, start_time=start_time, end_time=end_time)
+
+    bucket.add_instance(instance_path, instance.ID)
+
+    bucket_copy = create_path_entity_copy(bucket)
+    bucket_copy.to_TOML(Path(UUID_TO_PATH_INDEX[bucket_ID]))
+
+    instance_copy = create_path_entity_copy(instance)
+    instance_copy.to_TOML(instance_path)
+
+    add_ent_to_index(instance, instance_path)
+
+    return make_response("Instance added", 201)
+
+
+def add_analysis_files_to_instance(body):
+    """
+    Adds a list of analysis files to the specified instance. The body should be a dictionary with the following keys:
+        * data_loc: The path to the instance. We use path instead of ID because the measurement setups should not know what the ids are.
+        * analysis_files: A list of paths to the analysis files to add to the instance. The function will check if the files exists and sort them correctly.
+    """
+
+    if "data_loc" not in body or body['data_loc'] == "":
+        abort(404, f"Data loc is required")
+    data_path = Path(body['data_loc'])
+    if str(data_path) not in PATH_TO_UUID_INDEX:
+        abort(404, f"Data with path {data_path} not found")
+    uuid_ = PATH_TO_UUID_INDEX[str(data_path)]
+    if uuid_ not in INDEX:
+        abort(404, f"Instance with path {data_path} not found")
+    instance = INDEX[uuid_]
+
+    if "analysis_files" not in body or body['analysis_files'] == "":
+        abort(400, f"No analysis files are provided")
+
+    analysis_files = body['analysis_files']
+    if not isinstance(analysis_files, list):
+        abort(400, f"Analysis files should be a list")
+
+    for analysis_file in analysis_files:
+        path = Path(analysis_file)
+        if not path.is_file():
+            abort(404, f"Analysis file with path {path} not found")
+
+        if path.suffix == '.jpg' or path.suffix == '.png':
+            if path not in instance.images and analysis_file not in instance.images:
+                img = Image.open(path)
+                add_image_to_index(img, path)
+                instance.images.append(str(path))
+        elif path.suffix == '.html':
+            if path not in instance.analysis and analysis_file not in instance.analysis:
+                instance.images.append(str(path))
+        elif path.suffix == '.ipynb':
+            if path not in instance.analysis and analysis_file not in instance.analysis:
+                instance.analysis.append(str(path))
+        elif path.suffix == '.json':
+            if path not in instance.stored_params and analysis_file not in instance.stored_params:
+                instance.stored_params.append(str(path))
+
+    instance_copy = create_path_entity_copy(instance)
+    instance_copy.to_TOML(data_path)
+
+    return make_response("Analysis files added", 201)
+
+
+def toggle_star(data_loc: str):
+    """
+    Toggles the star tag of an instance.This changes both the parameter in the folder containing the instance as well as the TOML file.
+
+    :param data_loc: A path containing the instance. This can be either the path to the TOML file, the data file or the folder containing the data file.
+    """
+
+    data_path = Path(data_loc)
+    if data_path.name == 'data.ddh5':
+        instance_path = data_path.parent.joinpath(data_path.parent.name + '.toml')
+    elif data_path.is_dir():
+        instance_path = data_path.joinpath(data_path.name + '.toml')
+    elif data_path.suffix == '.toml':
+        instance_path = data_path
+    else:
+        abort(404, f"Data with path {data_path} not found")
+
+    if not instance_path.is_file():
+        abort(404, f"Instance with path {instance_path} not found")
+
+    # FIXME: there definitely is a more efficient way to do this.
+    if str(instance_path) not in PATH_TO_UUID_INDEX or PATH_TO_UUID_INDEX[str(instance_path)] not in INDEX:
+        abort(404, f"Instance with path {instance_path} not found")
+
+    instance = INDEX[PATH_TO_UUID_INDEX[str(instance_path)]]
+    star_path = instance_path.parent.joinpath('__star__.tag')
+
+    if star_path.is_file():
+        star_path.unlink()
+        if "star" in instance.tags:
+            instance.tags.remove("star")
+            instance_copy = create_path_entity_copy(instance)
+            instance_copy.to_TOML(instance_path)
+    else:
+        star_path.touch()
+        if "star" not in instance.tags:
+            instance.tags.append("star")
+            instance_copy = create_path_entity_copy(instance)
+            instance_copy.to_TOML(instance_path)
+
+    return make_response("Star toggled", 201)
+
+
+def get_buckets():
+    """
+    API function that returns a dictionary of all the buckets
+    :return: json with keys being the ID of the bucket and the value its name.
+    """
+    ret = {}
+    for k, v in INDEX.items():
+        if isinstance(v, Bucket):
+            ret[k] = v.name
+    return ret, 201
+
+
 def get_stored_params(ID):
     """
     Assuming all of the stored parameters are stored in JSON file for now but more complex types can be added.
     """
+
+    def convert_inf_to_string(data):
+        """
+        fit parameters in json sometimes store inf as a float, this function converts them to string
+        """
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, float):
+                    if value == float('inf'):
+                        data[key] = "Infinity"
+                    elif value == float('-inf'):
+                        data[key] = "-Infinity"
+                else:
+                    convert_inf_to_string(value)
+        elif isinstance(data, list):
+            for index, item in enumerate(data):
+                if isinstance(item, float):
+                    if item == float('inf'):
+                        data[index] = "Infinity"
+                    elif item == float('-inf'):
+                        data[index] = "-Infinity"
+                else:
+                    convert_inf_to_string(item)
+        return data
 
     if ID not in INDEX:
         abort(404, f"Entity with ID {ID} not found")
@@ -926,7 +1125,7 @@ def get_stored_params(ID):
                 data = json.load(json_file)
                 ret[path.stem] = data
 
-    return json.dumps(ret), 201
+    return json.dumps(convert_inf_to_string(ret)), 201
 
 
 def get_fake_mentions():
