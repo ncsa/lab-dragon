@@ -5,10 +5,12 @@ import '../../globals.css';
 import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
 import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
 import Placeholder from "@tiptap/extension-placeholder";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import Link from "@tiptap/extension-link";
 import { MentionList } from "./MentionList";
 import { PluginKey } from "prosemirror-state";
@@ -16,7 +18,6 @@ import { createDataMention } from "./extensions/DataMention";
 import { createPlotMention } from "./extensions/PlotMention";
 import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
-import Dropcursor from "@tiptap/extension-dropcursor";
 
 
 const uploadImage = async (file) => {
@@ -31,6 +32,8 @@ const uploadImage = async (file) => {
 }
 
 export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
+
+  const [isCursorInTable, setIsCursorInTable] = useState(false);
 
   const dataMentionsOptionsRef = useRef({});
   const plotMentionsOptionsRef = useRef({});
@@ -92,15 +95,18 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
 
   const editor = useEditor({
     extensions: [
-      Document,
-      Paragraph,
-      Text,
+      StarterKit,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableCell,
+      TableHeader,
       Link,
       Placeholder.configure({
         placeholder: "Write a comment here..."
       }),
       TiptapImage.configure({inline: true}),
-      Dropcursor,
       Iframe,
       createDataMention(dataMentionsOptionsRef).configure({
         HTMLAttributes: {
@@ -231,6 +237,14 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
     onUpdate: (props) => {
       onContentChange(props.editor.getHTML());
     },
+    onSelectionUpdate: ({ editor }) => {
+      // Check if the cursor is in a table and update the state
+      const { selection } = editor.state;
+      const { $anchor } = selection;
+      if (!$anchor || !$anchor.node) return;
+      const isInTable = !!$anchor.node(-1).type.spec.tableRole; // Checks if the parent node has a tableRole
+      setIsCursorInTable(isInTable);
+    },
     content: initialContent ? initialContent : '',
   });
 
@@ -248,7 +262,19 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
   }, [reloadEditor,])
 
   return (
-    <div>
+    <div className="tiptap" >
+      <div className="tiptap-buttons">
+        <button type="button" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>Insert Table</button>
+        {isCursorInTable && (
+          <div>
+            <button type="button" onClick={() => editor.chain().focus().deleteTable().run()}>Delete Table</button>
+            <button type="button" onClick={() => editor.chain().focus().addColumnAfter().run()}>Add Column</button>
+            <button type="button" onClick={() => editor.chain().focus().deleteColumn().run()}>Delete Column</button>
+            <button type="button" onClick={() => editor.chain().focus().addRowAfter().run()}>Add Row</button>
+            <button type="button" onClick={() => editor.chain().focus().deleteRow().run()}>Delete Row</button>
+          </div>
+        )}
+      </div>
       <EditorContent editor={editor} />
     </div>
   );

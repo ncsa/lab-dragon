@@ -22,8 +22,7 @@ export default function CommentEditor({entID, comment, refresh}) {
         setIsLoading(true);
 
         // FIXME: This is a dirty a way of fixing the issue of the content being a string or an array. I should probably make content always a string directly.
-        const editedComment = typeof content === 'string' ? content : content[0];
-
+        const editedComment = typeof content === 'string' ? content : content[comment.content.length - 1];
         let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + comment.ID + "?HTML=True&username=" + user, {
             method: 'PATCH',
             headers: {
