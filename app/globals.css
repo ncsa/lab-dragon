@@ -37,6 +37,8 @@
     --tiptap-font-color: white;
     --tiptap-button-background-color: transparent; 
 
+    --tiptap-bubble-menu-background-color: #6d5a72;
+    --tiptap-floating-menu-background-color: #6d5a72;
 
     --tiptap-a-color: #92dce5;
     --tiptap-a-border-color: #92dce5;
@@ -140,6 +142,30 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: var(--table-row-hover-background-color);
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    color: var(--tiptap-font-color);
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 20px;
+    color: var(--tiptap-font-color);
+}
+
+.logo-image {
+    width: 200px;
+    height: 200px;
+    margin-left: 15px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: var(--background-color);
+    
 }
 
 
@@ -557,6 +583,27 @@ tr:hover {
     margin-top: 5px;
 }
 
+.comment h1{
+    color: var(--tittle-color);
+    font-size: 1.6em;
+    font-weight: 700;
+    padding: 0.5em;
+}
+
+.comment h2{
+    color: var(--tittle-color);
+    font-size: 1.4em;
+    font-weight: 700;
+    padding: 0.5em;
+}
+
+.comment h3{
+    color: var(--tittle-color);
+    font-size: 1.3em;
+    font-weight: 700;
+    padding: 0.5em;
+}
+
 .comment iframe {
     width: 50%;
     height: 100%;
@@ -756,6 +803,75 @@ ul > li {
 .tiptap th, .tiptap td{
     padding: 10px;
     border: 1px solid var(--section-divider-line-color);
+}
+
+.tiptap h1{
+    color: var(--tittle-color);
+    font-size: 1.6em;
+    font-weight: 700;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+
+.tiptap h2{
+    color: var(--tittle-color);
+    font-size: 1.4em;
+    font-weight: 700;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+
+.tiptap h3{
+    color: var(--tittle-color);
+    font-size: 1.3em;
+    font-weight: 700;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+
+.tiptap .tiptap-bubble-menu {
+    display: flex;
+    background-color: #0D0D0D;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+}
+
+.tiptap .tiptap-bubble-menu button{
+    border: none;
+    background: none;
+    color: #FFF;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0 0.2rem;
+    opacity: 0.6;
+}
+
+.tiptap .tiptap-bubble-menu button:hover{
+    opacity: 1;
+}
+
+.tiptap .tiptap-bubble-menu .is-active button{
+    opacity: 1;
+}
+
+.tiptap .floating-menu {
+    display: flex;
+    background-color: var(--tiptap-floating-menu-background-color);
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+}
+
+.tiptap .floating-menu button {
+    border: none;
+    background: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0 0.2rem;
+    opacity: 0.6;
+}
+
+.tiptap .floating-menu button:hover{
+    opacity: 1;
 }
 
 .mention {

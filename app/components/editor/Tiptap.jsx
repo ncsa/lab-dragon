@@ -4,7 +4,7 @@ import '../../globals.css';
 
 import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
-import { useEditor, EditorContent, ReactRenderer } from "@tiptap/react";
+import { useEditor, EditorContent, ReactRenderer, BubbleMenu, FloatingMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
@@ -261,6 +261,9 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
   
   }, [reloadEditor,])
 
+  if (!editor) {
+    return null;
+  }
   return (
     <div className="tiptap" >
       <div className="tiptap-buttons">
@@ -275,6 +278,18 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
           </div>
         )}
       </div>
+      <BubbleMenu className="tiptap-bubble-menu" editor={editor} tippyOptions={{ duration: 100 }}>
+        <button type="button" className={editor.isActive('bold') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
+        <button type="button" className={editor.isActive('italic') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>
+        <button type="button" className={editor.isActive('strike') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleStrike().run()}>Strike</button>
+      </BubbleMenu>
+      {editor && <FloatingMenu className="floating-menu" tippyOptions={{ duration: 100 }} editor={editor}>
+        <button type="button" className={editor.isActive('bulletList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBulletList().run()} > Bullet List </button>
+        <button type="button" className={editor.isActive('orderedList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleOrderedList().run()}> Ordered List </button>
+        <button type="button" className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}> H1 </button>
+        <button type="button" className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}> H2 </button>
+        <button type="button" className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}> H3 </button>
+      </FloatingMenu>}
       <EditorContent editor={editor} />
     </div>
   );
