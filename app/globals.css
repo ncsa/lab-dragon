@@ -37,8 +37,8 @@
     --tiptap-font-color: white;
     --tiptap-button-background-color: transparent; 
 
-    --tiptap-bubble-menu-background-color: #6d5a72;
-    --tiptap-floating-menu-background-color: #6d5a72;
+    --tiptap-bubble-menu-background-color: #0D0D0D;
+    --tiptap-floating-menu-background-color: #0D0D0D;
 
     --tiptap-a-color: #92dce5;
     --tiptap-a-border-color: #92dce5;
@@ -157,8 +157,8 @@ ol {
 }
 
 .logo-image {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     margin-left: 15px;
     margin-bottom: 10px;
     margin-top: 5px;
@@ -167,7 +167,6 @@ ol {
     background-color: var(--background-color);
     
 }
-
 
 
 /* TOP BANNER */
@@ -218,6 +217,7 @@ ol {
 .banner-right {
     display: flex;
     align-items: center;
+    margin-right: 30px;
 }
 
 .banner-right .reset-button {
@@ -831,7 +831,7 @@ ul > li {
 
 .tiptap .tiptap-bubble-menu {
     display: flex;
-    background-color: #0D0D0D;
+    background-color: var(--tiptap-bubble-menu-background-color);
     padding: 0.2rem;
     border-radius: 0.5rem;
 }
@@ -856,14 +856,14 @@ ul > li {
 
 .tiptap .floating-menu {
     display: flex;
-    background-color: var(--tiptap-floating-menu-background-color);
+    background-color: var(--tiptap-bubble-menu-background-color);
     padding: 0.2rem;
     border-radius: 0.5rem;
 }
 
 .tiptap .floating-menu button {
     border: none;
-    background: none;
+    background-color: var(--tiptap-bubble-menu-background-color);
     font-size: 0.85rem;
     font-weight: 500;
     padding: 0 0.2rem;
@@ -872,6 +872,7 @@ ul > li {
 
 .tiptap .floating-menu button:hover{
     opacity: 1;
+    box-shadow: none;
 }
 
 .mention {
