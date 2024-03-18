@@ -75,7 +75,7 @@ export default function EntityInput( {populateSideBar} ) {
                 <form onSubmit={handleSubmit}>
                     <ul>
                         <li>
-                            <label>Entity Name:</label>
+                            <label>Entity Name: </label>
                             <input
                                 required
                                 type="text"
