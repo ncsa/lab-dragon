@@ -34,9 +34,9 @@ export default function TopBanner() {
     return (
     <div className="top-banner">
         <a href={"/entities/" + rootEntity.id}>
-            <Image src="/images/pfafflab_logo.png" alt="First Image" width="64" height="64"/>
+            <Image className="logo-image" src="/images/dragon_logo.jpeg" alt="First Image" width="2000" height="2000"/>
         </a>
-        <h1 className="main-title">Lab Notebook</h1>
+        <h1 className="main-title">🐉 Lab Dragon 🐉</h1>
         <div className="banner-right">
             <button onClick={resetServer} className="reset-button" title="Refresh the notebook server">
                 <i className="bi bi-arrow-clockwise"></i>
