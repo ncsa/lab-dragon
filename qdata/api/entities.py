@@ -13,6 +13,7 @@ from PIL import Image
 from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
 from flask import abort, make_response, send_file
+from markdown.extensions.tables import TableExtension
 
 # Refresh the modules before starting the server
 from qdata.generators.meta import generate_all_classes, delete_all_modules
@@ -1171,4 +1172,4 @@ reset()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE)])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE), TableExtension(use_align_attribute=True)])
