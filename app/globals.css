@@ -177,6 +177,12 @@ ol {
     
 }
 
+.ProseMirror * {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+
 
 /* TOP BANNER */
 
@@ -750,6 +756,23 @@ ul > li {
 .comment-creator {
     color: var(--comment-creator-color);
     padding-right: 20px;
+}
+
+.comment-creator button{
+    background-color: var(--button-main-color);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.comment-creator button:hover{
+    background-color: var(--button-hover-color);
 }
 
 

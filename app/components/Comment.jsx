@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState, useRef} from "react"
 import CommentEditor from "./CommentEditor"
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
@@ -16,33 +16,48 @@ export async function getComment(entId, commentId) {
 
 export default function Comment({com,
                                  entID,
-                                 activatedCommentOrChildID,
-                                 setActivatedCommentOrChildID,
                                 }) {
 
     const [comment, setComment] = useState(com);
+    const [isEditing, setIsEditing] = useState(false);
+    const standbyContent = useRef(com.content[com.content.length - 1]); // This is used to store the comment that was edited but not submitted.
+    const editorRef = useRef(null)
 
     const refreshComment = () => {
         getComment(entID, comment.ID).then(newComment => {
             const parsed_item = JSON.parse(JSON.parse(newComment)); // FIXME: This means I am over stringifying my object from the server. This should be fixed.
             setComment(parsed_item);
         });
-        setActivatedCommentOrChildID(null);
+        setIsEditing(false);
     }
 
     useEffect(() => {
         setComment(com);
     }, [com]);
 
-    if (comment && activatedCommentOrChildID === comment.ID) {
-        return <CommentEditor entID={entID} comment={comment} refresh={refreshComment}/>
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (editorRef.current && !editorRef.current.contains(event.target)) {
+                setIsEditing(false);
+            }
+        };
+        if (isEditing) {
+            document.addEventListener("click", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [isEditing]);
+
+    if (isEditing) {
+        return <CommentEditor entID={entID} comment={comment} standbyContent={standbyContent} refresh={refreshComment} editorRef={editorRef} />
     }
 
     if (!comment) {
         return <div>Loading...</div>
     }
     return <div className={`comment`}
-                onDoubleClick={() => setActivatedCommentOrChildID(comment.ID)} >
+                onDoubleClick={() => setIsEditing(true)} >
             <span dangerouslySetInnerHTML={{ __html: comment.content[comment.content.length - 1] }}/>
         </div>
 
