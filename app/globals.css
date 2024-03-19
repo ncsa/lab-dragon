@@ -886,7 +886,7 @@ ul > li {
     opacity: 1;
 }
 
-.tiptap .tiptap-bubble-menu .is-active button{
+.tiptap .tiptap-bubble-menu button.is-active {
     opacity: 1;
 }
 
