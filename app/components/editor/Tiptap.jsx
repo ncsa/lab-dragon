@@ -93,6 +93,20 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
     updatePlotMentionsOptions();
   }, []);
 
+  useEffect(() => {
+    if (editor) {
+    editor.commands.setContent(initialContent);
+    }
+  }, [initialContent]);
+
+  useEffect(() => {
+    if (reloadEditor) {
+      editor.commands.setContent("");
+      editor.commands.focus();
+    }
+  
+  }, [reloadEditor,])
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -248,19 +262,6 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
     content: initialContent ? initialContent : '',
   });
 
-  useEffect(() => {
-    if (editor) {
-    editor.commands.setContent(initialContent);
-    }
-  }, [initialContent]);
-
-  useEffect(() => {
-    if (reloadEditor) {
-      editor.commands.setContent("");
-    }
-  
-  }, [reloadEditor,])
-
   if (!editor) {
     return null;
   }
@@ -270,11 +271,11 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
         <button type="button" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>Insert Table</button>
         {isCursorInTable && (
           <div>
-            <button type="button" onClick={() => editor.chain().focus().deleteTable().run()}>Delete Table</button>
-            <button type="button" onClick={() => editor.chain().focus().addColumnAfter().run()}>Add Column</button>
-            <button type="button" onClick={() => editor.chain().focus().deleteColumn().run()}>Delete Column</button>
-            <button type="button" onClick={() => editor.chain().focus().addRowAfter().run()}>Add Row</button>
-            <button type="button" onClick={() => editor.chain().focus().deleteRow().run()}>Delete Row</button>
+            <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteTable().run()}}>Delete Table</button>
+            <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addColumnAfter().run()}}>Add Column</button>
+            <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteColumn().run()}}>Delete Column</button>
+            <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addRowAfter().run()}}>Add Row</button>
+            <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteRow().run()}}>Delete Row</button>
           </div>
         )}
       </div>

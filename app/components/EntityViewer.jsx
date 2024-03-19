@@ -1,5 +1,5 @@
 "use client"
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState, useRef} from 'react';
 import Link from 'next/link';
 
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
@@ -28,11 +28,11 @@ export default function EntityViewer({ entityID }) {
     const [parentName, setParentName] = useState(null);
     const [entityChildren, setEntityChildren] = useState([{}]);
     const [orderedChildrenAndComments, setOrderedChildrenAndComments] = useState(null); // Combined array with the comments and children that is sorted for displaying
-    // Used to track what comment or entity should be editable/comment creator on
-    const [activatedCommentOrChildID, setActivatedCommentOrChildID] = useState(null);
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
     const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
+
+    const standByContent = useRef(null); // Used to store the new comment that was edited but not submitted. Useless here but I don't want to create another component.
 
     const ID = entityID;
 
@@ -106,13 +106,13 @@ export default function EntityViewer({ entityID }) {
                     orderedChildrenAndComments && orderedChildrenAndComments.length > 0 &&
                     orderedChildrenAndComments.map(item => (
                         item.obj.com_type ? 
-                            <Comment key={`comment-${item.obj.ID}`} entID={entity.ID} com={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/> :
-                            <SmallEntityViewer key={`entity-${item.obj.ID}`} ent={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/>
+                            <Comment key={`comment-${item.obj.ID}`} entID={entity.ID} com={item.obj}/> :
+                            <SmallEntityViewer key={`entity-${item.obj.ID}`} ent={item.obj}/>
                     ))
                 }
             </div>
             <div className="addition-section">
-                <CommentCreator className="comment-creator" entID={ID} reloader={reloadComments} />
+                <CommentCreator className="comment-creator" entID={ID} standbyContent={standByContent} reloader={reloadComments} />
             </div>
         </div>
     )

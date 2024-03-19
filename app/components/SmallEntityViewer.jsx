@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState, useRef} from "react";
 import Link from "next/link";
 
 import { BookmarkContext } from '@/app/contexts/BookmarkContext';
@@ -49,19 +49,21 @@ export async function changeEntityName(id, newName) {
 }
 
 
-export default function SmallEntityViewer({ent, activatedCommentOrChildID, setActivatedCommentOrChildID}) {
+export default function SmallEntityViewer({ent}) {
 
     const [entity, setEntity] = useState(ent);
     const [entityChildren, setEntityChildren] = useState([{}]);
     const [bookmarked, setBookmarked] = useState(entity.bookmarked);
     const [orderedChildrenAndComments, setOrderedChildrenAndComments] = useState(null); // Combined array with the comments and children that is sorted for displaying
     const [isEditingName, setIsEditingName] = useState(false);
+    const [isNewCommentEditorOpen, setIsNewCommentEditorOpen] = useState(false);
     const [newName, setNewName] = useState(ent.name);
-
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
     const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
 
+    const viewerRef = useRef(null); // Used to detect if the user clicks outside the editor to close it.
+    const standByContent = useRef(null); // Used to store the new comment that was edited but not submitted.
     // selects the icon it will display next to the name of the small entity
     const EntType = entity.type;
     const icon = getEntityTypeIcon(EntType);
@@ -70,7 +72,6 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
         getComments(entity.ID).then(data => {
             setEntity({...entity, comments: data})
         });
-        setActivatedCommentOrChildID(null);
     }
 
     // Handle the submission of the edit
@@ -132,11 +133,26 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
         }
     }, [entity, entityChildren, onlyShowBookmarked]);
 
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (viewerRef.current && !viewerRef.current.contains(event.target)) {
+                setIsNewCommentEditorOpen(false);
+            }
+        }
+        if (isNewCommentEditorOpen) {
+            window.addEventListener('click', handleClickOutside);
+        }
+        return () => {
+            window.removeEventListener('click', handleClickOutside);
+        };
+    }, [isNewCommentEditorOpen, setIsNewCommentEditorOpen, viewerRef]);
+
     if (!entity) {
         return <div>Loading...</div>;
     }
     return (
-        <div className={`small-entity ${entity.type}`}>
+        <div className={`small-entity ${entity.type}`} ref={viewerRef}>
             <div className={`type-indicator ${entity.type}`}></div>
             <div className='small-entity-tittle'>
                 <h3>
@@ -174,7 +190,7 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
                         }}>
                         <i className="bi bi-x-circle" />
                     </button>
-                    <button className="add-comment-button" title={`Add a comment to "${entity.name}" \n (look at the opened textbox below)`} onClick={() => {setActivatedCommentOrChildID(entity.ID)}}>
+                    <button className="add-comment-button" title={`Add a comment to "${entity.name}" \n (look at the opened textbox below)`} onClick={() => {setIsNewCommentEditorOpen(true)}}>
                         <i className="bi bi-plus-circle" />
                     </button>
                 </div>
@@ -183,16 +199,11 @@ export default function SmallEntityViewer({ent, activatedCommentOrChildID, setAc
                 orderedChildrenAndComments && orderedChildrenAndComments.length > 0 &&
                 orderedChildrenAndComments.map(item => (
                     item.obj.com_type ?
-                        <Comment key={`comment-${item.obj.ID}`} entID={entity.ID} com={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/> :
-                        <SmallEntityViewer key={`entity-${item.obj.ID}`} ent={item.obj} activatedCommentOrChildID={activatedCommentOrChildID} setActivatedCommentOrChildID={setActivatedCommentOrChildID}/>
+                        <Comment key={`comment-${item.obj.ID}`} entID={entity.ID} com={item.obj}/> :
+                        <SmallEntityViewer key={`entity-${item.obj.ID}`} ent={item.obj} />
                 ))
             }
-            {
-                activatedCommentOrChildID === entity.ID &&
-                <div>
-                    <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadComments}/>
-                </div>
-            }
+            { isNewCommentEditorOpen && <CommentCreator className="comment-creator" entID={entity.ID} reloader={reloadComments} standbyContent={standByContent}/> }
         </div>
     )
 

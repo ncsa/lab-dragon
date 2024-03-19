@@ -6,23 +6,21 @@ import Tiptap from './editor/Tiptap';
 import { CreationPopupContext } from '@/app/contexts/CreationPopupContext';
 
 
-export default function CommentEditor({entID, comment, refresh}) {
+export default function CommentEditor({entID, comment, standbyContent, refresh, editorRef}) {
 
     const router = useRouter();
-    const [content, setContent] = useState(comment.content);
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useContext(CreationPopupContext);
 
     const handleContentChange = (content) => {
-        setContent(content);
+        standbyContent.current = content;
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // FIXME: This is a dirty a way of fixing the issue of the content being a string or an array. I should probably make content always a string directly.
-        const editedComment = typeof content === 'string' ? content : content[comment.content.length - 1];
+        const editedComment = standbyContent.current;
         let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + comment.ID + "?HTML=True&username=" + user, {
             method: 'PATCH',
             headers: {
@@ -40,11 +38,12 @@ export default function CommentEditor({entID, comment, refresh}) {
 
     }
     return (
-        <div className="CommentEditor">
+        // editorRef is used to detect if the user clicks outside the editor to close it.
+        <div className="CommentEditor" ref={editorRef}>
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}
                  entID={entID}
-                 initialContent={comment.content[comment.content.length - 1]}
+                 initialContent={standbyContent.current}
                  />
                 {isLoading && <p>Loading...</p>}
                 {!isLoading && <button type="submit" className="submitButton">Submit</button>}

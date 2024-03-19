@@ -5,17 +5,14 @@ import { useRouter } from 'next/navigation';
 import Tiptap from './editor/Tiptap';
 import { CreationPopupContext } from '../contexts/CreationPopupContext';
 
-export default function CommentCreator({entID, reloader, initialContent}) {
+export default function CommentCreator({entID, reloader, standbyContent,}) {
     const router = useRouter();
-    const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [reloadEditor, setReloadEditor] = useState(false);
-    // Onl;y use to set the text of the editor to nothing once the submit button is pressed.
-    const [initial, setInitial] = useState(initialContent);
     const { user } = useContext(CreationPopupContext)
 
     const handleContentChange = (content) => {
-        setContent(content);
+        standbyContent.current = content;
     }
 
     const handleSubmit = async (e) => {
@@ -27,19 +24,23 @@ export default function CommentCreator({entID, reloader, initialContent}) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(content),
+            body: JSON.stringify(standbyContent.current),
         });
 
         if (response.status === 201) {
             reloader();
-            setContent("");
-            setInitial("");
+            standbyContent.current = "";
             setIsLoading(false);
             setReloadEditor(prev => prev+1);
+            
         } else {
             alert ("Something went wrong, please try again.")
             setIsLoading(false)
         }
+    }
+
+    if (!standbyContent) {
+        return null;
     }
 
     return (
@@ -48,11 +49,11 @@ export default function CommentCreator({entID, reloader, initialContent}) {
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}
                  entID={entID}
-                 initialContent={initial}
+                 initialContent={standbyContent.current}
                  reloadEditor={reloadEditor}
                  />
                 {isLoading && <p>Loading...</p>}
-                {!isLoading && <button type="submit" className="submitButton">Submit</button>}
+                {!isLoading && <button type="submit">Submit</button>}
             </form>
         </div>
     )
