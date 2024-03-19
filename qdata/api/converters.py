@@ -5,7 +5,7 @@ import xml.etree.ElementTree as etree
 from markdownify import MarkdownConverter, chomp
 
 from markdown.extensions import Extension
-from markdown.inlinepatterns import LinkInlineProcessor
+from markdown.inlinepatterns import LinkInlineProcessor, Pattern
 
 
 API_URL_PREFIX = os.getenv('API_URL_PREFIX', '')
@@ -74,6 +74,16 @@ class MyMarkdownConverter(MarkdownConverter):
         """
         return str(el)
 
+
+class StrikethroughPattern(Pattern):
+    """ InlinePattern for strikethrough text. """
+    def handleMatch(self, m):
+        # m.group(2) contains the text between the ~~ symbols
+        el = etree.Element('del')
+        el.text = m.group(2)
+        return el
+
+
 # Markdown to HTML
 class CustomLinkExtension(Extension):
 
@@ -84,6 +94,11 @@ class CustomLinkExtension(Extension):
 
     def extendMarkdown(self, md):
         md.inlinePatterns.register(CustomLinkProcessor(self.uuid_index, self.instance_index, r'!?\[(.*?)\]\((.*?)\)', md), 'link', 160)
+        
+        # Register the new strikethrough pattern
+        # The pattern ~~(.+?)~~ matches text between two ~~ symbols
+        strikethrough_pattern = StrikethroughPattern(r'~~(.+?)~~', md)
+        md.inlinePatterns.register(strikethrough_pattern, 'strikethrough', 175)
 
 
 class CustomLinkProcessor(LinkInlineProcessor):
