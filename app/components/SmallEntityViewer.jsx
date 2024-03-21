@@ -6,6 +6,7 @@ import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
 import Comment from "@/app/components/Comment";
 import CommentCreator from "@/app/components/CommentCreator";
+import NewEntityButtons from "@/app/components/NewEntityButtons";
 import { getEntity, sortAndFilterChildren, getComments, getEntityTypeIcon } from "@/app/components/utils";
 
 
@@ -89,6 +90,10 @@ export default function SmallEntityViewer({ent}) {
             }
             setIsEditingName(false); // Exit editing mode
         }
+    };
+
+    const newCommentFunc = () => {
+        setIsNewCommentEditorOpen(true);
     };
 
     // Checks if this is the entity that needs an update for new children.
@@ -190,9 +195,7 @@ export default function SmallEntityViewer({ent}) {
                         }}>
                         <i className="bi bi-x-circle" />
                     </button>
-                    <button className="add-comment-button" title={`Add a comment to "${entity.name}" \n (look at the opened textbox below)`} onClick={() => {setIsNewCommentEditorOpen(true)}}>
-                        <i className="bi bi-plus-circle" />
-                    </button>
+                    <NewEntityButtons newCommentFunc={newCommentFunc}/>
                 </div>
             </div>
             {

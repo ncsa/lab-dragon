@@ -24,8 +24,12 @@
     --small-entity-background-color: #393B40;
     --small-entity-tittle-color: white;
     --small-entity-tittle-button-hover-color: rgb(215, 215, 215);
-    --comment-text-color: white;
+    --small-entity-extra-actions-delete-button-color: red;
+    --small-entity-extra-actions-delete-active-button-color: darkred;
+    
+    --new-entity-buttons-line-color: #6d6d6d;
 
+    --comment-text-color: white;
     --comment-creator-color: white;
     --comment-hover: cornflowerblue;
 
@@ -538,12 +542,19 @@ ol {
     margin: 0;
 }
 
+.small-entity .small-entity-tittle .extra-actions{
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+
 .small-entity .small-entity-tittle .extra-actions .delete-button i{
-    color: red;
+    color: var(--small-entity-extra-actions-delete-button-color);
 }
 
 .small-entity .small-entity-tittle .extra-actions .delete-button i:active{
-    color: darkred;
+    color: var(--small-entity-extra-actions-delete-active-button-color);
 }
 
 .small-entity .small-entity-tittle button:hover{
@@ -564,6 +575,80 @@ ol {
 .small-entity .small-entity-tittle:hover .bookmark{
     display: inline-block;
 }
+
+/* NewEntityButtons */
+
+.new-entity-buttons {
+    position: relative;
+    display: inline-block;
+    z-index: 10; /* Adjusted z-index to ensure it's above most other elements */
+    padding: 5px; /* Added padding to ensure space for the border */
+    box-sizing: border-box; /* Ensures padding is included in the width and height */
+}
+
+/* This applies the border around the entire container when hovered */
+.new-entity-buttons .hovered {
+    box-sizing: border-box;
+    border: 2px solid var(--new-entity-buttons-line-color); 
+    border-radius: 8px; 
+}
+
+.placeholder-button, .btn {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* Adjustments for the extra buttons to ensure they are correctly positioned and shown */
+.extra-buttons {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    /* transform: translateX(-50%) translateY(-10px);  */
+    gap: 10px;
+    background-color: var(--comment-background-color); /* Background color for extra buttons */
+    padding: 5px; /* Padding around extra buttons */
+    border-radius: 8px; /* Consistent rounded corners */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for depth */
+    z-index: 1001; /* Ensure these are above other content */
+}
+
+/* Show the extra buttons when the container is hovered */
+.new-entity-buttons.hovered .extra-buttons {
+    display: flex;
+}
+
+/* Optional: Animation for the extra buttons to appear smoothly */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(0px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+.extra-buttons {
+    animation: slideUp 0.5s forwards;
+}
+
+.icon-with-plus {
+    display: inline-flex;
+    align-items: center;
+    position: relative; /* Ensure the parent span is positioned relatively */
+}
+  
+.small-plus {
+    position: absolute; /* Position the plus icon absolutely within its parent */
+    font-size: 0.5em; /* Adjust the size of the plus icon */
+    bottom: 0; /* Position the plus icon towards the top of the first icon */
+    left: 0; /* Adjust this value to position the plus icon correctly */
+    transform: translate(35%, 35%); /* Center the plus icon on top of the first icon */
+  }
+
 
 /* Comment section */
 
