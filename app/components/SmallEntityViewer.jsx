@@ -6,6 +6,7 @@ import { CreationPopupContext } from "@/app/contexts/CreationPopupContext";
 
 import Comment from "@/app/components/Comment";
 import CommentCreator from "@/app/components/CommentCreator";
+import NewEntityButtons from "@/app/components/NewEntityButtons";
 import { getEntity, sortAndFilterChildren, getComments, getEntityTypeIcon } from "@/app/components/utils";
 
 
@@ -60,7 +61,7 @@ export default function SmallEntityViewer({ent}) {
     const [newName, setNewName] = useState(ent.name);
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-    const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
+    const { updatingID, setUpdatingID, setName, setParent, setType, setIsPopupOpen } = useContext(CreationPopupContext);
 
     const viewerRef = useRef(null); // Used to detect if the user clicks outside the editor to close it.
     const standByContent = useRef(null); // Used to store the new comment that was edited but not submitted.
@@ -90,6 +91,47 @@ export default function SmallEntityViewer({ent}) {
             setIsEditingName(false); // Exit editing mode
         }
     };
+
+    const newCommentFunc = () => {
+        setIsNewCommentEditorOpen(true);
+    };
+
+    // Depending on the type of entity, different functions get defined for the new entity buttons. 
+    // By having these variables be null, the NewEntityButtons component will not render the buttons.
+
+    let newProjectFunc = null;
+    let newTaskFunc = null;
+    let newStepFunc = null;
+
+    const _newProjectFunc = () => {
+        setParent(entity.ID);
+        setType("Project");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    const _newTaskFunc = () => {
+        setParent(entity.ID);
+        setType("Task");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    const _newStepFunc = () => {
+        setParent(entity.ID);
+        setType("Step");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    if (entity.type === "Project") {
+        newProjectFunc = _newProjectFunc;
+        newTaskFunc = _newTaskFunc;
+        newStepFunc = _newStepFunc;
+    } else if (entity.type === "Task") {
+        newTaskFunc = _newTaskFunc;
+        newStepFunc = _newStepFunc;
+    }
 
     // Checks if this is the entity that needs an update for new children.
     useEffect(() => {
@@ -153,7 +195,11 @@ export default function SmallEntityViewer({ent}) {
     }
     return (
         <div className={`small-entity ${entity.type}`} ref={viewerRef}>
-            <div className={`type-indicator ${entity.type}`}></div>
+            <div className={`type-indicator ${entity.type}`}>
+                <div className="new-entity-buttons-container">
+                    <NewEntityButtons newCommentFunc={newCommentFunc} newStepFunc={newStepFunc} newTaskFunc={newTaskFunc} newProjectFunc={newProjectFunc} reverseFill={true}/>
+                </div>
+            </div>
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon} title={`${entity.type}`}/>
@@ -190,9 +236,7 @@ export default function SmallEntityViewer({ent}) {
                         }}>
                         <i className="bi bi-x-circle" />
                     </button>
-                    <button className="add-comment-button" title={`Add a comment to "${entity.name}" \n (look at the opened textbox below)`} onClick={() => {setIsNewCommentEditorOpen(true)}}>
-                        <i className="bi bi-plus-circle" />
-                    </button>
+                    <NewEntityButtons newCommentFunc={newCommentFunc} newStepFunc={newStepFunc} newTaskFunc={newTaskFunc} newProjectFunc={newProjectFunc}/>
                 </div>
             </div>
             {
