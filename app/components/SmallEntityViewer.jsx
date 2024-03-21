@@ -195,7 +195,11 @@ export default function SmallEntityViewer({ent}) {
     }
     return (
         <div className={`small-entity ${entity.type}`} ref={viewerRef}>
-            <div className={`type-indicator ${entity.type}`}></div>
+            <div className={`type-indicator ${entity.type}`}>
+                <div className="new-entity-buttons-container">
+                    <NewEntityButtons newCommentFunc={newCommentFunc} newStepFunc={newStepFunc} newTaskFunc={newTaskFunc} newProjectFunc={newProjectFunc} reverseFill={true}/>
+                </div>
+            </div>
             <div className='small-entity-tittle'>
                 <h3>
                     <i className={icon} title={`${entity.type}`}/>

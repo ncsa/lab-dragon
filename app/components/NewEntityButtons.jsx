@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { getEntityTypeIcon } from './utils';
 
-export default function NewEntityButtons({ newCommentFunc, newStepFunc, newTaskFunc, newProjectFunc}) {
+export default function NewEntityButtons({ newCommentFunc, newStepFunc, newTaskFunc, newProjectFunc, reverseFill}) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -10,9 +10,11 @@ export default function NewEntityButtons({ newCommentFunc, newStepFunc, newTaskF
       onMouseEnter={() => setIsHovered(true)} 
       onMouseLeave={() => setIsHovered(false)}
     >
-      <button className="placeholder-button" title="Hover for addition options"> 
+      {reverseFill ? (
+        <i className="bi-plus-circle-fill placeholder"/>
+      ) : (
         <i className="bi-plus-circle placeholder"/>
-      </button>
+      )}
       {isHovered && (
         <div className={`extra-buttons ${isHovered ? 'hovered' : ''}`}>
           {newProjectFunc && (
