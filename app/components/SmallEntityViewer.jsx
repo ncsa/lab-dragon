@@ -61,7 +61,7 @@ export default function SmallEntityViewer({ent}) {
     const [newName, setNewName] = useState(ent.name);
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-    const { updatingID, setUpdatingID } = useContext(CreationPopupContext);
+    const { updatingID, setUpdatingID, setName, setParent, setType, setIsPopupOpen } = useContext(CreationPopupContext);
 
     const viewerRef = useRef(null); // Used to detect if the user clicks outside the editor to close it.
     const standByContent = useRef(null); // Used to store the new comment that was edited but not submitted.
@@ -95,6 +95,43 @@ export default function SmallEntityViewer({ent}) {
     const newCommentFunc = () => {
         setIsNewCommentEditorOpen(true);
     };
+
+    // Depending on the type of entity, different functions get defined for the new entity buttons. 
+    // By having these variables be null, the NewEntityButtons component will not render the buttons.
+
+    let newProjectFunc = null;
+    let newTaskFunc = null;
+    let newStepFunc = null;
+
+    const _newProjectFunc = () => {
+        setParent(entity.ID);
+        setType("Project");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    const _newTaskFunc = () => {
+        setParent(entity.ID);
+        setType("Task");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    const _newStepFunc = () => {
+        setParent(entity.ID);
+        setType("Step");
+        setName("");
+        setIsPopupOpen(true);
+    };
+
+    if (entity.type === "Project") {
+        newProjectFunc = _newProjectFunc;
+        newTaskFunc = _newTaskFunc;
+        newStepFunc = _newStepFunc;
+    } else if (entity.type === "Task") {
+        newTaskFunc = _newTaskFunc;
+        newStepFunc = _newStepFunc;
+    }
 
     // Checks if this is the entity that needs an update for new children.
     useEffect(() => {
@@ -195,7 +232,7 @@ export default function SmallEntityViewer({ent}) {
                         }}>
                         <i className="bi bi-x-circle" />
                     </button>
-                    <NewEntityButtons newCommentFunc={newCommentFunc}/>
+                    <NewEntityButtons newCommentFunc={newCommentFunc} newStepFunc={newStepFunc} newTaskFunc={newTaskFunc} newProjectFunc={newProjectFunc}/>
                 </div>
             </div>
             {
