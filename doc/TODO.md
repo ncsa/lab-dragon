@@ -21,6 +21,11 @@ The following is simply a place to quickly write down known issues as well as ne
 
 - when an entity is deleted, the notebook marks the TOML file as deleted and removes it from the parent. But there is no history left there that the entity was a child of someone 
 
+## bugs
+
+- when deleting an entity it doesn't go away from the sidebar
+
+
 # Assumptions
 
 - every msmt folder contains only a single TOML file and that TOML file is a valid entity
