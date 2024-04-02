@@ -39,14 +39,14 @@ export default function CommentEditor({entID, comment, standbyContent, refresh, 
     }
     return (
         // editorRef is used to detect if the user clicks outside the editor to close it.
-        <div className="CommentEditor" ref={editorRef}>
+        <div className="comment-creator editor" ref={editorRef}>
             <form onSubmit={handleSubmit}>
                 <Tiptap onContentChange={handleContentChange}
                  entID={entID}
                  initialContent={standbyContent.current}
                  />
                 {isLoading && <p>Loading...</p>}
-                {!isLoading && <button type="submit" className="submitButton">Submit</button>}
+                {!isLoading && <button type="submit">Submit</button>}
             </form>
         </div>
     )
