@@ -779,7 +779,7 @@ def change_entity_name(ID, body):
 # FIXME: Left here for now as reference. This function tries to find similar images in the system and reutrns that path.
 #  This has proven to be more harmful than usefull. In the future a modal might appear saying that it found this image,
 #  if the user wants to use that instead of uploading one that might work. But for now let's leave it depreceated
-def add_image_depreceated(body, image):
+def _add_image_depreceated(body, image):
     """
     Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into
     resource.
@@ -814,10 +814,14 @@ def add_image(body, image):
     :return: The relative URL to the new image.
     """
     converted_image = Image.open(image.stream)
-    file_path = RESOURCEPATH.joinpath(secure_filename(image.filename))
+    filename = secure_filename(image.filename)
+    file_path = RESOURCEPATH.joinpath(filename)
 
     while file_path.is_file():
-        new_name = image.filename.join('_' + random.choice(string.ascii_letters) for i in range(6))
+        f_parts = filename.split('.')
+        if len(f_parts) != 2:
+            abort(400, "The filename is not in the correct format")
+        new_name = f_parts[0] + '_' + ''.join(random.choice(string.ascii_letters) for i in range(6)) + '.' + f_parts[1]
         file_path = RESOURCEPATH.joinpath(new_name)
 
     converted_image.save(file_path)

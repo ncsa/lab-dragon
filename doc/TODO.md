@@ -35,4 +35,7 @@ The following is simply a place to quickly write down known issues as well as ne
 
 - How do we handle a dataset with a failed msmt, like an incomplete msmt
 
+# UI Testing steps
 
+- Create a new entity -> check if it appears in the sidebar, check if the entity shows up in the entity page
+- add an image with the character ')' in the name and check if the link is broken.
