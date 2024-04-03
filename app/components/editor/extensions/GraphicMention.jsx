@@ -1,18 +1,18 @@
 import { mergeAttributes } from '@tiptap/core'
 import Mention from "@tiptap/extension-mention";
 
-export const createPlotMention = (plotMentionsOptionsRef) => {
+export const createGraphicMention = (graphicMentionsOptionsRef) => {
   return Mention.extend({
-    name: 'plotMention', // Unique name for the PlotMention extension
+    name: 'graphicMention', // Unique name for the GraphicMention extension
     renderHTML({node, HTMLAttributes}) {
       
-      const name = plotMentionsOptionsRef.current[node.attrs.id][0]
-      const insID = plotMentionsOptionsRef.current[node.attrs.id][1]
+      const name = graphicMentionsOptionsRef.current[node.attrs.id][0]
+      const insID = graphicMentionsOptionsRef.current[node.attrs.id][1]
 
       if (name.endsWith('.html')) {
         return [
           'iframe',
-          mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${plotMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
+          mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${graphicMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
           this.options.renderLabel({
             options: this.options,
             node,
@@ -32,7 +32,7 @@ export const createPlotMention = (plotMentionsOptionsRef) => {
           ]
         ];
       } else {
-        throw new Error("Unsupported file type for plot mention.");
+        throw new Error("Unsupported file type for graphic mention.");
       }
       
       
