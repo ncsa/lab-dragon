@@ -31,6 +31,12 @@ export default function CreationPopupProvider({ children }) {
     // Holds the root entity for the logo to find the correct URL
     const [rootEntity, setRootEntity] = useState({"ID": ""});
 
+    // FIXME: This probably should be moved to a different context as it is not technically related to the creation popup
+    // Holds a list of entities that should be deleted from the sidebar as soon as possible.
+    // This is loaded by components down the ui that want to remove an entity from the sidebar.
+    const [shouldUpdateSidebar, setShouldUpdateSidebar] = useState(false);
+
+
     async function getUsers() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/users`);
         return await response.json();
@@ -105,7 +111,9 @@ export default function CreationPopupProvider({ children }) {
         updatingID,
         setUpdatingID,
         rootEntity,
-        setRootEntity
+        setRootEntity,
+        shouldUpdateSidebar,
+        setShouldUpdateSidebar
     };
 
     return (
