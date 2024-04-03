@@ -5,14 +5,37 @@ export const createPlotMention = (plotMentionsOptionsRef) => {
   return Mention.extend({
     name: 'plotMention', // Unique name for the PlotMention extension
     renderHTML({node, HTMLAttributes}) {
-      return [
-        'iframe',
-        mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${plotMentionsOptionsRef.current[node.attrs.id]}`}, this.options.HTMLAttributes, HTMLAttributes),
-        this.options.renderLabel({
-          options: this.options,
-          node,
-        }),
-      ]
+      
+      const name = plotMentionsOptionsRef.current[node.attrs.id][0]
+      const insID = plotMentionsOptionsRef.current[node.attrs.id][1]
+
+      if (name.endsWith('.html')) {
+        return [
+          'iframe',
+          mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${plotMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
+          this.options.renderLabel({
+            options: this.options,
+            node,
+          }),
+        ];
+      } else if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg')) {
+        return [
+          'a',
+          mergeAttributes(
+            {'href': `/entities/${insID}`}, 
+            this.options.HTMLAttributes, 
+            HTMLAttributes
+          ),
+          [
+            'img',
+            {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${name}`}
+          ]
+        ];
+      } else {
+        throw new Error("Unsupported file type for plot mention.");
+      }
+      
+      
     },
   })
 }
