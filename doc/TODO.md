@@ -13,13 +13,13 @@ The following is simply a place to quickly write down known issues as well as ne
 - I need a list of a systematic way of testing the curent feautres of the website and code, to make sure everything is working as expected.
 - when the notebook tries to look for an entity page that does not exists, it should return a message saying that the page does not exists, instead of crashing.
 - make the tasks have some concrete objective that they are meant and how you tick completed tasks. Essentially why are tasks different from steps and projects?
-- If the entity is not long enough the text in the buttons gets smaller and runs off in the background
 
 - For now all the configuration of the notebook integration is done as module variables. I might want to at some point figure out how to do it using the options class.
 - The plot_suggestions and data suggestions shouild move the /data/ entry path instead of properties
 - The way the data structure section in the instance is stored might not be great. The naming of the table is wierd
 
 - when an entity is deleted, the notebook marks the TOML file as deleted and removes it from the parent. But there is no history left there that the entity was a child of someone 
+- Clean up all the duplicate images code if we throw that feature away.
 
 ## bugs
 
@@ -35,4 +35,7 @@ The following is simply a place to quickly write down known issues as well as ne
 
 - How do we handle a dataset with a failed msmt, like an incomplete msmt
 
+# UI Testing steps
 
+- Create a new entity -> check if it appears in the sidebar, check if the entity shows up in the entity page
+- add an image with the character ')' in the name and check if the link is broken.

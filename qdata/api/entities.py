@@ -2,6 +2,9 @@ import os
 import re
 import json
 import copy
+import random
+import string
+import warnings
 from pathlib import Path
 from enum import Enum, auto
 from typing import Optional, Union, Tuple
@@ -29,7 +32,7 @@ from qdata.modules.instance import Instance
 
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from .converters import MyMarkdownConverter,  CustomLinkExtension
+from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
 
 ROOTPATH = Path()
 
@@ -231,9 +234,9 @@ def add_image_to_index(image, image_path):
     img_hash = imagehash.average_hash(image)
     if img_hash not in IMAGEINDEX:
         IMAGEINDEX[img_hash] = image_path
-    # FIXME: This is a design decision that should be checked
-    elif str(IMAGEINDEX[img_hash]) != str(image_path):
-        print(f'duplicated image has been found, will ignore the new image {image_path}')
+    # Currently commented out because we are not checking for duplicates
+    # elif str(IMAGEINDEX[img_hash]) != str(image_path):
+    #     print(f'duplicated image has been found, will ignore the new image {image_path}')
 
 
 def find_equivalent_image(image, threshold=0.1):
@@ -773,7 +776,10 @@ def change_entity_name(ID, body):
     return make_response("Entity name changed", 201)
 
 
-def add_image(body, image):
+# FIXME: Left here for now as reference. This function tries to find similar images in the system and reutrns that path.
+#  This has proven to be more harmful than usefull. In the future a modal might appear saying that it found this image,
+#  if the user wants to use that instead of uploading one that might work. But for now let's leave it depreceated
+def _add_image_depreceated(body, image):
     """
     Adds an image to the notebook. Checks if the image already exists in the system. if it doesn't, copy the image into
     resource.
@@ -781,6 +787,8 @@ def add_image(body, image):
     :param body: Text of the tag being added. usually empty
     :param image: The image you get from the flask call.
     """
+    warnings.warn("This function is deprecated and will be removed in the future", DeprecationWarning)
+
     converted_image = Image.open(image.stream)
     image_path = find_equivalent_image(converted_image)
 
@@ -793,6 +801,32 @@ def add_image(body, image):
 
     image_url = f"/api/properties/image/{str(image_path).replace('/', '%23')}"
 
+    return make_response(image_url, 201)
+
+
+def add_image(body, image):
+    """
+    Adds and image to the notebook. If an image with the same name is already present in the RESOURCEPATH, it will
+    add a random string to the name to avoid overwriting the image.
+
+    :param body: Text of the tag being added. Usually empty.
+    :param image: The image you get from the flask call.
+    :return: The relative URL to the new image.
+    """
+    converted_image = Image.open(image.stream)
+    filename = secure_filename(image.filename)
+    file_path = RESOURCEPATH.joinpath(filename)
+
+    while file_path.is_file():
+        f_parts = filename.split('.')
+        if len(f_parts) != 2:
+            abort(400, "The filename is not in the correct format")
+        new_name = f_parts[0] + '_' + ''.join(random.choice(string.ascii_letters) for i in range(6)) + '.' + f_parts[1]
+        file_path = RESOURCEPATH.joinpath(new_name)
+
+    converted_image.save(file_path)
+    add_image_to_index(converted_image, file_path)
+    image_url = f"/api/properties/image/{str(file_path).replace('/', '%23')}"
     return make_response(image_url, 201)
 
 
@@ -1172,4 +1206,7 @@ reset()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE), TableExtension(use_align_attribute=True)])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX,
+                                                                          instance_index=INSTANCEIMAGE),
+                                                      TableExtension(use_align_attribute=True),
+                                                      CustomHeadlessTableExtension()])
