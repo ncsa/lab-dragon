@@ -1,4 +1,6 @@
 "use client"
+// You need the wrapper so that the whole screen darkens when the popup is open.
+
 
 import React, { useState, useContext, useEffect } from 'react';
 import SplitPane from 'react-split-pane'; // Assuming you have or will install react-split-pane
@@ -19,7 +21,7 @@ export default function EntityPopupWrapper({ children }) {
 
     const [entities, setEntities] = useState([]); // The entities that will be displayed in the sidebar
     const [maxLeftPaneSize, setMaxLeftPaneSize] = useState(null); // Adjust the size of the left pane based on the window size. We can only specify the max length of the left side of the pane
-    const { isPopupOpen, setIsPopupOpen, setRootEntity, setName } = useContext(CreationPopupContext);
+    const { isPopupOpen, setIsPopupOpen, setRootEntity, setName, shouldUpdateSidebar, setShouldUpdateSidebar } = useContext(CreationPopupContext);
 
     const closePopup = () => { setIsPopupOpen(false) }
 
@@ -42,6 +44,13 @@ export default function EntityPopupWrapper({ children }) {
     useEffect(() => {
         populateSidebarItems();
     }, []);
+
+    useEffect(() => {
+        if (shouldUpdateSidebar) {
+            populateSidebarItems();
+            setShouldUpdateSidebar(false);
+        }
+    }, [shouldUpdateSidebar, setShouldUpdateSidebar, populateSidebarItems])
 
     return (
         <div>

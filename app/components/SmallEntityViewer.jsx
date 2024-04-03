@@ -61,7 +61,7 @@ export default function SmallEntityViewer({ent}) {
     const [newName, setNewName] = useState(ent.name);
 
     const { onlyShowBookmarked } = useContext(BookmarkContext);
-    const { updatingID, setUpdatingID, setName, setParent, setType, setIsPopupOpen } = useContext(CreationPopupContext);
+    const { updatingID, setUpdatingID, setName, setParent, setType, setIsPopupOpen, setShouldUpdateSidebar } = useContext(CreationPopupContext);
 
     const viewerRef = useRef(null); // Used to detect if the user clicks outside the editor to close it.
     const standByContent = useRef(null); // Used to store the new comment that was edited but not submitted.
@@ -231,6 +231,7 @@ export default function SmallEntityViewer({ent}) {
                             if (window.confirm("Are you sure you want to delete this entity?")) {
                                 deleteEntity(entity.ID).then(data => {
                                     setUpdatingID(entity.parent);
+                                    setShouldUpdateSidebar(true);
                                 });
                             }
                         }}>
