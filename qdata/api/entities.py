@@ -32,7 +32,7 @@ from qdata.modules.instance import Instance
 
 from qdata.generators.meta import read_from_TOML
 from qdata.components.comment import SupportedCommentType, Comment
-from .converters import MyMarkdownConverter,  CustomLinkExtension
+from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
 
 ROOTPATH = Path()
 
@@ -1206,4 +1206,7 @@ reset()
 html_to_markdown = MyMarkdownConverter(uuid_index=UUID_TO_PATH_INDEX)
 
 
-markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX, instance_index=INSTANCEIMAGE), TableExtension(use_align_attribute=True)])
+markdown_to_html = md = markdown.Markdown(extensions=[CustomLinkExtension(uuid_index=UUID_TO_PATH_INDEX,
+                                                                          instance_index=INSTANCEIMAGE),
+                                                      TableExtension(use_align_attribute=True),
+                                                      CustomHeadlessTableExtension()])

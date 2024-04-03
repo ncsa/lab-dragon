@@ -1,4 +1,5 @@
 import os
+import re
 from urllib.parse import urlparse
 import xml.etree.ElementTree as etree
 
@@ -6,6 +7,7 @@ from markdownify import MarkdownConverter, chomp
 
 from markdown.extensions import Extension
 from markdown.inlinepatterns import LinkInlineProcessor, Pattern
+from markdown.blockprocessors import BlockProcessor
 
 
 API_URL_PREFIX = os.getenv('API_URL_PREFIX', '')
@@ -145,3 +147,34 @@ class CustomLinkProcessor(LinkInlineProcessor):
         el.set('src', url)
         el.set('alt', 'Image is loading or not available')
         return el, m.start(0), m.end(0)
+    
+
+class CustomHeadlessTableExtension(Extension):
+    """
+    Custom extension to be able to accept tables without headers
+    """
+    def extendMarkdown(self, md):
+        md.parser.blockprocessors.register(CustomHeadlessTablesProcessor(md.parser), 'custom_table', 75)
+
+class CustomHeadlessTablesProcessor(BlockProcessor):
+    
+    RE_TABLE = re.compile(r'''
+        ^[ ]{0,3}(\|.*\|)[ ]*(\n|$)   # First line must start with '|' (after optional whitespace)
+        ''', re.MULTILINE | re.VERBOSE)
+
+    def test(self, parent, block):
+        return bool(self.RE_TABLE.search(block))
+
+    def run(self, parent, blocks):
+        block = blocks.pop(0)
+        table = etree.SubElement(parent, 'table')
+        tbody = etree.SubElement(table, 'tbody')
+
+        rows = block.strip().split('\n')
+        for row in rows:
+            tr = etree.SubElement(tbody, 'tr')
+            for cell in row.strip('|').split('|'):
+                td = etree.SubElement(tr, 'td')
+                td.text = cell.strip()
+    
+    
