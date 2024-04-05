@@ -15,7 +15,7 @@ import Link from "@tiptap/extension-link";
 import { MentionList } from "./MentionList";
 import { PluginKey } from "prosemirror-state";
 import { createDataMention } from "./extensions/DataMention";
-import { createPlotMention } from "./extensions/PlotMention";
+import { createGraphicMention } from "./extensions/GraphicMention";
 import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
 
@@ -36,7 +36,7 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
   const [isCursorInTable, setIsCursorInTable] = useState(false);
 
   const dataMentionsOptionsRef = useRef({});
-  const plotMentionsOptionsRef = useRef({});
+  const graphicMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
     let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/data_suggestions/` + entID ;
@@ -48,14 +48,14 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
     dataMentionsOptionsRef.current = data;
   }
 
-  const updatePlotMentionsOptions = async (query) => {
-    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/plot_suggestions/` + entID ;
+  const updateGraphicMentionsOptions = async (query) => {
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/graphic_suggestions/` + entID ;
     if (query) {
       url += "?query_filter=" + query;
     }
     const response = await fetch(url);
     const data = JSON.parse(await response.json());
-    plotMentionsOptionsRef.current = data;
+    graphicMentionsOptionsRef.current = data;
   }
 
   const handleEditorImage = (image, view) => {
@@ -90,7 +90,7 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
   }, []);
 
   useEffect(() => {
-    updatePlotMentionsOptions();
+    updateGraphicMentionsOptions();
   }, []);
 
   useEffect(() => {
@@ -176,17 +176,17 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
           }
         },
       }),
-      createPlotMention(plotMentionsOptionsRef).configure({
+      createGraphicMention(graphicMentionsOptionsRef).configure({
         HTMLAttributes: {
-          class: "plot-mention"
+          class: "graphic-mention"
         },
         renderLabel: ({options, node}) => {
             return `${node.attrs.label ?? node.attrs.id}`
         },
         suggestion: {
           items: async ({ query }) => {
-            await updatePlotMentionsOptions(query);
-            const keys = Object.keys(plotMentionsOptionsRef.current);
+            await updateGraphicMentionsOptions(query);
+            const keys = Object.keys(graphicMentionsOptionsRef.current);
             return keys;
           },
           char: "~",
