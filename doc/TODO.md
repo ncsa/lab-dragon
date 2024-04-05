@@ -4,6 +4,7 @@ The following is simply a place to quickly write down known issues as well as ne
 # Features
 
 * Being able to mention any other instance
+* Being able to mention tables instead of only images. Might not be a bad idea to call jupyter notebooks 
 
 # Known Issues
 

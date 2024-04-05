@@ -325,7 +325,11 @@ def read_child_entity(entity_path: Path):
     child_list = []
     if len(ent.children) > 0:
         for child in ent.children:
-            child_list.append(read_child_entity(child))
+            try:
+                child_list.append(read_child_entity(child))
+            except Exception as e:
+                print(f"Error reading child {ent.name} with path {UUID_TO_PATH_INDEX[ent.ID]}")
+                raise e
 
     data_buckets = []
     for bucket_path in ent.data_buckets:
@@ -379,6 +383,20 @@ def read_all():
                 val.children[val.children.index(child)] = PATH_TO_UUID_INDEX[str(path)]
 
     return ret
+
+
+def _generate_structure_helper(ID):
+
+    ent = INDEX[ID]
+    children = [_generate_structure_helper(child) for child in ent.children]
+    name = ent.name
+    ID = ent.ID
+    type_ = ent.__class__.__name__
+    return {"name": name, "id": ID, "children": children, "type": type_}
+
+
+def generate_structure():
+    return make_response(json.dumps([_generate_structure_helper(PATH_TO_UUID_INDEX[str(ROOTPATH)])]), 201)
 
 
 def read_one(ID, name_only=False):
@@ -911,15 +929,16 @@ def get_data_suggestions(ID, query_filter="", num_matches=10):
     return json.dumps(matches), 201
 
 
-def get_plot_suggestions(ID, query_filter="", num_matches=10):
+def get_graphic_suggestions(ID, query_filter="", num_matches=10):
     """
-    Look for plots inside of a data bucket. A plot is an html file containing a bokeh plot as of now.
+    Look for images inside of a data bucket. This includes html files containg hvplots.
 
     :param ID: The ID of the instance you are searching
     :param query_filter: A query to find matches to
     :param num_matches: How many matches until the function stops looking for matches.
 
-    :return: Dictionary with the name of data + plots as keys and paths to the plots as values
+    :return: Dictionary with the name of data + images as keys and a 2 object tuple where the first item is the paths to
+        the images and second the uuid of the instance they are a part of as values.
     """
     matches = {}
     ent = INDEX[ID]
@@ -927,7 +946,7 @@ def get_plot_suggestions(ID, query_filter="", num_matches=10):
         ent = _search_parents_with_buckets(ent)
         if ent is None:
             return json.dumps({}), 201
-    
+
     for bucket_path in ent.data_buckets:
         bucket_id = PATH_TO_UUID_INDEX[str(bucket_path)]
         bucket = INDEX[bucket_id]
@@ -939,9 +958,9 @@ def get_plot_suggestions(ID, query_filter="", num_matches=10):
             if 'star' in instance.tags:
                 for im_p in instance.images:
                     p_obj = Path(im_p)
-                    plot_name = p_obj.parts[-2] + "/" + p_obj.parts[-1] # The folder name + the plot
-                    if p_obj.suffix == '.html' and pattern.search(plot_name):
-                        matches[plot_name] = im_p.replace('/', '%23')
+                    image_name = p_obj.parts[-2] + "/" + p_obj.parts[-1] # The folder name + the image
+                    if (p_obj.suffix == '.html' or p_obj.suffix == '.jpg' or p_obj.suffix == '.png') and pattern.search(image_name):
+                        matches[image_name] = (im_p.replace('/', '%23'), instance.ID)
                     
     return json.dumps(matches), 201
 
@@ -988,12 +1007,9 @@ def add_instance(body):
     if not data_file.is_file():
         abort(403, f"Data with path {data_file} not found")
 
-    instance_path = data_path.joinpath(data_path.name + '.toml')
-    if instance_path.is_file():
-        abort(400, f"Instance with path {instance_path} already exists")
-
     instance = Instance(name=data_path.name, data=[str(data_file)], user=username, start_time=start_time, end_time=end_time)
 
+    instance_path = data_path.joinpath(instance.ID[:8] + '_' + data_path.name + '.toml')
     bucket.add_instance(instance_path, instance.ID)
 
     bucket_copy = create_path_entity_copy(bucket)
