@@ -110,7 +110,7 @@ paths:
 
   /entities:
     get:
-      operationId: "qdata.api.entities.read_all"
+      operationId: "qdata.api.entities.generate_structure"
       tags:
         - Entities
       summary: "Creates the complete structure of the whole lab notebook."
@@ -520,14 +520,14 @@ paths:
         "404":
           description: "Entity not found"
 
-  /properties/plot_suggestions/{ID}:
+  /properties/graphic_suggestions/{ID}:
     get:
-      operationId: "qdata.api.entities.get_plot_suggestions"
+      operationId: "qdata.api.entities.get_graphic_suggestions"
       tags:
         - Properties
         - Data
-      summary: "Returns a dictionary of plot suggestions for a specified query. If no query is specified,
-       all plot suggestions are returned."
+      summary: "Returns a dictionary of image suggestions for a specified query. If no query is specified,
+       all image suggestions are returned."
       parameters:
         - $ref: "#/components/parameters/ID"
         - $ref: "#/components/parameters/query_filter"
