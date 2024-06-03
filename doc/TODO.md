@@ -8,6 +8,7 @@ The following is simply a place to quickly write down known issues as well as ne
 * Have somewhere in the pages that will let you store arbitrary parameters in the notebook. This will be cool if you can then add another value to that paremeter.
 * When you edit something before you save it and change pages, that changed text should be saved somewhere
 * How do we handle analysis made out of multiple instances, for example if run 40 overnight sweeps of t1s or t2s, and we create 40 instance for each of those. How dow we handle creating a specific data analysis instance? This probably con be done with a specific type of instance that is a data analysis instance, that just has a field where it list all the other instances it was used to perform this data analysis. this can be controlled by making people use a context that lets the notebook knows of all of the data files that is loading to use create this analysis. Might be way more tricky if discipline is not enforced.
+* You should probably be able to choose what kind of file type you want. If you want to use yaml, or toml, json or just text. Any of these will honestly work. Maybe not text since we have libraries to parse the text already.
 
 
 
