@@ -1,2 +1,5 @@
-# qdata-mockup
-A mock-up of the file and logic structure for the Pfaff Lab
+# Lab Dragon
+
+Welcome to the Lab Dragon git repository.
+
+More information to come :) 
