@@ -26,7 +26,7 @@ services:
     volumes:
       # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
       - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
-    container_name: "backend"
+    container_name: "dragon_core"
     env_file:
       - .env
     labels:

@@ -8,7 +8,7 @@ from typing import Union, Optional
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
-from dragon_core import QDATADIR, TEMPLATESDIR
+from dragon_core import DRAGONDIR, TEMPLATESDIR
 from dragon_core.generators.display import generate_md
 
 
@@ -85,7 +85,7 @@ def generate_book(root_path: Union[Path, str],
     """
 
     if logo_path is None:
-        logo_path = QDATADIR.joinpath('resource', 'qubit_logo.png')
+        logo_path = DRAGONDIR.joinpath('resource', 'qubit_logo.png')
 
     root_path = Path(root_path).absolute()
 
