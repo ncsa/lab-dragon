@@ -315,7 +315,7 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
 
 if __name__ == "__main__":
 
-    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/dragon_core-mockup/test/env_generator")
+    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/dragon-core-mockup/test/env_generator")
     jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
     jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 

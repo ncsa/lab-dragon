@@ -26,7 +26,7 @@ services:
     volumes:
       # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
       - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
-    container_name: "dragon_core"
+    container_name: "dragon-core"
     env_file:
       - .env
     labels:
@@ -43,7 +43,7 @@ services:
 
   nextjs:
     image: marcosf2/frontend
-    container_name: "dragon_scales"
+    container_name: "dragon-scales"
     build:
       context: ../qdata-webapp
     labels:
@@ -56,7 +56,7 @@ services:
 #    develop:
 #      watch:
 #        - action: rebuild
-#          path: ../dragon_core-webapp/
+#          path: ../dragon-core-webapp/
 
 networks:
   monitor:

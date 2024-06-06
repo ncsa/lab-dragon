@@ -20,9 +20,9 @@ __pycache__/
 
 
 # Ignore the files created by the generators
-dragon_core/dragon_core/modules/*
-!dragon_core/dragon_core/modules/__init__.py
-!dragon_core/dragon_core/modules/bucket.py
+dragon-core/dragon_core/modules/*
+!dragon-core/dragon_core/modules/__init__.py
+!dragon-core/dragon_core/modules/bucket.py
 _build/
 test/pytest/tmp/*
 
