@@ -21,12 +21,12 @@ COPY --chown=pfafflab requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
-COPY --chown=pfafflab . ./lab-dragon
+COPY --chown=pfafflab . ./dragon-core
 
 
 RUN pip install uvicorn
-RUN pip install -e ./lab-dragon
+RUN pip install -e ./dragon-core/
 
-WORKDIR /home/pfafflab/lab-dragon
+WORKDIR /home/pfafflab/dragon-core
 
-CMD uvicorn 'dragon-core.api.starting_app:app' --host 0.0.0.0 --forwarded-allow-ips '*'
+CMD uvicorn 'dragon_core.api.starting_app:app' --host 0.0.0.0 --forwarded-allow-ips '*'

@@ -42,7 +42,7 @@ services:
 #          path: .
 
   nextjs:
-    image: marcosf2/frontend
+    image: marcosf2/dragon-scales
     container_name: "dragon-scales"
     build:
       context: ./dragon-scales
