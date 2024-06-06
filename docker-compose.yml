@@ -14,10 +14,10 @@ services:
       - "traefik.http.routers.traefik.service=traefik-svc"
       - "traefik.http.services.traefik-svc.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.traefik.basicauth.realm=Lab Notebook"
-      - "traefik.http.middlewares.traefik.basicauth.usersfile=users.txt"
-
+      - "traefik.http.middlewares.traefik.basicauth.usersfile=/etc/traefik/users.txt"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./users.txt:/etc/traefik/users.txt"
 
   connexion:
     image: marcosf2/dragon-core
