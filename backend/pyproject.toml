@@ -1,11 +1,11 @@
 [project]
-name="qdata"
+name="dragon_core"
 version="0.0.1"
 dependencies = [
     "pytest",
     "connexion[flask,swaggwer-ui]",
     "numpy",
-    "qdata",
+    "dragon_core",
     "jinja2",
     "labcore@git+https://github.com/toolsforexperiments/labcore.git",
     "nbformat",

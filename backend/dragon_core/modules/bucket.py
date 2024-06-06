@@ -9,7 +9,7 @@ from typing import Optional, Union
 import tomlkit
 
 from .entity import Entity
-from qdata.generators.meta import read_from_TOML
+from dragon_core.generators.meta import read_from_TOML
 
 
 class Bucket(Entity):

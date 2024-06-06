@@ -1,8 +1,8 @@
 
 
-from qdata.generators.jupyterbook import create_relation_dict
+from dragon_core.generators.jupyterbook import create_relation_dict
 
-from qdata.scripts.env_creator import create_simple_test_env
+from dragon_core.scripts.env_creator import create_simple_test_env
 
 
 def md_path_creator(dir_path, filename):

@@ -17,10 +17,10 @@ from labcore.data.datadict_storage import load_as_xr
 import hvplot.xarray
 import hvplot as hv
 
-from qdata.components.table import Table
-from qdata.generators.meta import read_from_TOML
-from qdata.scripts.add_toml_to_data_dir import add_toml_to_data
-from qdata.generators.meta import generate_all_classes, delete_all_modules
+from dragon_core.components.table import Table
+from dragon_core.generators.meta import read_from_TOML
+from dragon_core.scripts.add_toml_to_data_dir import add_toml_to_data
+from dragon_core.generators.meta import generate_all_classes, delete_all_modules
 
 
 def delete_directory_contents(directory_path, light_delete=False):
@@ -75,10 +75,10 @@ def create_simple_test_env(target: Optional[Union[Path, str]] = None, create_md:
 
     env_creator_path = Path(__file__)
 
-    from qdata.generators.display import generate_md
-    from qdata.modules.project import Project
-    from qdata.modules.task import Task
-    from qdata.modules.step import Step
+    from dragon_core.generators.display import generate_md
+    from dragon_core.modules.project import Project
+    from dragon_core.modules.task import Task
+    from dragon_core.modules.step import Step
 
     top_project = Project(name="Testing Project",
                           description="This is the top most parent project.",
@@ -315,7 +315,7 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
 
 if __name__ == "__main__":
 
-    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/qdata-mockup/test/env_generator")
+    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/dragon_core-mockup/test/env_generator")
     jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
     jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 

@@ -5,7 +5,7 @@ import connexion
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 
-from qdata.scripts.env_creator import create_test_env_with_msmts
+from dragon_core.scripts.env_creator import create_test_env_with_msmts
 
 if os.getenv('CREATE_TESTING_ENVIRONMENT') == 'True':
     create_test_env_with_msmts(tmp_path=Path(os.getenv("NOTEBOOK_ROOT")).parent)

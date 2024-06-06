@@ -9,10 +9,10 @@ from pathlib import Path
 
 import tomllib as toml
 
-import qdata
-import qdata.modules
-from qdata.generators.meta import read_from_TOML
-from qdata.components import Table
+import dragon_core
+import dragon_core.modules
+from dragon_core.generators.meta import read_from_TOML
+from dragon_core.components import Table
 
 
 def generate_random_string(length):
@@ -22,12 +22,12 @@ def generate_random_string(length):
 
 
 def get_toml_module_and_class(item):
-    toml_path = qdata.SCHEMASDIR.joinpath(f'{item}.toml')
+    toml_path = dragon_core.SCHEMASDIR.joinpath(f'{item}.toml')
 
     with open(str(toml_path), 'rb') as f:
         toml_doc = toml.load(f)
 
-    module = importlib.import_module(f'qdata.modules.{item}')
+    module = importlib.import_module(f'dragon_core.modules.{item}')
     cls = item[0].upper() + item[1:]
     _class = getattr(module, cls)
 

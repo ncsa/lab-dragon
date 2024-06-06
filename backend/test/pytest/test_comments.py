@@ -1,7 +1,7 @@
 import time
 
-from qdata.utils import create_timestamp
-from qdata.components import Comment, SupportedCommentType, Table
+from dragon_core.utils import create_timestamp
+from dragon_core.components import Comment, SupportedCommentType, Table
 
 user = 'test_user'
 user2 = 'test_user2'

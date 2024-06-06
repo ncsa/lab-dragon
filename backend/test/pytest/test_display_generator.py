@@ -2,9 +2,9 @@ from pathlib import Path
 
 import tomllib as toml
 
-from qdata.generators.display import generate_md
-from qdata.modules.entity import Entity
-from qdata.modules.task import Task
+from dragon_core.generators.display import generate_md
+from dragon_core.modules.entity import Entity
+from dragon_core.modules.task import Task
 
 
 def create_entity(path):

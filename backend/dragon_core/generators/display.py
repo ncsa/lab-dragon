@@ -17,8 +17,8 @@ from pathlib import Path
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
-from qdata import TEMPLATESDIR
-from qdata.components.comment import SupportedCommentType, Comment
+from dragon_core import TEMPLATESDIR
+from dragon_core.components.comment import SupportedCommentType, Comment
 
 
 def get_all_files(path: Union[Path, str]) -> list[Path]:

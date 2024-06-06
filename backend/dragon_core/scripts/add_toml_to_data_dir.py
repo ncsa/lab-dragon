@@ -9,8 +9,8 @@ from pathlib import Path
 
 from labcore.data.datadict_storage import datadict_from_hdf5
 
-from qdata.modules.instance import Instance
-from qdata.modules.bucket import Bucket
+from dragon_core.modules.instance import Instance
+from dragon_core.modules.bucket import Bucket
 
 
 def delete_toml_files(directory):

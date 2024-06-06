@@ -19,19 +19,19 @@ from flask import abort, make_response, send_file
 from markdown.extensions.tables import TableExtension
 
 # Refresh the modules before starting the server
-from qdata.generators.meta import generate_all_classes, delete_all_modules
+from dragon_core.generators.meta import generate_all_classes, delete_all_modules
 delete_all_modules()
 generate_all_classes()
 
-from qdata.modules.task import Task
-from qdata.modules.step import Step
-from qdata.modules.bucket import Bucket
-from qdata.modules.entity import Entity
-from qdata.modules.project import Project
-from qdata.modules.instance import Instance
+from dragon_core.modules.task import Task
+from dragon_core.modules.step import Step
+from dragon_core.modules.bucket import Bucket
+from dragon_core.modules.entity import Entity
+from dragon_core.modules.project import Project
+from dragon_core.modules.instance import Instance
 
-from qdata.generators.meta import read_from_TOML
-from qdata.components.comment import SupportedCommentType, Comment
+from dragon_core.generators.meta import read_from_TOML
+from dragon_core.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
 
 ROOTPATH = Path()

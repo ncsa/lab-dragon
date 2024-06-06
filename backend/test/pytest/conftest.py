@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 import connexion
 
-import qdata
-from qdata.scripts.env_creator import create_test_env_with_msmts
-from qdata.generators.meta import generate_all_classes, delete_all_modules
+import dragon_core
+from dragon_core.scripts.env_creator import create_test_env_with_msmts
+from dragon_core.generators.meta import generate_all_classes, delete_all_modules
 
 
 def count_files(path):
@@ -25,13 +25,13 @@ def refresh_modules():
 @pytest.fixture()
 def module_names(refresh_modules):
 
-    nschemas = count_files(qdata.SCHEMASDIR)
-    nmodules = count_files(qdata.MODULESDIR)
+    nschemas = count_files(dragon_core.SCHEMASDIR)
+    nmodules = count_files(dragon_core.MODULESDIR)
 
     if nmodules != nschemas:
         raise FileNotFoundError(f'Number of schemas ({nschemas}) does not match number of modules ({nmodules})')
 
-    return [x.stem for x in qdata.MODULESDIR.glob('*.py') if '__init__' not in str(x)]
+    return [x.stem for x in dragon_core.MODULESDIR.glob('*.py') if '__init__' not in str(x)]
 
 
 @pytest.fixture()
@@ -51,14 +51,14 @@ def set_cors_headers_on_response(response):
 @pytest.fixture(scope='module')
 def client():
     original_path = os.getcwd() #+ '/test/pytest'
-    entities_path = Path("../../qdata/api").resolve()
+    entities_path = Path("../../dragon_core/api").resolve()
 
     sys.path.insert(0, str(entities_path))
 
     os.chdir(entities_path)
 
-    app = connexion.App(__name__, specification_dir='../../qdata/api/')
-    app.add_api(Path("../../qdata/api/API_specification.yaml"))
+    app = connexion.App(__name__, specification_dir='../../dragon_core/api/')
+    app.add_api(Path("../../dragon_core/api/API_specification.yaml"))
     app.app.after_request(set_cors_headers_on_response)
     with app.app.test_client() as c:
         os.chdir(original_path)

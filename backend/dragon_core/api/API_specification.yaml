@@ -90,7 +90,7 @@ paths:
 
   /health:
     get:
-      operationId: "qdata.api.entities.health_check"
+      operationId: "dragon_core.api.entities.health_check"
       tags:
         - Health
       summary: "Returns the health of the server"
@@ -100,7 +100,7 @@ paths:
 
   /reset:
     post:
-      operationId: "qdata.api.entities.reset"
+      operationId: "dragon_core.api.entities.reset"
       tags:
         - Reset
       summary: "Resets the notebook to its initial state"
@@ -110,7 +110,7 @@ paths:
 
   /entities:
     get:
-      operationId: "qdata.api.entities.generate_structure"
+      operationId: "dragon_core.api.entities.generate_structure"
       tags:
         - Entities
       summary: "Creates the complete structure of the whole lab notebook."
@@ -120,7 +120,7 @@ paths:
 
     post:
       summary: "Adds a new entity to the lab notebook"
-      operationId: "qdata.api.entities.add_entity"
+      operationId: "dragon_core.api.entities.add_entity"
       tags:
         - Entities
       requestBody:
@@ -148,7 +148,7 @@ paths:
 
   /entities/{ID}:
     get:
-      operationId: "qdata.api.entities.read_one"
+      operationId: "dragon_core.api.entities.read_one"
       tags:
         - Entities
       summary: "Read the entity with the given ID"
@@ -167,7 +167,7 @@ paths:
             description: "Entity not found"
 
     put:
-      operationId: "qdata.api.entities.add_comment"
+      operationId: "dragon_core.api.entities.add_comment"
       tags:
         - Entities
         - Comments
@@ -190,7 +190,7 @@ paths:
               type: "string"
 
     delete:
-        operationId: "qdata.api.entities.delete_entity"
+        operationId: "dragon_core.api.entities.delete_entity"
         tags:
             - Entities
         summary: "Deletes the entity with the given ID"
@@ -203,7 +203,7 @@ paths:
               description: "Entity not found"
 
     patch:
-      operationId: "qdata.api.entities.change_entity_name"
+      operationId: "dragon_core.api.entities.change_entity_name"
       tags:
         - Entities
       summary: "Change the name of the entity with the given ID"
@@ -228,7 +228,7 @@ paths:
 
   /entities/{ID}/{commentID}:
     get:
-      operationId: "qdata.api.entities.read_comment"
+      operationId: "dragon_core.api.entities.read_comment"
       tags:
         - Entities
         - Comments
@@ -249,7 +249,7 @@ paths:
           description: "Comment not found"
 
     patch:
-      operationId: "qdata.api.entities.edit_comment"
+      operationId: "dragon_core.api.entities.edit_comment"
       tags:
           - Entities
           - Comments
@@ -280,7 +280,7 @@ paths:
 
   /entities/{ID}/info:
     get:
-      operationId: "qdata.api.entities.read_entity_info"
+      operationId: "dragon_core.api.entities.read_entity_info"
       tags:
           - Entities
           - Info
@@ -295,7 +295,7 @@ paths:
 
   /entities/{ID}/tree:
     get:
-      operationId: "qdata.api.entities.generate_tree"
+      operationId: "dragon_core.api.entities.generate_tree"
       tags:
         - Entities
         - Info
@@ -310,7 +310,7 @@ paths:
 
   /entities/{ID}/stored_params:
     get:
-      operationId: "qdata.api.entities.get_stored_params"
+      operationId: "dragon_core.api.entities.get_stored_params"
       tags:
         - Entities
         - Data
@@ -328,7 +328,7 @@ paths:
 
   /entities/{ID}/toggle_bookmark:
     post:
-      operationId: "qdata.api.entities.toggle_bookmark"
+      operationId: "dragon_core.api.entities.toggle_bookmark"
       tags:
         - Entities
       summary: "Toggles the bookmark status of the entity with the given ID"
@@ -342,7 +342,7 @@ paths:
 
   /data:
     post:
-      operationId: "qdata.api.entities.add_instance"
+      operationId: "dragon_core.api.entities.add_instance"
       tags:
         - Data
       summary: "Adds a new instance to the lab notebook"
@@ -378,7 +378,7 @@ paths:
           description: "Bucket not found"
 
     patch:
-      operationId: "qdata.api.entities.add_analysis_files_to_instance"
+      operationId: "dragon_core.api.entities.add_analysis_files_to_instance"
       tags:
           - Data
       summary: "Adds analysis files to the instance with the given data loc"
@@ -407,7 +407,7 @@ paths:
 
   /data/buckets:
     get:
-      operationId: "qdata.api.entities.get_buckets"
+      operationId: "dragon_core.api.entities.get_buckets"
       tags:
         - Data
         - Properties
@@ -418,7 +418,7 @@ paths:
 
   /data/toggle_star:
     patch:
-      operationId: "qdata.api.entities.toggle_star"
+      operationId: "dragon_core.api.entities.toggle_star"
       tags:
           - Data
       summary: "Toggles the star status of the instance with the given ID"
@@ -436,7 +436,7 @@ paths:
 
   /properties/users:
     get:
-      operationId: "qdata.api.entities.get_users"
+      operationId: "dragon_core.api.entities.get_users"
       tags:
         - Properties
       summary: "Returns all users present in the notebook"
@@ -446,7 +446,7 @@ paths:
 
   /properties/types:
     get:
-      operationId: "qdata.api.entities.get_types"
+      operationId: "dragon_core.api.entities.get_types"
       tags:
         - Properties
       summary: "Returns all types present in the notebook"
@@ -456,7 +456,7 @@ paths:
 
   /properties/parents:
     get:
-      operationId: "qdata.api.entities.get_possible_parents"
+      operationId: "dragon_core.api.entities.get_possible_parents"
       tags:
         - Properties
       summary: "Returns all the possible parents in the notebook"
@@ -466,7 +466,7 @@ paths:
 
   /properties/image:
     post:
-      operationId: "qdata.api.entities.add_image"
+      operationId: "dragon_core.api.entities.add_image"
       tags:
         - Properties
         - Images
@@ -490,7 +490,7 @@ paths:
 
   /properties/image/{imagePath}:
     get:
-      operationId: "qdata.api.entities.read_image"
+      operationId: "dragon_core.api.entities.read_image"
       tags:
         - Properties
         - Images
@@ -505,7 +505,7 @@ paths:
 
   /properties/data_suggestions/{ID}:
     get:
-      operationId: "qdata.api.entities.get_data_suggestions"
+      operationId: "dragon_core.api.entities.get_data_suggestions"
       tags:
         - Properties
         - Data
@@ -522,7 +522,7 @@ paths:
 
   /properties/graphic_suggestions/{ID}:
     get:
-      operationId: "qdata.api.entities.get_graphic_suggestions"
+      operationId: "dragon_core.api.entities.get_graphic_suggestions"
       tags:
         - Properties
         - Data
@@ -539,7 +539,7 @@ paths:
 
   /testing/indices:
     get:
-      operationId: "qdata.api.entities.get_indices"
+      operationId: "dragon_core.api.entities.get_indices"
       tags:
         - Testing
       summary: "Returns all indices for testing purposes"
@@ -549,7 +549,7 @@ paths:
 
   /testing/fake_mentions:
     get:
-      operationId: "qdata.api.entities.get_fake_mentions"
+      operationId: "dragon_core.api.entities.get_fake_mentions"
       tags:
         - Testing
       summary: "Returns a fake list of mentions for testing porpuses"

@@ -8,8 +8,8 @@ from typing import Union, Optional
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
-from qdata import QDATADIR, TEMPLATESDIR
-from qdata.generators.display import generate_md
+from dragon_core import QDATADIR, TEMPLATESDIR
+from dragon_core.generators.display import generate_md
 
 
 # FIXME: Right now we are generating the md files twice, we should figure out a way of doing it only once.

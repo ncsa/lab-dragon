@@ -5,12 +5,12 @@ import argparse
 from pathlib import Path
 
 try:
-    from qdata.modules.project import Project
+    from dragon_core.modules.project import Project
 except ImportError as e:
-    from qdata.generators.meta import generate_all_classes, delete_all_modules
+    from dragon_core.generators.meta import generate_all_classes, delete_all_modules
     delete_all_modules()
     generate_all_classes()
-    from qdata.modules.project import Project 
+    from dragon_core.modules.project import Project
 
 
 if __name__ == "__main__":

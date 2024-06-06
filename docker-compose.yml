@@ -56,7 +56,7 @@ services:
 #    develop:
 #      watch:
 #        - action: rebuild
-#          path: ../qdata-webapp/
+#          path: ../dragon_core-webapp/
 
 networks:
   monitor:

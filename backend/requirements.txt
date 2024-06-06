@@ -2,6 +2,7 @@ pytest
 connexion
 numpy
 jinja2
+h5py
 labcore @ git+https://github.com/toolsforexperiments/labcore.git
 nbformat
 markdown

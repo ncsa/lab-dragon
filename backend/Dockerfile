@@ -3,6 +3,9 @@ FROM python:3.11.7-slim
 RUN apt-get update && apt-get upgrade --yes
 RUN yes | apt-get install git
 RUN apt-get update -y && apt-get install -y gcc
+RUN apt install libhdf5-dev --yes
+RUN apt install libhdf5-serial-dev
+RUN apt-get install -y pkg-config 
 
 RUN useradd --create-home pfafflab
 USER pfafflab
@@ -15,15 +18,15 @@ ENV PATH="$VIRTUALENV/bin:$PATH"
 EXPOSE 8000
 
 COPY --chown=pfafflab requirements.txt ./
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
-COPY --chown=pfafflab . ./qdata-mockup
+COPY --chown=pfafflab . ./lab-dragon
 
 
 RUN pip install uvicorn
-RUN pip install -e ./qdata-mockup
+RUN pip install -e ./lab-dragon
 
-WORKDIR /home/pfafflab/qdata-mockup
+WORKDIR /home/pfafflab/lab-dragon
 
-CMD uvicorn 'qdata.api.starting_app:app' --host 0.0.0.0 --forwarded-allow-ips '*'
+CMD uvicorn 'dragon-core.api.starting_app:app' --host 0.0.0.0 --forwarded-allow-ips '*'

@@ -6,8 +6,8 @@ from typing import Union
 import tomllib as toml
 from jinja2 import Environment, FileSystemLoader
 
-from qdata.components.comment import Comment
-from qdata import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
+from dragon_core.components.comment import Comment
+from dragon_core import SCHEMASDIR, MODULESDIR, TEMPLATESDIR, APISCHEMAS
 
 
 def parser(path: Union[Path, str]) -> dict:
@@ -40,7 +40,7 @@ def parser(path: Union[Path, str]) -> dict:
     if 'imports' in data:
         imports.update(data['imports'])
     if inherits_from != 'object':
-        imports.update({inherits_from: f"from qdata.modules.{inherits_from.lower()} import {inherits_from}"})
+        imports.update({inherits_from: f"from dragon_core.modules.{inherits_from.lower()} import {inherits_from}"})
 
     if 'params' in data:
         params = data['params']
@@ -112,7 +112,7 @@ def read_from_TOML(path: Union[str, Path]) -> object:
 
     data = data[next(iter(data))]
 
-    module = importlib.import_module(f'qdata.modules.{data["type"].lower()}')
+    module = importlib.import_module(f'dragon_core.modules.{data["type"].lower()}')
     _class = getattr(module, data.pop('type'))
 
     if len(data['comments']) > 0:
