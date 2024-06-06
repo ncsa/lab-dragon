@@ -43,7 +43,7 @@ services:
 
   nextjs:
     image: marcosf2/frontend
-    container_name: "frontend"
+    container_name: "dragon_scales"
     build:
       context: ../qdata-webapp
     labels:
