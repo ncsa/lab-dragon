@@ -1,0 +1,558 @@
+openapi: 3.0.3
+info:
+  title: "Lab Manager API"
+  description: "An API designed to interact with a lab notebook."
+  version: 1.0.0
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Entity:
+      type: "object"
+      required:
+        - ID
+      properties:
+        ID:
+          type: "string"
+        name:
+          type: "string"
+        parent:
+          type: "string"
+        user:
+          type: "string"
+        description:
+          type: "string"
+        comments:
+          type: "array"
+        children:
+          type: "array"
+
+    Comment:
+      type: "object"
+      required:
+        - content
+      properties:
+        content:
+          type: "string"
+          description: "Text of the comment"
+
+  parameters:
+    ID:
+      name: "ID"
+      description: "ID of the entity to get"
+      in: path
+      required: true
+      schema:
+        type: "string"
+
+    imagePath:
+      name: "imagePath"
+      description: "path of the image to get"
+      in: path
+      required: true
+      schema:
+        type: "string"
+
+    commentID:
+        name: "commentID"
+        description: "ID of the comment to get"
+        in: path
+        required: true
+        schema:
+            type: "string"
+
+    username:
+      name: "username"
+      description: "The username adding content"
+      in: query
+      required: false
+      schema:
+          type: "string"
+
+    query_filter:
+      name: "query_filter"
+      description: "Query to search for"
+      in: query
+      required: false
+      schema:
+        type: "string"
+
+    HTML:
+      name: "HTML"
+      description: "If true, the text in the request body is interpreted as HTML and converted to markdown or vice versa. Always defaults to False"
+      in: query
+      required: false
+      schema:
+          type: "boolean"
+
+paths:
+
+  /health:
+    get:
+      operationId: "dragon_core.api.entities.health_check"
+      tags:
+        - Health
+      summary: "Returns the health of the server"
+      responses:
+        "201":
+          description: "Server is healthy"
+
+  /reset:
+    post:
+      operationId: "dragon_core.api.entities.reset"
+      tags:
+        - Reset
+      summary: "Resets the notebook to its initial state"
+      responses:
+        "200":
+          description: "Successfully reset notebook"
+
+  /entities:
+    get:
+      operationId: "dragon_core.api.entities.generate_structure"
+      tags:
+        - Entities
+      summary: "Creates the complete structure of the whole lab notebook."
+      responses:
+        "200":
+          description: "Successfully created lab entries"
+
+    post:
+      summary: "Adds a new entity to the lab notebook"
+      operationId: "dragon_core.api.entities.add_entity"
+      tags:
+        - Entities
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                  user:
+                    type: "string"
+                  type:
+                    type: "string"
+                  parent:
+                    type: "string"
+
+      responses:
+        "200":
+          description: "Successfully added entity"
+        "400":
+          description: "Invalid entity"
+        "404":
+          description: "Parent not found"
+
+  /entities/{ID}:
+    get:
+      operationId: "dragon_core.api.entities.read_one"
+      tags:
+        - Entities
+      summary: "Read the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - in: query
+          name: "name_only"
+          schema:
+            type: "boolean"
+          description: "If true, only the name of the entity is returned"
+
+      responses:
+        "200":
+            description: "Successfully read entity"
+        "404":
+            description: "Entity not found"
+
+    put:
+      operationId: "dragon_core.api.entities.add_comment"
+      tags:
+        - Entities
+        - Comments
+      summary: "Add a comment to the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/username"
+        - $ref: "#/components/parameters/HTML"
+      responses:
+        "200":
+            description: "Successfully added comment"
+        "404":
+            description: "Entity not found"
+      requestBody:
+        description: "Comment to add"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "string"
+
+    delete:
+        operationId: "dragon_core.api.entities.delete_entity"
+        tags:
+            - Entities
+        summary: "Deletes the entity with the given ID"
+        parameters:
+            - $ref: "#/components/parameters/ID"
+        responses:
+            "200":
+              description: "Successfully deleted entity"
+            "404":
+              description: "Entity not found"
+
+    patch:
+      operationId: "dragon_core.api.entities.change_entity_name"
+      tags:
+        - Entities
+      summary: "Change the name of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody: # Define the request body here
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_name: # Specify the new_name field expected in the JSON body
+                  type: string
+      responses:
+        "200":
+          description: "Successfully changed entity name"
+        "400":
+          description: "Invalid name"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/{commentID}:
+    get:
+      operationId: "dragon_core.api.entities.read_comment"
+      tags:
+        - Entities
+        - Comments
+      summary: "Read the comment with the given ID, mainly used to get entity images"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/commentID"
+        - in: query
+          name: "whole_comment"
+          schema:
+              type: "boolean"
+          description: "If true, the whole comment is returned, otherwise only the content"
+        - $ref: "#/components/parameters/HTML"
+      responses:
+        "200":
+          description: "Successfully read comment"
+        "404":
+          description: "Comment not found"
+
+    patch:
+      operationId: "dragon_core.api.entities.edit_comment"
+      tags:
+          - Entities
+          - Comments
+      summary: "Edit the comment with the given ID of an entity"
+      parameters:
+          - $ref: "#/components/parameters/ID"
+          - $ref: "#/components/parameters/commentID"
+          - $ref: "#/components/parameters/username"
+          - in: query
+            name: "HTML"
+            schema:
+              type: "boolean"
+            description: "If true, the comment is interpreted as HTML and converted to markdown"
+      responses:
+          "200":
+              description: "Successfully edited comment"
+          "404":
+              description: "Comment not found"
+
+      requestBody:
+        description: "Updated comment"
+        required: true
+        content:
+          application/json:
+              schema:
+                type: "string"
+                x-body-name: "comment"
+
+  /entities/{ID}/info:
+    get:
+      operationId: "dragon_core.api.entities.read_entity_info"
+      tags:
+          - Entities
+          - Info
+      summary: "Returns the rank and number of children this entity has."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/tree:
+    get:
+      operationId: "dragon_core.api.entities.generate_tree"
+      tags:
+        - Entities
+        - Info
+      summary: "Returns a tree representation of the children of this entity."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/stored_params:
+    get:
+      operationId: "dragon_core.api.entities.get_stored_params"
+      tags:
+        - Entities
+        - Data
+      summary: "Returns a dictionary of stored parameters for a specified query. If no query is specified,
+       all stored parameters are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "400":
+          description: "Entity type is not an Instance"
+        "404":
+          description: "Entity not found"
+
+  /entities/{ID}/toggle_bookmark:
+    post:
+      operationId: "dragon_core.api.entities.toggle_bookmark"
+      tags:
+        - Entities
+      summary: "Toggles the bookmark status of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: "Successfully toggled bookmark"
+        "404":
+          description: "Entity not found"
+
+  /data:
+    post:
+      operationId: "dragon_core.api.entities.add_instance"
+      tags:
+        - Data
+      summary: "Adds a new instance to the lab notebook"
+      description: "The data_path should be the directory in which the data is located. Goes in that directory and creates an instance based on the files present. The name of the new Instance is the name of the directory"
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  bucket_ID:
+                    type: "string"
+                  data_loc:
+                    type: "string"
+                  username:
+                    type: "string"
+                  start_time:
+                    type: "string"
+                  end_time:
+                    type: "string"
+                required:
+                  - bucket_ID
+                  - data_loc
+                  - username
+      responses:
+        "200":
+          description: "Successfully added instance"
+        "400":
+          description: "Invalid instance"
+        "403":
+          description: "Data folder not found"
+        "404":
+          description: "Bucket not found"
+
+    patch:
+      operationId: "dragon_core.api.entities.add_analysis_files_to_instance"
+      tags:
+          - Data
+      summary: "Adds analysis files to the instance with the given data loc"
+      description: "Accepts a list of file paths pointing to analysis files. The files are sorted into the respective field depending on their extension"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                data_loc:
+                  type: "string"
+                analysis_files:
+                  type: "array"
+              required:
+                - data_loc
+                - analysis_files
+      responses:
+          "200":
+              description: "Successfully added analysis files"
+          "400":
+              description: "No analysis files provided"
+          "404":
+              description: "Instance not found"
+
+
+  /data/buckets:
+    get:
+      operationId: "dragon_core.api.entities.get_buckets"
+      tags:
+        - Data
+        - Properties
+      summary: "Returns all buckets present in the notebook in a dictionary with bucket_ID as keys and name as values"
+      responses:
+        "200":
+          description: "Successfully read buckets"
+
+  /data/toggle_star:
+    patch:
+      operationId: "dragon_core.api.entities.toggle_star"
+      tags:
+          - Data
+      summary: "Toggles the star status of the instance with the given ID"
+      parameters:
+        - in: query
+          name: "data_loc"
+          schema:
+            type: "string"
+          description: "The location of the data. An entity should exist with this data_loc"
+      responses:
+          "200":
+            description: "Successfully toggled star"
+          "404":
+            description: "Instance not found"
+
+  /properties/users:
+    get:
+      operationId: "dragon_core.api.entities.get_users"
+      tags:
+        - Properties
+      summary: "Returns all users present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read users"
+
+  /properties/types:
+    get:
+      operationId: "dragon_core.api.entities.get_types"
+      tags:
+        - Properties
+      summary: "Returns all types present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read types"
+
+  /properties/parents:
+    get:
+      operationId: "dragon_core.api.entities.get_possible_parents"
+      tags:
+        - Properties
+      summary: "Returns all the possible parents in the notebook"
+      responses:
+        "200":
+          description: "Successfully read parents"
+
+  /properties/image:
+    post:
+      operationId: "dragon_core.api.entities.add_image"
+      tags:
+        - Properties
+        - Images
+      summary: "Uploads an image to the server"
+      requestBody:
+        description: "Image to upload"
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                image:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "Successfully uploaded image"
+        "400":
+          description: "Invalid image"
+
+  /properties/image/{imagePath}:
+    get:
+      operationId: "dragon_core.api.entities.read_image"
+      tags:
+        - Properties
+        - Images
+      summary: "Returns the image of the entity with the given ID"
+      parameters:
+        - $ref: "#/components/parameters/imagePath"
+      responses:
+        "200":
+          description: "Successfully read entity image"
+        "404":
+          description: "Image not found"
+
+  /properties/data_suggestions/{ID}:
+    get:
+      operationId: "dragon_core.api.entities.get_data_suggestions"
+      tags:
+        - Properties
+        - Data
+      summary: "Returns a dictionary of suggestions for a specified query. If no query is specified,
+       all suggestions are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/query_filter"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /properties/graphic_suggestions/{ID}:
+    get:
+      operationId: "dragon_core.api.entities.get_graphic_suggestions"
+      tags:
+        - Properties
+        - Data
+      summary: "Returns a dictionary of image suggestions for a specified query. If no query is specified,
+       all image suggestions are returned."
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/query_filter"
+      responses:
+        "200":
+          description: "Successfully read entity info"
+        "404":
+          description: "Entity not found"
+
+  /testing/indices:
+    get:
+      operationId: "dragon_core.api.entities.get_indices"
+      tags:
+        - Testing
+      summary: "Returns all indices for testing purposes"
+      responses:
+        "200":
+          description: "Call used exclusively for testing purposes. Returns all indices so they can be inspected"
+
+  /testing/fake_mentions:
+    get:
+      operationId: "dragon_core.api.entities.get_fake_mentions"
+      tags:
+        - Testing
+      summary: "Returns a fake list of mentions for testing porpuses"
+      responses:
+        "200":
+          description: "Call used exclusively for testing purposes. Returns a fake list of entities"

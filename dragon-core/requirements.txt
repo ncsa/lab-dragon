@@ -1,0 +1,20 @@
+pytest
+connexion
+numpy
+jinja2
+h5py
+labcore @ git+https://github.com/toolsforexperiments/labcore.git
+nbformat
+markdown
+imagehash
+pillow
+nbconvert
+werkzeug
+flask
+markdownify
+tomlkit
+param
+setuptools
+flask-cors
+connexion[swagger-ui]
+qcodes

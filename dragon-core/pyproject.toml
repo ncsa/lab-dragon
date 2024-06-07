@@ -1,0 +1,27 @@
+[project]
+name="dragon_core"
+version="0.0.2"
+dependencies = [
+    "pytest",
+    "connexion[flask,swaggwer-ui]",
+    "numpy",
+    "dragon_core",
+    "jinja2",
+    "labcore@git+https://github.com/toolsforexperiments/labcore.git",
+    "nbformat",
+    "markdown",
+    "imagehash",
+    "pillow",
+    "nbconvert",
+    "werkzeug",
+    "flask",
+    "markdownify",
+    "tomlkit",
+    "param",
+    "setuptools",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]

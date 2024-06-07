@@ -14,19 +14,19 @@ services:
       - "traefik.http.routers.traefik.service=traefik-svc"
       - "traefik.http.services.traefik-svc.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.traefik.basicauth.realm=Lab Notebook"
-      - "traefik.http.middlewares.traefik.basicauth.users=pfafflab:$$2y$$05$$q/dphAPEb0M5Oaq4hgPcCuBUqqIAVm3EO/a7FvfJaq419c4O1uMtG"
-
+      - "traefik.http.middlewares.traefik.basicauth.usersfile=/etc/traefik/users.txt"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./users.txt:/etc/traefik/users.txt"
 
   connexion:
-    image: marcosf2/backend
+    image: marcosf2/dragon-core
     build:
-      context: .
+      context: ./dragon-core
     volumes:
       # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
       - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
-    container_name: "backend"
+    container_name: "dragon-core"
     env_file:
       - .env
     labels:
@@ -42,10 +42,10 @@ services:
 #          path: .
 
   nextjs:
-    image: marcosf2/frontend
-    container_name: "frontend"
+    image: marcosf2/dragon-scales
+    container_name: "dragon-scales"
     build:
-      context: ../qdata-webapp
+      context: ./dragon-scales
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextjs.rule=Host(`${TRAEFIK_HOST}`)"
@@ -56,7 +56,7 @@ services:
 #    develop:
 #      watch:
 #        - action: rebuild
-#          path: ../qdata-webapp/
+#          path: ../dragon-core-webapp/
 
 networks:
   monitor:

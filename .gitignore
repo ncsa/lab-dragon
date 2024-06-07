@@ -17,26 +17,26 @@ __pycache__/
 
 # Environment variables
 .env
-
+*.env.local
 
 # Ignore the files created by the generators
-qdata/modules/*
-!qdata/modules/__init__.py
-!qdata/modules/bucket.py
+dragon-core/dragon_core/modules/*
+!dragon-core/dragon_core/modules/__init__.py
+!dragon-core/dragon_core/modules/bucket.py
 _build/
 test/pytest/tmp/*
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
+*/node_modules
+*/.pnp
+*.pnp.js
 
 # testing
 /coverage
 
 # next.js
-/.next/
-/out/
+*/.next/
+*/out/
 
 # production
 /build
@@ -54,3 +54,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# users
+users.txt
