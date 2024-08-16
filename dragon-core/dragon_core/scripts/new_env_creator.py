@@ -288,6 +288,9 @@ def create_simulated_env(target: Path) -> None:
     pages_to_create = []
     target = target.resolve()
 
+    if not target.exists():
+        target.mkdir(parents=True, exist_ok=True)
+
     delete_directory_contents(target)
 
     # Creating data bucket
