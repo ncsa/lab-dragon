@@ -19,10 +19,7 @@ __pycache__/
 .env
 *.env.local
 
-# Ignore the files created by the generators
-dragon-core/dragon_core/modules/*
-!dragon-core/dragon_core/modules/__init__.py
-!dragon-core/dragon_core/modules/bucket.py
+# Ignore build and testing environment.
 _build/
 test/pytest/tmp/*
 

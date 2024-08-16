@@ -19,37 +19,9 @@ import hvplot as hv
 
 from dragon_core.components.table import Table
 from dragon_core.generators.meta import read_from_TOML
+from dragon_core.utils import delete_directory_contents
 from dragon_core.scripts.add_toml_to_data_dir import add_toml_to_data
 from dragon_core.generators.meta import generate_all_classes, delete_all_modules
-
-
-def delete_directory_contents(directory_path, light_delete=False):
-    """
-    Deletes all files and subdirectories in a directory. if light_delete is True, will only delete toml files in the
-    same directory
-
-    :param directory_path:
-    :param light_delete:
-    :return:
-    """
-    # Create a Path object from the directory path
-    directory = Path(directory_path)
-
-    # Iterate over all files and subdirectories in the directory
-    for item in directory.glob('*'):
-        if light_delete:
-            if item.is_file() and item.suffix == '.toml':
-                # Delete file
-                item.unlink()
-        else:
-            if item.is_file():
-                # Delete file
-                item.unlink()
-            else:
-                # Recursively delete subdirectory and its contents
-                delete_directory_contents(item)
-                # Delete empty subdirectory
-                item.rmdir()
 
 
 # TODO: When we have a better plan for how to handle the instance object, add the images into the instance object.
@@ -315,7 +287,7 @@ def create_test_env_with_msmts(request=False, tmp_path=Path(r'./tmp').resolve(),
 
 if __name__ == "__main__":
 
-    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/dragon-core-mockup/test/env_generator")
+    new_notebook_location = Path(r"/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/pytest/tmp")
     jupyter_book_root_path = Path("../../test/env_generator/Testing Project.toml")
     jupyter_book_target_path = Path("../../test/env_generator/jupyterbook/")
 

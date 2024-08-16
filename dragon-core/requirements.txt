@@ -16,5 +16,6 @@ tomlkit
 param
 setuptools
 flask-cors
-connexion[swagger-ui]
+connexion[swagger-ui, flask]
 qcodes
+python-dotenv
