@@ -1,0 +1,29 @@
+name: lab-dragon
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pytest
+  - connexion=3
+  - connexion[swagger-ui,flask]
+  - numpy
+  - jinja2
+  - h5py
+  - nbformat
+  - markdown
+  - imagehash
+  - pillow
+  - nbconvert
+  - werkzeug
+  - flask
+  - markdownify
+  - tomlkit
+  - param
+  - setuptools
+  - flask-cors
+  - qcodes
+  - python-dotenv
+  - pip
+  - pip:
+      - labcore @ git+https://github.com/toolsforexperiments/labcore.git
