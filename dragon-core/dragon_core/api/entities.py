@@ -15,7 +15,7 @@ import imagehash
 from PIL import Image
 from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
-from flask import abort, make_response, send_file
+from flask import abort, make_response, send_file, current_app
 from markdown.extensions.tables import TableExtension
 
 # Refresh the modules before starting the server
@@ -34,11 +34,13 @@ from dragon_core.generators.meta import read_from_TOML
 from dragon_core.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
 
-ROOTPATH = Path()
 
-ROOTPATH = Path()
+# Config coming from starting script.
+CONFIG = current_app.config['API_config']
 
-RESOURCEPATH = Path()
+ROOTPATH: Path = Path(CONFIG['notebook_root'])
+
+RESOURCEPATH: Path = Path(CONFIG['resource_path'])
 
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
@@ -62,10 +64,11 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS = set()
+USERS: set = CONFIG['users']
 
 
 def set_initial_indices():
+    global CONFIG
     global ROOTPATH
     global RESOURCEPATH
     global PARENT_TYPES
@@ -78,15 +81,15 @@ def set_initial_indices():
     global INSTANCEIMAGE
     global USERS
 
-    ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+    ROOTPATH = Path(CONFIG['notebook_root'])
 
-    RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+    RESOURCEPATH = Path(CONFIG['resource_path'])
 
     # List of classes that can contain children. Only Project and Task can contain children for now.
     PARENT_TYPES = ["Project", "Task"]
     ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
     # Holds all of the entity types that exists in the notebook
-    ENTITY_TYPES = set(("Project", "Task", "Step"))
+    ENTITY_TYPES = {"Project", "Task", "Step"}
 
     INDEX = {}
 
@@ -102,7 +105,7 @@ def set_initial_indices():
     INSTANCEIMAGE = {}
 
     # Holds all of the users that exists in the notebook
-    USERS = set(os.getenv("USERS").split(','))
+    USERS = set(copy.copy(CONFIG['users']))
 
 
 def reset():
