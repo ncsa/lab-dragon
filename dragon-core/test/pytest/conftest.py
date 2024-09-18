@@ -6,6 +6,8 @@ import pytest
 import connexion
 
 import dragon_core
+from dragon_core.config import verify_and_parse_config
+from dragon_core.scripts.new_env_creator import create_simulated_env
 from dragon_core.scripts.env_creator import create_test_env_with_msmts
 from dragon_core.generators.meta import generate_all_classes, delete_all_modules
 
@@ -35,7 +37,7 @@ def module_names(refresh_modules):
 
 
 @pytest.fixture()
-def generate_msmt_folder_structure(request, tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
+def deprecated_generate_msmt_folder_structure(request, tmp_path=Path(r'./tmp').resolve(), n_measurements=1, generate_each_run=False):
     create_test_env_with_msmts(request, tmp_path, n_measurements, generate_each_run)
 
 
@@ -50,16 +52,23 @@ def set_cors_headers_on_response(response):
 
 @pytest.fixture(scope='module')
 def client():
-    original_path = os.getcwd() #+ '/test/pytest'
+    """
+    client fixture starts a testing server, this should look very similar to how the real server is started.
+    """
     entities_path = Path("../../dragon_core/api").resolve()
 
     sys.path.insert(0, str(entities_path))
+    tmp_path = Path("./tmp").resolve()
 
-    os.chdir(entities_path)
+    config_path = Path('../../config_example.toml').resolve()
+    config = verify_and_parse_config(config_path)
 
-    app = connexion.App(__name__, specification_dir='../../dragon_core/api/')
+    config['notebook_root'] = create_simulated_env(target=tmp_path)
+
+    app = connexion.FlaskApp(__name__, specification_dir='../../dragon_core/api/')
     app.add_api(Path("../../dragon_core/api/API_specification.yaml"))
     app.app.after_request(set_cors_headers_on_response)
-    with app.app.test_client() as c:
-        os.chdir(original_path)
-        yield c
+    with app.app.app_context():
+        app.app.config['API_config'] = config
+        with app.test_client() as c:
+            yield c

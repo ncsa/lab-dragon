@@ -1,3 +1,4 @@
+# FIXME: This should be updated for how we handle comments now
 import time
 
 from dragon_core.utils import create_timestamp

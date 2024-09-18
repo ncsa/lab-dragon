@@ -28,7 +28,7 @@ def start_server(config_path: Path) -> None:
     if create_testing_environment:
         # target = Path(resource_path)
         notebook_root = create_simulated_env(target=Path(notebook_root).parent)
-        config['notebook_root'] = str(notebook_root)
+        config['notebook_root'] = Path(notebook_root)
 
     app = connexion.FlaskApp(__name__, specification_dir='./')
     app.add_middleware(
