@@ -402,6 +402,7 @@ def generate_structure():
     return make_response(json.dumps([_generate_structure_helper(PATH_TO_UUID_INDEX[str(ROOTPATH)])]), 201)
 
 
+# FIXME: This is a bad name, it should probably be read entity or something like that instead.
 def read_one(ID, name_only=False):
     """
     API function that returns an entity based on its ID
@@ -414,7 +415,7 @@ def read_one(ID, name_only=False):
         ent = INDEX[ID]
 
         if name_only:
-            return ent.name
+            return ent.name, 200
 
         ent_copy = copy.deepcopy(ent)
         for comment in ent_copy.comments:

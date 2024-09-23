@@ -72,3 +72,11 @@ def client():
         app.app.config['API_config'] = config
         with app.test_client() as c:
             yield c
+
+
+@pytest.fixture()
+def toml_files():
+    current_path = Path(__file__).resolve()
+    toml_files = [x for x in (current_path.parent / 'tmp').glob('*.toml')]
+
+    return toml_files

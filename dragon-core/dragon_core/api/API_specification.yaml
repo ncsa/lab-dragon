@@ -143,8 +143,6 @@ paths:
           description: "Successfully added entity"
         "400":
           description: "Invalid entity"
-        "404":
-          description: "Parent not found"
 
   /entities/{ID}:
     get:
@@ -162,6 +160,8 @@ paths:
 
       responses:
         "200":
+          description: "Successfully read entity with only_name true."
+        "201":
             description: "Successfully read entity"
         "404":
             description: "Entity not found"
