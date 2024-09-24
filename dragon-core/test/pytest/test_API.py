@@ -5,6 +5,7 @@ Missing tests that will come later:
 
 """
 import json
+from pathlib import Path
 
 import tomllib as toml
 
@@ -126,7 +127,7 @@ def test_get_entities(client):
     assert compare_entity_structure(CORRECT_RECT, ret.json())
     
 
-def test_post_entities_correct(client):
+def test_post_entities_correct(client, toml_files):
 
     # Getting root entity
     entities_response = client.get('/api/entities')
@@ -149,8 +150,13 @@ def test_post_entities_correct(client):
 
     assert 'New entity' in first_child_names
 
-    # Updating the new entity, the following is not part of the test.
+    # Checks that new entity has a toml file
+    current_path = Path(__file__).resolve()
+    new_toml_files = [x for x in (current_path.parent / 'tmp').glob('*.toml')]
 
+    assert len(new_toml_files) == len(toml_files) + 1
+
+    # Updating the new entity, the following is not part of the test.
     CORRECT_RECT[0]['children'].append({'name': 'New entity', 'type': 'Project', 'id': '', 'children': []})
 
 
@@ -374,4 +380,67 @@ def test_wrong_patch_entities_id(client):
     """
     ret = client.patch('/api/entities/123', json={'new_name': 'New name'})
     assert ret.status_code == 404
+
+
+def test_delete_entities_id(client, root_entity):
+    root_file, root_entity = root_entity
+
+    # Creating a new entity
+    new_name = 'New Entity to be deleted'
+    new_entity_arguments = {
+        'name': new_name,
+        'type': 'Project',
+        'parent': root_entity['ID'],
+        'user': 'Smaug',
+    }
+
+    added_entities_response = client.post('/api/entities', json=new_entity_arguments)
+
+    assert added_entities_response.status_code == 201
+
+    new_structure = client.get('/api/entities').json()
+
+    first_child_names = [x['name'] for x in new_structure[0]['children']]
+    assert new_name in first_child_names
+
+    # Finding deleted data
+    for child in new_structure[0]['children']:
+        if child['name'] == new_name:
+            deleted_data_structure = child
+            break
+
+    ID_to_delete = deleted_data_structure['id']
+    deleted_filepath = root_file.parent / f'{ID_to_delete[:8]}_{new_name}.toml'
+    assert deleted_filepath.exists()
+
+    with root_file.open('rb') as f:
+        parent_entity = toml.load(f)
+    loaded_before_deletion_parent_entity = parent_entity[[x for x in parent_entity.keys()][0]]
+    assert str(deleted_filepath) in loaded_before_deletion_parent_entity['children']
+
+    client.delete(f'/api/entities/{ID_to_delete}')
+
+    after_deletion_structure = client.get('/api/entities').json()
+    after_deletion_first_child_names = [x['name'] for x in after_deletion_structure[0]['children']]
+    assert new_name not in after_deletion_first_child_names
+
+    # Checking if you can find that deleted entity
+    ret = client.get(f'/api/entities/{ID_to_delete}')
+    assert ret.status_code == 404
+
+    # Checking if the file has not been deleted
+    assert deleted_filepath.exists()
+
+    # Checking if the parent file has been updated
+    with root_file.open('rb') as f:
+        parent_entity = toml.load(f)
+    loaded_after_deletion_parent_entity = parent_entity[[x for x in parent_entity.keys()][0]]
+    assert str(deleted_filepath) not in loaded_after_deletion_parent_entity['children']
+
+    # Check that the deleted flag is true in the file
+    with deleted_filepath.open('rb') as f:
+        entity = toml.load(f)
+    loaded_entity = entity[[x for x in entity.keys()][0]]
+    assert loaded_entity['deleted'] is True
+
 
