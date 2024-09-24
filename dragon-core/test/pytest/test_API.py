@@ -85,6 +85,7 @@ def test_booting_test_server(client):
     assert ret.status_code == 201
 
 
+# FIXME: this is not testing comments
 def test_get_entities(client):
     """
     Test the GET endpoint for entities. Dictionary hardcoded based on the simulated environment
@@ -270,8 +271,107 @@ def test_get_entities_id_wrong(client):
     assert ret.status_code == 404
 
 
+# FIXME: This needs to compare comments as well.
+def test_patch_entities_id_new_name_in_memory(client, toml_files):
+    """
+    This test is testing changing the name of an entity.
+    Because this is a complicated process so this test is testing for:
+
+        * Name changes in the API.
+        * Name changes in the TOML file.
+        * Filename changes.
+        * Parent filepath gets new path.
+        * Children path also get updated.
+    """
+    selector = "Chocolate mk3 I Tune-up"
+
+    file = None
+    for f in toml_files:
+        if selector in str(f):
+            file = f
+            break
+
+    if file is None:
+        raise FileNotFoundError('No entity found')
+
+    with file.open('rb') as f:
+        entity = toml.load(f)
+
+    loaded_entity_old = entity[[x for x in entity.keys()][0]]
+
+    # Check if the entity exists before doing anything
+    ID = loaded_entity_old['ID']
+    ret = client.get(f'/api/entities/{ID}')
+    assert ret.status_code == 201
+
+    # Get old name
+    old_name = client.get(f'/api/entities/{ID}?name_only=true').json()
+
+    # Changing the name
+    new_name = 'New name'
+    ret = client.patch(f'/api/entities/{ID}', json={'new_name': new_name})
+
+    assert ret.status_code == 201
+
+    # Get new name:
+    ret_new_name = client.get(f'/api/entities/{ID}?name_only=true').json()
+
+    assert ret_new_name == new_name
+
+    # Check that the file has been renamed
+    assert not file.exists()
+
+    new_file = file.parent / f'{ID[:8]}_{new_name}.toml'
+    assert new_file.exists()
+
+    # Load changed name entity from file
+    with new_file.open('rb') as f:
+        entity = toml.load(f)
+
+    loaded_entity_new = entity[[x for x in entity.keys()][0]]
+
+    # Assert new name is correct
+    assert loaded_entity_new['name'] == new_name
+
+    # Assert that old name is recorded
+    assert 'previous_names' in loaded_entity_new
+    assert loaded_entity_new['previous_names'] == [old_name]
+
+    # Assert that on the server previous_names is correctly there
+    server_entity = json.loads(client.get(f'/api/entities/{ID}').json())
+    assert server_entity['previous_names'] == [old_name]
+
+    # Check that all other values are the same
+    for key, val in loaded_entity_old.items():
+        if key == 'name' or key == 'previous_names' or key == 'comments':
+            continue
+        assert val == loaded_entity_new[key]
+
+    # Check parent file has correct path
+    with open(loaded_entity_new['parent'], 'rb') as f:
+        parent = toml.load(f)
+
+    parent_loaded = parent[[x for x in parent.keys()][0]]
+    assert str(new_file) in parent_loaded['children']
+
+    # Check children files have correct path
+    for child in loaded_entity_new['children']:
+        with open(child, 'rb') as f:
+            child = toml.load(f)
+        child_loaded = child[[x for x in child.keys()][0]]
+        assert str(new_file) == str(child_loaded['parent'])
+
+    # Fix the name back
+    ret = client.patch(f'/api/entities/{ID}', json={'new_name': old_name})
+
+    assert ret.status_code == 201
+    assert not new_file.exists()
 
 
-
-
+def test_wrong_patch_entities_id(client):
+    """
+    Test that the server returns a 404 when the id is not found.
+    """
+    ret = client.patch('/api/entities/123', json={'new_name': 'New name'})
+    assert ret.status_code == 404
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 import connexion
+import tomllib as toml
 
 import dragon_core
 from dragon_core.config import verify_and_parse_config
@@ -80,3 +81,28 @@ def toml_files():
     toml_files = [x for x in (current_path.parent / 'tmp').glob('*.toml')]
 
     return toml_files
+
+
+@pytest.fixture()
+def root_entity(client):
+    current_path = Path(__file__).resolve()
+    toml_file = None
+    for file in (current_path.parent / 'tmp').glob('*.toml'):
+        if 'Demo Notebook' in str(file):
+            toml_file = file
+            break
+
+    if toml_file is None:
+        raise FileNotFoundError('No root entity found')
+
+    with toml_file.open('rb') as f:
+        entity = toml.load(f)
+
+    loaded_entity = entity[[x for x in entity.keys()][0]]
+    return toml_file, loaded_entity
+
+
+
+
+
+

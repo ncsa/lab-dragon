@@ -750,6 +750,7 @@ def delete_entity(ID):
     return make_response("Entity deleted", 201)
 
 
+# FIXME: At the moment you cannot change the name of the root of the notebook.
 def change_entity_name(ID, body):
     """
     Changes the name of an entity and updates the TOML file.
@@ -768,7 +769,7 @@ def change_entity_name(ID, body):
     ent = INDEX[ID]
     ent.change_name(new_name)
     old_ent_path = Path(UUID_TO_PATH_INDEX[ID])
-    new_ent_path = old_ent_path.parent.joinpath(new_name + '.toml')
+    new_ent_path = old_ent_path.parent.joinpath(f"{ID[:8]}_" + new_name + '.toml')
 
     # Update the UUID indexes
     del PATH_TO_UUID_INDEX[str(old_ent_path)]
