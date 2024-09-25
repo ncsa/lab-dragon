@@ -15,7 +15,7 @@ import imagehash
 from PIL import Image
 from nbconvert import HTMLExporter
 from werkzeug.utils import secure_filename
-from flask import abort, make_response, send_file
+from flask import abort, make_response, send_file, current_app
 from markdown.extensions.tables import TableExtension
 
 # Refresh the modules before starting the server
@@ -34,11 +34,13 @@ from dragon_core.generators.meta import read_from_TOML
 from dragon_core.components.comment import SupportedCommentType, Comment
 from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
 
-ROOTPATH = Path()
 
-ROOTPATH = Path()
+# Config coming from starting script.
+CONFIG = current_app.config['API_config']
 
-RESOURCEPATH = Path()
+ROOTPATH: Path = Path(CONFIG['notebook_root'])
+
+RESOURCEPATH: Path = Path(CONFIG['resource_path'])
 
 
 # List of classes that can contain children. Only Project and Task can contain children for now.
@@ -62,10 +64,11 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS = set()
+USERS: set = CONFIG['users']
 
 
 def set_initial_indices():
+    global CONFIG
     global ROOTPATH
     global RESOURCEPATH
     global PARENT_TYPES
@@ -78,15 +81,15 @@ def set_initial_indices():
     global INSTANCEIMAGE
     global USERS
 
-    ROOTPATH = Path(os.getenv("NOTEBOOK_ROOT"))
+    ROOTPATH = Path(CONFIG['notebook_root'])
 
-    RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+    RESOURCEPATH = Path(CONFIG['resource_path'])
 
     # List of classes that can contain children. Only Project and Task can contain children for now.
     PARENT_TYPES = ["Project", "Task"]
     ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step}
     # Holds all of the entity types that exists in the notebook
-    ENTITY_TYPES = set(("Project", "Task", "Step"))
+    ENTITY_TYPES = {"Project", "Task", "Step"}
 
     INDEX = {}
 
@@ -102,7 +105,7 @@ def set_initial_indices():
     INSTANCEIMAGE = {}
 
     # Holds all of the users that exists in the notebook
-    USERS = set(os.getenv("USERS").split(','))
+    USERS = set(copy.copy(CONFIG['users']))
 
 
 def reset():
@@ -399,6 +402,7 @@ def generate_structure():
     return make_response(json.dumps([_generate_structure_helper(PATH_TO_UUID_INDEX[str(ROOTPATH)])]), 201)
 
 
+# FIXME: This is a bad name, it should probably be read entity or something like that instead.
 def read_one(ID, name_only=False):
     """
     API function that returns an entity based on its ID
@@ -411,7 +415,7 @@ def read_one(ID, name_only=False):
         ent = INDEX[ID]
 
         if name_only:
-            return ent.name
+            return ent.name, 200
 
         ent_copy = copy.deepcopy(ent)
         for comment in ent_copy.comments:
@@ -746,6 +750,7 @@ def delete_entity(ID):
     return make_response("Entity deleted", 201)
 
 
+# FIXME: At the moment you cannot change the name of the root of the notebook.
 def change_entity_name(ID, body):
     """
     Changes the name of an entity and updates the TOML file.
@@ -764,7 +769,7 @@ def change_entity_name(ID, body):
     ent = INDEX[ID]
     ent.change_name(new_name)
     old_ent_path = Path(UUID_TO_PATH_INDEX[ID])
-    new_ent_path = old_ent_path.parent.joinpath(new_name + '.toml')
+    new_ent_path = old_ent_path.parent.joinpath(f"{ID[:8]}_" + new_name + '.toml')
 
     # Update the UUID indexes
     del PATH_TO_UUID_INDEX[str(old_ent_path)]

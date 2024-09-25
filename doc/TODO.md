@@ -50,3 +50,8 @@ The following is simply a place to quickly write down known issues as well as ne
 
 - Create a new entity -> check if it appears in the sidebar, check if the entity shows up in the entity page
 - add an image with the character ')' in the name and check if the link is broken.
+
+# Design interactions
+
+- How does the Library title text resize and change depending on the size of the screen and the library title name.
+- The adding new entities from the tree

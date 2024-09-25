@@ -22,6 +22,9 @@ dependencies = [
     "python-dotenv"
 ]
 
+[project.scripts]
+dragon_start_server = "dragon_core.entry_points:dragon_ignite_fire_sack"
+
 [tool.pytest.ini_options]
 pythonpath = [
     "."

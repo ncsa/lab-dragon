@@ -54,3 +54,7 @@ next-env.d.ts
 
 # users
 users.txt
+
+# Testing ground
+./dragon-core/test/tmp/
+./dragon-core/test/tmp/*

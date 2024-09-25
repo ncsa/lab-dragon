@@ -1,0 +1,30 @@
+["config"]
+
+
+# If true the pytest fixture to create a testing environment will be run to create a fresh testing notebook.
+# The path of the notebook is the parent of the value NOTEBOOK_ROOT
+create_testing_environment = false
+
+# Path of toml file where the notebook begins. Will be overwritten if CREATE_TESTING_ENVIRONMENT is True.
+# If you don't have a root toml file, follow the instructions in the README to create one.
+notebook_root = "/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/tmp/067b8775_Demo Notebook.toml"
+
+# Resource path. This is a path to a directory where all of the uploaded images and content will go on disk.
+# It is good practice to have it inside the volume origin to not have any unintended consequences.
+resource_path = "/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/tmp/resource"
+
+
+# Specifies the users that will be available to select in the notebook.
+# Note that this has no relation to the user and password required to login to the notebook.
+users=["Smaug", "Spyro", "Drogon", "Charizard"]
+
+# Address where the API is hosted. If deploying it on a machine this should match the URL_HOST.
+api_url_prefix="http://localhost:8000"
+
+# Address of the web-app. If deploying it on a machine this should match API_URL_PREFIX.
+url_host="http://localhost:3000"
+
+
+# hostname of erver
+traefik_host="localhost"
+
