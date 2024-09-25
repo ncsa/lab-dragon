@@ -66,6 +66,7 @@ const Toolbar = () => {
         ))}
       </div>
 
+    {/* Profile with Dropdown */}
       <div className="w-full p-3 flex flex-col items-center relative">
         {activeUser && (
           <div className="text-xs font-semibold text-blue-600 mb-2 bg-blue-100 px-2 py-1 rounded-full">
