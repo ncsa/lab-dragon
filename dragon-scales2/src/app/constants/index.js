@@ -21,3 +21,4 @@ export const navLinks = [
     },
   ];
   
+  export const userNames = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Williams', 'Eva Brown'];
