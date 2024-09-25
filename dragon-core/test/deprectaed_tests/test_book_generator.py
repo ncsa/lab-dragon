@@ -1,4 +1,4 @@
-
+# This seems to be testing the output to jupyterbooks. This feature probably broke at some point, will get fixed later.
 
 from dragon_core.generators.jupyterbook import create_relation_dict
 
