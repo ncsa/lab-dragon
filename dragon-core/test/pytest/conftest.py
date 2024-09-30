@@ -56,18 +56,19 @@ def client():
     """
     client fixture starts a testing server, this should look very similar to how the real server is started.
     """
-    entities_path = Path("../../dragon_core/api").resolve()
+    file_path = Path(__file__).resolve()
+    entities_path = file_path.parent.parent.parent / 'dragon_core/api'
 
     sys.path.insert(0, str(entities_path))
-    tmp_path = Path("./tmp").resolve()
+    tmp_path = file_path.parent / 'tmp'
 
-    config_path = Path('../../config_example.toml').resolve()
+    config_path = file_path.parent.parent.parent / 'config_example.toml'
     config = verify_and_parse_config(config_path)
 
     config['notebook_root'] = create_simulated_env(target=tmp_path)
 
-    app = connexion.FlaskApp(__name__, specification_dir='../../dragon_core/api/')
-    app.add_api(Path("../../dragon_core/api/API_specification.yaml"))
+    app = connexion.FlaskApp(__name__, specification_dir=str(entities_path))
+    app.add_api(entities_path / 'API_specification.yaml')
     app.app.after_request(set_cors_headers_on_response)
     with app.app.app_context():
         app.app.config['API_config'] = config

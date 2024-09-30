@@ -152,7 +152,7 @@ def test_post_entities_correct(client, toml_files):
 
     # Checks that new entity has a toml file
     current_path = Path(__file__).resolve()
-    new_toml_files = [x for x in (current_path.parent / 'tmp').glob('*.toml')]
+    new_toml_files = [x for x in (current_path.parent.parent / 'tmp').glob('*.toml')]
 
     assert len(new_toml_files) == len(toml_files) + 1
 
@@ -442,5 +442,54 @@ def test_delete_entities_id(client, root_entity):
         entity = toml.load(f)
     loaded_entity = entity[[x for x in entity.keys()][0]]
     assert loaded_entity['deleted'] is True
+
+
+def test_post_entities_id_toggle_bookmark(client, toml_files):
+    """
+    Test that the bookmark is toggled when requested.
+    """
+    selector = "Chocolate mk3 I Tune-up"
+
+    file = None
+    for f in toml_files:
+        if selector in str(f):
+            file = f
+            break
+
+    if file is None:
+        raise FileNotFoundError('No entity found')
+
+    with file.open('rb') as f:
+        entity = toml.load(f)
+
+    loaded_entity = entity[[x for x in entity.keys()][0]]
+
+    ID = loaded_entity['ID']
+
+    # Check if the entity exists before doing anything
+    ret = client.get(f'/api/entities/{ID}')
+    assert ret.status_code == 201
+
+    # Check that the bookmark is not set
+    assert loaded_entity['bookmarked'] is False
+
+    # Toggle the bookmark
+    ret = client.post(f'/api/entities/{ID}/toggle_bookmark')
+    assert ret.status_code == 201
+
+    # Check that the bookmark is set
+    with file.open('rb') as f:
+        entity = toml.load(f)
+    reloaded_loaded_entity = entity[[x for x in entity.keys()][0]]
+    assert reloaded_loaded_entity['bookmarked'] is True
+
+
+def test_post_entities_id_toggle_bookmark_wrong(client):
+    """
+    Test that the server returns a 404 when the id is not found.
+    """
+    ret = client.post('/api/entities/123/toggle_bookmark')
+    assert ret.status_code == 404
+
 
 
