@@ -1,0 +1,17 @@
+["T2 Echo Measurement"]
+type = "Step"
+user = "Smuag"
+ID = "bb861883-e555-42b8-9f5c-940a1702acd9"
+name = "T2 Echo Measurement"
+previous_names = []
+parent = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/b44fea02_Doing coherence measurements now.toml"
+deleted = false
+description = ""
+comments = ["{\"ID\": \"ffe0a6b7-3f53-4d3f-85bb-010d9e6f9ca7\", \"user\": \"Smuag\", \"created\": \"2024-09-27T10:09:36.566023-05:00\", \"deleted\": false, \"content\": [\"![](/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_echo_measurement/t2_fit.png) \\n37 us, not badd. Seems like there is still some slow noise limiting our setup, but it's not as bad as last time.\"], \"dates\": [\"2024-09-27T10:09:36.566023-05:00\"], \"authors\": [\"Smuag\"], \"com_type\": [2]}"]
+children = []
+params = []
+data_buckets = []
+bookmarked = false
+start_time = "2024-09-27T10:09:36.566092-05:00"
+end_time = "2024-09-27T10:09:36.566103-05:00"
+process = ""
