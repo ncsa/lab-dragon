@@ -4,6 +4,7 @@ numpy
 jinja2
 h5py
 labcore @ git+https://github.com/toolsforexperiments/labcore.git
+tomlkit
 nbformat
 markdown
 imagehash
