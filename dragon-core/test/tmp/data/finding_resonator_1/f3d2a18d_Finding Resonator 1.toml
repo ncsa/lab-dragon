@@ -1,0 +1,26 @@
+["Finding Resonator 1"]
+type = "Instance"
+user = "Smuag"
+ID = "f3d2a18d-a5d6-46ca-a955-661939706d56"
+name = "Finding Resonator 1"
+previous_names = []
+parent = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/a2303a20_Measurements.toml"
+deleted = false
+description = ""
+comments = []
+children = []
+params = []
+data_buckets = []
+bookmarked = false
+start_time = "2024-09-27T10:09:34.201781-05:00"
+end_time = "2024-09-27T10:09:34.201818-05:00"
+version = 0
+stored_params = []
+tags = ["star"]
+images = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/finding_resonator_1/resonator_response_raw.png", "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/finding_resonator_1/resonator_response_fit.png"]
+data = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/finding_resonator_1/data.ddh5"]
+analysis = []
+
+["Finding Resonator 1".data_structure."data.ddh5"]
+"frequency[GHz]" = [1000]
+"signal[frequency][a.u.]" = [1000]

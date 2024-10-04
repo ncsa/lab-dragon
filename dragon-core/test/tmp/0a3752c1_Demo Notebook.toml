@@ -1,0 +1,16 @@
+["Demo Notebook"]
+type = "Project"
+user = "Smuag"
+ID = "0a3752c1-2883-4202-86ac-01a37644413a"
+name = "Demo Notebook"
+previous_names = []
+parent = ""
+deleted = false
+description = ""
+comments = ["{\"ID\": \"334bceff-28ea-4192-b304-46121318dd76\", \"user\": \"Smuag\", \"created\": \"2024-09-27T10:09:32.870326-05:00\", \"deleted\": false, \"content\": [\"The following is a demo notebook written by the superconductor dragon called Smuag (any similarities with other dragons is merely a coincidence). \\nPlease feel free to edit as much as you want. Instructions on how to reset this notebook are in the quickstart section of the README\"], \"dates\": [\"2024-09-27T10:09:32.870326-05:00\"], \"authors\": [\"Smuag\"], \"com_type\": [2]}"]
+children = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/783003bd_Chocolate mk3 I Tune-up.toml"]
+params = []
+data_buckets = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/a2303a20_Measurements.toml"]
+bookmarked = false
+start_time = "2024-09-27T10:09:32.870355-05:00"
+end_time = "2024-09-27T10:09:32.870363-05:00"

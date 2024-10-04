@@ -1,0 +1,26 @@
+["T2 Echo Measurement"]
+type = "Instance"
+user = "Smuag"
+ID = "f197a625-c418-4b57-9cb9-90dc04d992aa"
+name = "T2 Echo Measurement"
+previous_names = []
+parent = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/a2303a20_Measurements.toml"
+deleted = false
+description = ""
+comments = []
+children = []
+params = []
+data_buckets = []
+bookmarked = false
+start_time = "2024-09-27T10:09:36.559997-05:00"
+end_time = "2024-09-27T10:09:36.560024-05:00"
+version = 0
+stored_params = []
+tags = ["star"]
+images = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_echo_measurement/t2_fit.png", "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_echo_measurement/t2_raw.png"]
+data = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_echo_measurement/data.ddh5"]
+analysis = []
+
+["T2 Echo Measurement".data_structure."data.ddh5"]
+"signal[time][a.u.]" = [300]
+"time[us]" = [300]
