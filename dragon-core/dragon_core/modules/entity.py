@@ -1,14 +1,3 @@
-
-
-# The following file has been created automatically based on a jinja template
-# Anything you modify to it, will get lost when the next time the template is
-# created. If you want to modify the class, please do so in the template
-#
-# Template has been rendered
-
-
-
-
 import uuid
 import tomlkit
 
@@ -19,11 +8,9 @@ from dragon_core.utils import create_timestamp
 from dragon_core.components import Comment, SupportedCommentType, Table
 
 
-
 class Entity(object):
-
-    
-    # If True, checks everytime the entity is saved to_TOML if the filename starts with the first 8 digits of the ID. If it doesn't it adds them.
+    # If True, checks everytime the entity is saved to_TOML if the filename starts with the first 8 digits of the ID.
+    # If it doesn't it adds them.
     START_FILENAME_WITH_ID = True
     
     def __init__(self,
@@ -97,10 +84,7 @@ class Entity(object):
         else:
             self.end_time = end_time
 
-        
-
     def to_TOML(self, path: Optional[Union[str,Path]] = None):
-
         if hasattr(super(), 'to_TOML'):
             doc = super().to_TOML()
             vals = doc[self.name]
@@ -138,7 +122,6 @@ class Entity(object):
         
         vals['end_time'] = self.end_time
         
-        
         doc[self.name] = vals
 
         if path is not None:
@@ -159,14 +142,14 @@ class Entity(object):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return False
-
     
     def add_child(self, child):
         if not hasattr(self, 'children'):
             self.children = []
         self.children.append(child)
 
-    def add_comment(self, comment: Union[str, Comment, Table, List[Table], List[Comment], List[str]], user: Optional[str] = None) -> None:
+    def add_comment(self, comment: Union[str, Comment, Table, List[Table], List[Comment], List[str]],
+                    user: Optional[str] = None) -> None:
         """
         Add a comment to the entity. If a directory is passed, this function will go through the directory and add a
         comment to every supported file in it in alphabetical order. It will **NOT** go through subdirectories.
@@ -181,7 +164,8 @@ class Entity(object):
             If not passed, it will default to the use who created this entity.
         """
 
-        # Function inside function because its very specific to adding comments and should not be called from anywhere else
+        # Function inside function because its very specific to adding comments and should not be called from
+        # anywhere else
         def add_directory(path: Path) -> None:
             files = [file for file in path.iterdir() if file.is_file()]
             supported_items = SupportedCommentType.__members__.keys()
@@ -236,7 +220,6 @@ class Entity(object):
         comment.modify(content=content, user=user)
         return True
 
-
     def suggest_data(self, query: str = "", min_threshold=5) -> List[str]:
         """
         Function used to suggest Instances based on a passed query.
@@ -281,7 +264,4 @@ class Entity(object):
         """
         self.previous_names.append(self.name)
         self.name = new_name
-    
-
-    
     
