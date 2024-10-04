@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { navLinks } from '../constants/index';
 import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   justifyContent: 'space-between',
   backgroundColor: theme.palette.grey[100],
   boxShadow: theme.shadows[3],
+  zIndex: theme.zIndex.drawer + 1,
 }));
 
 const StyledLink = styled(Link)(({ theme, active }) => ({
@@ -44,8 +45,19 @@ const IconContainer = styled(Box)(({ theme, active }) => ({
   boxShadow: theme.shadows[1],
 }));
 
-const Toolbar = () => {
+const Toolbar = ({ onMenuBookClick }) => {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleMenuBookClick = (e) => {
+    e.preventDefault();
+    if (pathname !== '/library') {
+      router.push('/library');
+    }
+    if (onMenuBookClick) {
+      onMenuBookClick();
+    }
+  };
 
   return (
     <StyledPaper elevation={3}>
@@ -63,9 +75,35 @@ const Toolbar = () => {
       </StyledLink>
 
       {/* Navigation Links */}
-      <Stack flexGrow={1} spacing={1}>
+      <Stack flexGrow={1}>
+        <Box
+          onClick={handleMenuBookClick}
+          sx={{
+            cursor: 'pointer',
+            width: '100%',
+            padding: (theme) => theme.spacing(1.5),
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: pathname === '/library' ? (theme) => theme.palette.primary.main : 'transparent',
+            '&:hover': {
+              backgroundColor: pathname === '/library' 
+                ? (theme) => theme.palette.primary.main 
+                : (theme) => theme.palette.primary.light,
+            },
+          }}
+        >
+          <IconContainer active={pathname === '/library' ? 1 : 0}>
+            <IconButton
+              color={pathname === '/library' ? 'primary' : 'default'}
+              size="small"
+            >
+              <MenuBook />
+            </IconButton>
+          </IconContainer>
+        </Box>
         {navLinks
-          .filter(link => ['library', 'comment', 'search'].includes(link.id))
+          .filter(link => ['comment', 'search'].includes(link.id))
           .map((link) => (
             <StyledLink
               key={link.id}
@@ -77,7 +115,6 @@ const Toolbar = () => {
                   color={pathname === `/${link.id}` ? 'primary' : 'default'}
                   size="small"
                 >
-                  {link.id === 'library' && <MenuBook />}
                   {link.id === 'comment' && <Comment />}
                   {link.id === 'search' && <Search />}
                 </IconButton>
