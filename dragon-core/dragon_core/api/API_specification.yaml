@@ -340,6 +340,30 @@ paths:
         "404":
           description: "Entity not found"
 
+  /entities/add_library:
+    post:
+      operationId: "dragon_core.api.entities.add_library"
+      tags:
+        - Entities
+        - Libraries
+      summary: "Adds a new library to the system"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                user:
+                  type: "string"
+
+      responses:
+        "201":
+          description: "Successfully added library"
+        "400":
+          description: "Invalid name or user"
+
   /data:
     post:
       operationId: "dragon_core.api.entities.add_instance"

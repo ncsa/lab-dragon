@@ -23,6 +23,10 @@ def verify_and_parse_config(config_path: Path) -> None:
         raise ValueError("notebook_root not found in config file")
     ret['notebook_root'] = config['notebook_root']
 
+    if 'lairs_directory' not in config:
+        raise ValueError("dragon_lair not found in config file")
+    ret['lairs_directory'] = config['lairs_directory']
+
     if 'resource_path' not in config:
         raise ValueError("resource_path not found in config file")
     ret['resource_path'] = config['resource_path']
