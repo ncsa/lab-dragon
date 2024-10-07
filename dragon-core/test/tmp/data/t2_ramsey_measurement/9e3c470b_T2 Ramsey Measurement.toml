@@ -1,0 +1,26 @@
+["T2 Ramsey Measurement"]
+type = "Instance"
+user = "Smuag"
+ID = "9e3c470b-9bac-472b-884f-e1fbdbe258e7"
+name = "T2 Ramsey Measurement"
+previous_names = []
+parent = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/a2303a20_Measurements.toml"
+deleted = false
+description = ""
+comments = []
+children = []
+params = []
+data_buckets = []
+bookmarked = false
+start_time = "2024-09-27T10:09:35.759642-05:00"
+end_time = "2024-09-27T10:09:35.759668-05:00"
+version = 0
+stored_params = []
+tags = ["star"]
+images = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_ramsey_measurement/t2_fit.png", "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_ramsey_measurement/t2_raw.png"]
+data = ["/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/t2_ramsey_measurement/data.ddh5"]
+analysis = []
+
+["T2 Ramsey Measurement".data_structure."data.ddh5"]
+"signal[time][a.u.]" = [300]
+"time[us]" = [300]

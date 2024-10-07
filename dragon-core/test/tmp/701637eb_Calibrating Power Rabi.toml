@@ -1,0 +1,17 @@
+["Calibrating Power Rabi"]
+type = "Step"
+user = "Smuag"
+ID = "701637eb-508d-4e65-bbc0-afb6ce8b08af"
+name = "Calibrating Power Rabi"
+previous_names = []
+parent = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/783003bd_Chocolate mk3 I Tune-up.toml"
+deleted = false
+description = ""
+comments = ["{\"ID\": \"0699f2da-45e9-4bc4-8e25-ac77fff16027\", \"user\": \"Smuag\", \"created\": \"2024-09-27T10:09:35.268193-05:00\", \"deleted\": false, \"content\": [\"![](/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/data/power_rabi/power_rabi_fit.png) \\nLooks good. Pi pulse amp at 0.065 a,p. With pi pulse sigma of 40 ns for 6 sigma.\"], \"dates\": [\"2024-09-27T10:09:35.268193-05:00\"], \"authors\": [\"Smuag\"], \"com_type\": [2]}"]
+children = []
+params = []
+data_buckets = []
+bookmarked = false
+start_time = "2024-09-27T10:09:35.268247-05:00"
+end_time = "2024-09-27T10:09:35.268258-05:00"
+process = ""

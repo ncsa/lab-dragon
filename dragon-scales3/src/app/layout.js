@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Toolbar from "./components/toolbar";
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import Toolbar from "../app/components/toolbar";
 
 
 const geistSans = localFont({
