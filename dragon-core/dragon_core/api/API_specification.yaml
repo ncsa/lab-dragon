@@ -143,6 +143,12 @@ paths:
           description: "Successfully added entity"
         "400":
           description: "Invalid entity"
+        "401":
+          description: "Cannot add Libraries directly, use /entities/add_library instead"
+#        "402":
+#          description: "Cannot addd Buckets directly, use /data/buckets instead"
+        "403":
+          description: "Parent cannot hold children of this type"
 
   /entities/{ID}:
     get:
@@ -165,6 +171,8 @@ paths:
             description: "Successfully read entity"
         "404":
             description: "Entity not found"
+        "405":
+          description: "That ID is the Dragon's lair, you cannot access that."
 
     put:
       operationId: "dragon_core.api.entities.add_comment"

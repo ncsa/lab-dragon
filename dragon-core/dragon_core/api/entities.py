@@ -49,6 +49,10 @@ ALL_TYPES = {}
 # Holds all of the entity types that exists in the notebook
 ENTITY_TYPES = set()
 
+# dictionary holding all entity types (in string form) as keys and a list of classes (in the form of strings) of
+# what type can be their children.
+ALLOWED_PARENTAL_RELATIONS = {}
+
 # Holds all of the entities that exists in the notebook, uuid as key and the entity as value.
 INDEX = {}
 
@@ -76,6 +80,7 @@ def set_initial_indices():
     global PARENT_TYPES
     global ALL_TYPES
     global ENTITY_TYPES
+    global ALLOWED_PARENTAL_RELATIONS
     global INDEX
     global PATH_TO_UUID_INDEX
     global UUID_TO_PATH_INDEX
@@ -91,11 +96,25 @@ def set_initial_indices():
 
     DRAGONLAIR = DragonLair(LAIRSPATH)
 
+    # FIXME: This can be refactored in a way that I don't need 4 different global variables.
+
     # List of classes that can contain children. Only Project and Task can contain children for now.
     PARENT_TYPES = ["Library", "Notebook", "Project", "Task"]
     ALL_TYPES = {"Project": Project, "Task": Task, "Step": Step, "Library": Library, "Notebook": Notebook}
     # Holds all of the entity types that exists in the system.
     ENTITY_TYPES = {"Library", "Notebook", "Project", "Task", "Step"}
+
+    # dictionary holding all entity types (in string form) as keys and a list of classes (in the form of strings) of
+    # what type can be their children.
+    ALLOWED_PARENTAL_RELATIONS = {
+        "Library": ["Notebook"],
+        "Notebook": ["Project"],
+        "Project": ["Task", "Step"],
+        "Task": ["Step"],
+        "Step": [],
+        "Bucket": ["Instance"],
+        "Instance": []
+    }
 
     INDEX = {}
 
@@ -376,7 +395,7 @@ def load_system():
     """
 
     for dragon_library in DRAGONLAIR.libraries:
-        library = recursively_load_entity(dragon_library.path)
+        ret_dict, library = recursively_load_entity(dragon_library.path)
         DRAGONLAIR.insert_instance(library)
 
     # We replace the parent and children after we are done going through all identities to make sure that
@@ -416,6 +435,9 @@ def read_one(ID, name_only=False):
     API function that returns an entity based on its ID
     """
 
+    if ID == DRAGONLAIR.ID:
+        abort(405, "That ID belongs to the lair, you should not be accessing it directly.")
+
     if ID not in INDEX:
         load_system()
 
@@ -441,7 +463,7 @@ def read_one(ID, name_only=False):
 
                     # Create HTML exporter
                     html_exporter = HTMLExporter()
-                    html_exporter.theme = "dark" # Change the theme of the notebook
+                    html_exporter.theme = "dark"  # Change the theme of the notebook
                     html_exporter.template_name = 'classic'  # use classic template (you can change this)
 
                     # Export the notebook to HTML format
@@ -699,9 +721,10 @@ def add_library(body):
 
     DRAGONLAIR.add_library(library, lib_path)
 
-    return make_response("Library added", 201)
+    return make_response(f"Library named {body['name']} added", 201)
 
 
+# TODO: Check for buckets as well, these should be added from here
 def add_entity(body):
     """
     Creates an entity through the API call. It will add the entity to the parent and create the new TOML file
@@ -722,11 +745,20 @@ def add_entity(body):
     if "user" not in body or body['user'] == "":
         abort(400, "User of entity is required")
 
-    cls = ALL_TYPES[body['type']]
-    ent = cls(name=body['name'], parent=body['parent'], user=body['user'])
-    parent = INDEX[body['parent']]
+    if body["type"] == "Library":
+        abort(401, "You cannot add a library through this endpoint")
+
+    if body["type"] not in ALLOWED_PARENTAL_RELATIONS.keys():
+        abort(400, f"Type of entity {body['type']} is not allowed")
+
+    parent = INDEX[body["parent"]]
+    if body["type"] not in ALLOWED_PARENTAL_RELATIONS[parent.__class__.__name__]:
+        abort(403, f"The parent of type: {parent.__class__.__name__} cannot have children of type: {body['type']}")
+
+    cls = ALL_TYPES[body["type"]]
+    ent = cls(name=body["name"], parent=body["parent"], user=body["user"])
     parent_path = Path(UUID_TO_PATH_INDEX[parent.ID])
-    ent_path = parent_path.parent.joinpath(ent.ID[:8] + '_' + ent.name + '.toml')
+    ent_path = parent_path.parent.joinpath(ent.ID[:8] + "_" + ent.name + ".toml")
 
     # Because the children do not have a path yet, you need to make a path copy before adding the child
     parent_copy = create_path_entity_copy(parent)
