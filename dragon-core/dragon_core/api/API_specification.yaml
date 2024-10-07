@@ -113,10 +113,18 @@ paths:
       operationId: "dragon_core.api.entities.generate_structure"
       tags:
         - Entities
-      summary: "Creates the complete structure of the whole lab notebook."
+      summary: "Creates a tree representation of the entities in the notebook. If ID is empty creates a list where the top level are all the libraries in the system. Specify ID to get a list with a single tree structure for every entity under the specified ID"
+      parameters:
+        - in: query
+          name: "ID"
+          schema:
+              type: "string"
+          description: "The ID of the entity to get the tree structure of"
       responses:
         "200":
           description: "Successfully created lab entries"
+        "404":
+          description: "Entity not found"
 
     post:
       summary: "Adds a new entity to the lab notebook"
@@ -143,6 +151,12 @@ paths:
           description: "Successfully added entity"
         "400":
           description: "Invalid entity"
+        "401":
+          description: "Cannot add Libraries directly, use /entities/add_library instead"
+#        "402":
+#          description: "Cannot addd Buckets directly, use /data/buckets instead"
+        "403":
+          description: "Parent cannot hold children of this type"
 
   /entities/{ID}:
     get:
@@ -165,6 +179,8 @@ paths:
             description: "Successfully read entity"
         "404":
             description: "Entity not found"
+        "405":
+          description: "That ID is the Dragon's lair, you cannot access that."
 
     put:
       operationId: "dragon_core.api.entities.add_comment"
@@ -335,10 +351,34 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ID"
       responses:
-        "200":
+        "201":
           description: "Successfully toggled bookmark"
         "404":
           description: "Entity not found"
+
+  /entities/add_library:
+    post:
+      operationId: "dragon_core.api.entities.add_library"
+      tags:
+        - Entities
+        - Libraries
+      summary: "Adds a new library to the system"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                user:
+                  type: "string"
+
+      responses:
+        "201":
+          description: "Successfully added library"
+        "400":
+          description: "Invalid name or user"
 
   /data:
     post:

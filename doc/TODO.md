@@ -31,6 +31,7 @@ The following is simply a place to quickly write down known issues as well as ne
 - Clean up all the duplicate images code if we throw that feature away.
 - When pressing escape in the entity creation popup, it should close.
 - bookmark feature is broken.
+- Have all of the entity fields be outside the TOML table, there is no point in grouping them in a table.
 
 ## bugs
 

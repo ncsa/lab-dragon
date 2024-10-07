@@ -58,3 +58,4 @@ users.txt
 # Testing ground
 /dragon-core/test/tmp/
 /dragon-core/test/tmp/*
+/dragon-core/test/pytest/tmp/*

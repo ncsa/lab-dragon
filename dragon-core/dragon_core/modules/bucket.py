@@ -8,17 +8,15 @@ from typing import Optional, Union
 
 import tomlkit
 
-from .entity import Entity
+from dragon_core.modules.entity import Entity
 from dragon_core.generators.meta import read_from_TOML
 
 
 class Bucket(Entity):
     """
     Stands for data_bucket, entity needs to be called the same name as the module for the code to work.
-
     """
-
-    def __init__(self,path_to_uuid={}, uuid_to_path={}, *args, **kwargs):
+    def __init__(self, path_to_uuid={}, uuid_to_path={}, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if len(path_to_uuid) == 0:
