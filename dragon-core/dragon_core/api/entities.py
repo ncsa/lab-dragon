@@ -425,8 +425,18 @@ def _generate_structure_helper(ID):
     return {"name": name, "id": ID, "children": children, "type": type_}
 
 
-def generate_structure():
-    return make_response(json.dumps([_generate_structure_helper(PATH_TO_UUID_INDEX[str(ROOTPATH)])]), 201)
+def generate_structure(ID=None):
+
+    ret = []
+    if ID is None:
+        for lib in DRAGONLAIR.libraries:
+            ret.append(_generate_structure_helper(lib.ID))
+    else:
+        if ID not in INDEX:
+            abort(404, f"Entity with ID {ID} not found")
+        ret = _generate_structure_helper(ID)
+
+    return make_response(json.dumps(ret), 201)
 
 
 # FIXME: This is a bad name, it should probably be read entity or something like that instead.
@@ -720,6 +730,7 @@ def add_library(body):
     path_copy.to_TOML(lib_path)
 
     DRAGONLAIR.add_library(library, lib_path)
+    add_ent_to_index(library, lib_path)
 
     return make_response(f"Library named {body['name']} added", 201)
 
