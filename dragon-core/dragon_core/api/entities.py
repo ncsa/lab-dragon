@@ -927,6 +927,15 @@ def add_image(body, image):
     return make_response(image_url, 201)
 
 
+def get_all_libraries():
+
+    libraries = {}
+    for lib in DRAGONLAIR.libraries:
+        libraries[lib.name] = lib.ID
+
+    return make_response(json.dumps(libraries), 201)
+
+
 def get_users():
     """
     API function that returns the list of users

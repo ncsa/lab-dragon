@@ -31,3 +31,4 @@
 # Extra tests on behaviours:
 
 - [ ] Test that when creating a new entity, the API checks that the type requested can be a child of the parent entity.
+- [ ] Test that you cannot have multiple libraries with the same name. Entities can have the same name but not libraries.

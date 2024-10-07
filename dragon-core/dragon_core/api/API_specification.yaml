@@ -380,6 +380,17 @@ paths:
         "400":
           description: "Invalid name or user"
 
+  /entities/get_all_libraries:
+    get:
+      operationId: "dragon_core.api.entities.get_all_libraries"
+      tags:
+        - Entities
+        - Libraries
+      summary: "Returns all libraries present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read libraries"
+
   /data:
     post:
       operationId: "dragon_core.api.entities.add_instance"
