@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { navLinks } from '../constants/index';
@@ -7,6 +7,13 @@ import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
 import { Box, IconButton, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import ExplorerDrawer from './explorer_drawer';
+
+// FIXME: Handle errors properly
+async function getLibraries() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
+  return await res.json();
+}
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   position: 'fixed',
@@ -49,14 +56,17 @@ const Toolbar = ({ onMenuBookClick }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleMenuBookClick = (e) => {
-    e.preventDefault();
-    if (pathname !== '/library') {
-      router.push('/library');
-    }
-    if (onMenuBookClick) {
-      onMenuBookClick();
-    }
+  const [libraries, setLibraries] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    getLibraries().then(data => {
+      setLibraries(data);
+    });
+  }, []);  
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
   return (
@@ -74,35 +84,35 @@ const Toolbar = ({ onMenuBookClick }) => {
         </IconContainer>
       </StyledLink>
 
-      {/* Navigation Links */}
-      <Stack flexGrow={1}>
-        <Box
-          onClick={handleMenuBookClick}
-          sx={{
-            cursor: 'pointer',
-            width: '100%',
-            padding: (theme) => theme.spacing(1.5),
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: pathname === '/library' ? (theme) => theme.palette.primary.main : 'transparent',
-            '&:hover': {
-              backgroundColor: pathname === '/library' 
-                ? (theme) => theme.palette.primary.main 
-                : (theme) => theme.palette.primary.light,
-            },
-          }}
-        >
-          <IconContainer active={pathname === '/library' ? 1 : 0}>
-            <IconButton
-              color={pathname === '/library' ? 'primary' : 'default'}
-              size="small"
-            >
-              <MenuBook />
-            </IconButton>
-          </IconContainer>
-        </Box>
-        {navLinks
+       {/* Navigation Links */}
+       <Stack flexGrow={1}>
+        {Object.entries(libraries).map(([key, value]) => (
+          pathname === `/library/${value}` ? (
+            <Box key={value}>
+              <IconContainer active={1}>
+                <IconButton title={key}
+                  active={1}
+                  color="primary"
+                  size="small"
+                  onClick={handleDrawerToggle}>
+                  <MenuBook />
+                </IconButton>
+              </IconContainer>
+              {drawerOpen && <ExplorerDrawer key={value} open={drawerOpen} />}
+            </Box>
+          ) : (
+            <StyledLink key={value} href={`/library/${value}`} active={pathname === `/library/${value}` ? 1 : 0}>
+              <IconContainer active={0}>
+                <IconButton title={key} color="default" size="small" onClick={handleDrawerToggle}>
+                  <MenuBook />
+                </IconButton>
+              </IconContainer>
+            </StyledLink>
+          )
+        ))}
+      </Stack>
+      <Stack>  
+      {navLinks
           .filter(link => ['comment', 'search'].includes(link.id))
           .map((link) => (
             <StyledLink
