@@ -94,16 +94,16 @@ const Toolbar = ({ onMenuBookClick }) => {
                   active={1}
                   color="primary"
                   size="small"
-                  onClick={handleDrawerToggle}>
+                  onClick={() => {handleDrawerToggle()}}>
                   <MenuBook />
                 </IconButton>
               </IconContainer>
-              {drawerOpen && <ExplorerDrawer key={value} open={drawerOpen} />}
+              {drawerOpen && <ExplorerDrawer open={drawerOpen} name={key} id={value}/>}
             </Box>
           ) : (
             <StyledLink key={value} href={`/library/${value}`} active={pathname === `/library/${value}` ? 1 : 0}>
               <IconContainer active={0}>
-                <IconButton title={key} color="default" size="small" onClick={handleDrawerToggle}>
+                <IconButton title={key} color="default" size="small" onClick={() => {setDrawerOpen(true)}}>
                   <MenuBook />
                 </IconButton>
               </IconContainer>
