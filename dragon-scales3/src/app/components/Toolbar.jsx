@@ -7,7 +7,7 @@ import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
 import { Box, IconButton, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ExplorerDrawer from './explorerDrawer';
+import ExplorerDrawer from './ExplorerDrawer';
 import { ExplorerContext } from '../contexts/explorerContext';
 
 // FIXME: Handle errors properly

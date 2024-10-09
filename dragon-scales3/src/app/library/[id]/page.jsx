@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Box, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import ProjectViewer from '../../components/projectViewer';
+import ProjectViewer from '../../components/ProjectViewer';
 import { ExplorerContext } from '../../contexts/explorerContext';
 
 async function getEntity(id) {

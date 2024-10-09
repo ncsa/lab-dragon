@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Toolbar from "../app/components/toolbar";
+import Toolbar from "./components/Toolbar";
 import { ExplorerProvider } from "../app/contexts/explorerContext";
 
 
