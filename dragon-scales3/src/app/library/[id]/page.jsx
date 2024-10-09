@@ -1,15 +1,11 @@
 "use client";
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import ProjectViewer from '../../components/ProjectViewer';
 import { ExplorerContext } from '../../contexts/explorerContext';
-
-async function getEntity(id) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}`);
-  return await res.json();
-}
+import { getEntity } from "@/app/utils";
 
 async function getNotebookParent(id) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
@@ -38,18 +34,15 @@ export default function Library() {
   const { drawerOpen, currentlySelectedItem } = useContext(ExplorerContext);
   const [ currentNotebookId, setCurrentNotebookId ] = useState("");
   const [ currentNotebookEnt, setCurrentNotebookEnt ] = useState(null);
-  const [ topLevelProjects, setTopLevelProjects ] = useState([]);
+  const [ topLevelProjects, setTopLevelProjects ] = useState(null);
 
   const openDrawerWidth = 24;
   const closedDrawerWidth = -8;
 
   useEffect(() => {
     if (currentlySelectedItem) {
-      console.log(`Getting currently selected item: ${currentlySelectedItem}`);
       getNotebookParent(currentlySelectedItem).then(data => {
-        if (data && data != currentNotebookEnt) {
-          console.log(`I have found a parent:`);
-          console.log(data);
+        if (data && data !== currentNotebookId) {
           setCurrentNotebookId(data);
         }
       });
@@ -58,27 +51,16 @@ export default function Library() {
 
   useEffect(() => {
     if (currentNotebookId) {
-      console.log(`Getting current notebook: ${currentNotebookId}`);
       getEntity(currentNotebookId).then(data => {
         const parsedData = JSON.parse(data);
-        console.log(`I have found a notebook:`);
-        console.log(parsedData);
         setCurrentNotebookEnt(parsedData);
-        
-        // Initialize a new array to accumulate projects
-        const newTopLevelProjects = [];
   
-        parsedData.children.forEach(child => {
-          getEntity(child).then(project => {
-            const parsedProject = JSON.parse(project);
-            
-            // Add each project to the new array
-            newTopLevelProjects.push(parsedProject);
-  
-            // Update the state with the accumulated projects
-            setTopLevelProjects([...newTopLevelProjects]);
+        // Use Promise.all to wait for all getEntity calls to complete
+        Promise.all(parsedData.children.map(child => getEntity(child)))
+          .then(projects => {
+            const newTopLevelProjects = projects.map(project => JSON.parse(project));
+            setTopLevelProjects(newTopLevelProjects);
           });
-        });
       });
     }
   }, [currentNotebookId]);
@@ -87,7 +69,7 @@ export default function Library() {
     // marginLeft is here because it is dynamically set by the drawer state so it needs to be set in the component.
     <MainContent marginLeft={drawerOpen ? openDrawerWidth : closedDrawerWidth}>
       <Stack flexGrow={2} spacing={2} direction='column'>
-      {topLevelProjects.map(project => (
+      {topLevelProjects && topLevelProjects.map(project => (
         <ProjectViewer key={project.id} projectEntity={project} />
       ))}
       </Stack>
