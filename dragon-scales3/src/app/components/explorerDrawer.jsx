@@ -1,11 +1,11 @@
 // TODO: Only 1 thing across all of the trees should be selected at a time. If an item is not selected and the user clicks it once, it should not expand but instead scroll there
 
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Drawer, Divider, Accordion, AccordionDetails, AccordionActions, AccordionSummary } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
+import { ExplorerContext } from '../contexts/explorerContext';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 
 const drawerWidth = 240;
@@ -36,8 +36,9 @@ const DrawerContent = styled('div')(({ theme }) => ({
 
 export default function ExplorerDrawer({open, name, id}) {
 
+    const { setCurrentlySelectedItem } = useContext(ExplorerContext);
+
     const [libraryStructure, setLibraryStructure] = useState([]);
-    const [lastClickedItem, setLastClickedItem] = useState(null);
 
     useEffect(() => {
         getLibraryStructure(id).then(data => {
@@ -71,7 +72,7 @@ export default function ExplorerDrawer({open, name, id}) {
                         </AccordionSummary>
                         <AccordionDetails>
                             <RichTreeView items={createTreeStructure(child)}
-                            onItemClick={(event, itemId) => setLastClickedItem(itemId)} />
+                            onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)} />
                         </AccordionDetails>
                     </Accordion>
                 ))}

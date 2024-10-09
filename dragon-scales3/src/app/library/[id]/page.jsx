@@ -1,19 +1,27 @@
 "use client";
-import React, { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Box, Typography, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 
+import ProjectViewer from '../../components/projectViewer';
+import { ExplorerContext } from '../../contexts/explorerContext';
 
-const drawerWidth = 240;
+async function getEntity(id) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}`);
+  return await res.json();
+}
+
+async function getNotebookParent(id) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
+  return res.json();
+}
 
 const MainContent = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
   padding: theme.spacing(2),
   paddingBottom: theme.spacing(10),
   paddingLeft: 64,
+  backgroundColor: '#4C9DFC',
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(10),
     paddingLeft: `calc(64px + ${theme.spacing(10)})`,
@@ -24,84 +32,65 @@ const MainContent = styled(Box)(({ theme }) => ({
   }),
 }));
 
-const DrawerContent = styled('div')(({ theme }) => ({
-  width: drawerWidth,
-  marginTop: theme.spacing(2),
-}));
 
 export default function Library() {
-  const [open, setOpen] = React.useState(false);
 
-  const handleDrawerToggle = () => {
-    setOpen(!open);
-  };
+  const { drawerOpen, currentlySelectedItem } = useContext(ExplorerContext);
+  const [ currentNotebookId, setCurrentNotebookId ] = useState("");
+  const [ currentNotebookEnt, setCurrentNotebookEnt ] = useState(null);
+  const [ topLevelProjects, setTopLevelProjects ] = useState([]);
+
+  const openDrawerWidth = 24;
+  const closedDrawerWidth = -8;
+
+  useEffect(() => {
+    if (currentlySelectedItem) {
+      console.log(`Getting currently selected item: ${currentlySelectedItem}`);
+      getNotebookParent(currentlySelectedItem).then(data => {
+        if (data && data != currentNotebookEnt) {
+          console.log(`I have found a parent:`);
+          console.log(data);
+          setCurrentNotebookId(data);
+        }
+      });
+    }
+  }, [currentlySelectedItem]);
+
+  useEffect(() => {
+    if (currentNotebookId) {
+      console.log(`Getting current notebook: ${currentNotebookId}`);
+      getEntity(currentNotebookId).then(data => {
+        const parsedData = JSON.parse(data);
+        console.log(`I have found a notebook:`);
+        console.log(parsedData);
+        setCurrentNotebookEnt(parsedData);
+        
+        // Initialize a new array to accumulate projects
+        const newTopLevelProjects = [];
+  
+        parsedData.children.forEach(child => {
+          getEntity(child).then(project => {
+            const parsedProject = JSON.parse(project);
+            
+            // Add each project to the new array
+            newTopLevelProjects.push(parsedProject);
+  
+            // Update the state with the accumulated projects
+            setTopLevelProjects([...newTopLevelProjects]);
+          });
+        });
+      });
+    }
+  }, [currentNotebookId]);
+
   return(
-    <Typography variant="h4" component="h1">Hello something</Typography>
+    // marginLeft is here because it is dynamically set by the drawer state so it needs to be set in the component.
+    <MainContent marginLeft={drawerOpen ? openDrawerWidth : closedDrawerWidth}>
+      <Stack flexGrow={2} spacing={2} direction='column'>
+      {topLevelProjects.map(project => (
+        <ProjectViewer key={project.id} projectEntity={project} />
+      ))}
+      </Stack>
+    </MainContent>
   )
-
-  // return (
-  //   <>
-
-  //     <Drawer
-  //       sx={{
-  //         width: drawerWidth,
-  //         flexShrink: 0,
-  //         '& .MuiDrawer-paper': {
-  //           width: drawerWidth,
-  //           boxSizing: 'border-box',
-  //           marginLeft: '64px',
-  //           paddingTop: '20px',
-  //         },
-  //       }}
-  //       variant="persistent"
-  //       anchor="left"
-  //       open={open}
-  //     >
-  //       <DrawerContent>
-  //         <List>
-  //           {['Notebooks', 'Recent', 'Favorites', 'Shared'].map((text, index) => (
-  //             <ListItem key={text} disablePadding>
-  //               <ListItemButton>
-  //                 <ListItemIcon>
-  //                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-  //                 </ListItemIcon>
-  //                 <ListItemText primary={text} />
-  //               </ListItemButton>
-  //             </ListItem>
-  //           ))}
-  //         </List>
-  //         <Divider />
-  //         <List>
-  //           {['Archive', 'Trash'].map((text, index) => (
-  //             <ListItem key={text} disablePadding>
-  //               <ListItemButton>
-  //                 <ListItemIcon>
-  //                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-  //                 </ListItemIcon>
-  //                 <ListItemText primary={text} />
-  //               </ListItemButton>
-  //             </ListItem>
-  //           ))}
-  //         </List>
-  //       </DrawerContent>
-  //     </Drawer>
-  //     <MainContent
-  //       sx={{
-  //         ...(open && {
-  //           marginLeft: `${drawerWidth}px`,
-  //           transition: (theme) =>
-  //             theme.transitions.create(['margin', 'width'], {
-  //               easing: theme.transitions.easing.easeOut,
-  //               duration: theme.transitions.duration.enteringScreen,
-  //             }),
-  //         }),
-  //       }}
-  //     >
-  //       <Typography variant="h4" component="h1">
-  //         Library
-  //       </Typography>
-  //       {/* Add your library content here */}
-  //     </MainContent>
-  //   </>
-  // );
 }

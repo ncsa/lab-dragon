@@ -927,6 +927,38 @@ def add_image(body, image):
     return make_response(image_url, 201)
 
 
+def _check_for_notebook_parent(ent):
+
+    parent = INDEX[ent.parent]
+
+    if parent.parent == "" or parent.parent is None:
+        return abort(404, f"Entity with ID {ent.ID} is not in a notebook")
+
+    if isinstance(parent, Notebook):
+        return parent.ID
+
+    return _check_for_notebook_parent(parent)
+
+
+def get_notebook_parent(ID):
+    """
+    Checks the ID given of an entity and returns the ID of the notebook it is contained in.
+    """
+
+    if ID not in INDEX:
+        abort(404, f"Entity with ID {ID} not found")
+
+    ent = INDEX[ID]
+    if isinstance(ent, Notebook):
+        return make_response(ent.ID, 201)
+
+    if isinstance(ent, Library):
+        return abort(404, f"Entity with ID {ID} is a library and does not have a notebook")
+
+    return str(_check_for_notebook_parent(ent)), 201
+
+
+
 def get_all_libraries():
 
     libraries = {}

@@ -1,5 +1,5 @@
 "use client"
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { navLinks } from '../constants/index';
@@ -7,7 +7,8 @@ import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
 import { Box, IconButton, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ExplorerDrawer from './explorer_drawer';
+import ExplorerDrawer from './explorerDrawer';
+import { ExplorerContext } from '../contexts/explorerContext';
 
 // FIXME: Handle errors properly
 async function getLibraries() {
@@ -24,7 +25,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.grey[100],
+  // backgroundColor: theme.palette.grey[100],
+  backgroundColor: '#BFBFBF',
   boxShadow: theme.shadows[3],
   zIndex: theme.zIndex.drawer + 1,
 }));
@@ -52,12 +54,14 @@ const IconContainer = styled(Box)(({ theme, active }) => ({
   boxShadow: theme.shadows[1],
 }));
 
-const Toolbar = ({ onMenuBookClick }) => {
+export default function Toolbar() {
+
+  const { drawerOpen, setDrawerOpen } = useContext(ExplorerContext);
+
   const pathname = usePathname();
   const router = useRouter();
 
   const [libraries, setLibraries] = useState([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     getLibraries().then(data => {
@@ -144,5 +148,3 @@ const Toolbar = ({ onMenuBookClick }) => {
     </StyledPaper>
   );
 };
-
-export default Toolbar;
