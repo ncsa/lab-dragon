@@ -5,7 +5,7 @@ import { styled } from "@mui/material/styles";
 import {Typography, Paper, Stack, Breadcrumbs, Box} from "@mui/material";
 import ViewCompactIcon from '@mui/icons-material/ViewCompact';
 
-import StepViewer from "./StepViewer";
+import StepViewer from "./StepViewerComponents/StepViewer";
 import { getEntity } from "@/app/utils";
 
 
@@ -38,7 +38,6 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
             ...prevState,
             [stepId]: isActive
         }));
-        console.log(activeSteps);
     };
 
     useEffect(() => {
