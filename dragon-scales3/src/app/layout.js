@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Toolbar from "../app/components/toolbar";
+import Toolbar from "./components/Toolbar";
+import { ExplorerProvider } from "../app/contexts/explorerContext";
 
 
 const geistSans = localFont({
@@ -25,8 +26,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <Toolbar/>
-      {children}
+      <ExplorerProvider>
+        <Toolbar/>
+        {children}
+      </ExplorerProvider>
       </body>
     </html>
   );

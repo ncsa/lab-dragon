@@ -356,6 +356,22 @@ paths:
         "404":
           description: "Entity not found"
 
+  /entities/{ID}/notebook_parent:
+    get:
+      operationId: "dragon_core.api.entities.get_notebook_parent"
+      tags:
+          - Entities
+      summary: "Returns the notebook parent of the entity with the given ID"
+      parameters:
+          - $ref: "#/components/parameters/ID"
+      responses:
+          "200":
+            description: "Successfully read notebook parent"
+          "403":
+            description: "Entity is a Library, it cannot have notebook parents"
+          "404":
+            description: "Entity not found"
+
   /entities/add_library:
     post:
       operationId: "dragon_core.api.entities.add_library"
@@ -379,6 +395,17 @@ paths:
           description: "Successfully added library"
         "400":
           description: "Invalid name or user"
+
+  /entities/get_all_libraries:
+    get:
+      operationId: "dragon_core.api.entities.get_all_libraries"
+      tags:
+        - Entities
+        - Libraries
+      summary: "Returns all libraries present in the notebook"
+      responses:
+        "200":
+          description: "Successfully read libraries"
 
   /data:
     post:

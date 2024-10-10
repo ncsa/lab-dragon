@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { navLinks } from '../constants/index';
@@ -7,6 +7,14 @@ import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
 import { Box, IconButton, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import ExplorerDrawer from './ExplorerDrawer';
+import { ExplorerContext } from '../contexts/explorerContext';
+
+// FIXME: Handle errors properly
+async function getLibraries() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
+  return await res.json();
+}
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   position: 'fixed',
@@ -17,7 +25,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.grey[100],
+  // backgroundColor: theme.palette.grey[100],
+  backgroundColor: '#BFBFBF',
   boxShadow: theme.shadows[3],
   zIndex: theme.zIndex.drawer + 1,
 }));
@@ -45,18 +54,23 @@ const IconContainer = styled(Box)(({ theme, active }) => ({
   boxShadow: theme.shadows[1],
 }));
 
-const Toolbar = ({ onMenuBookClick }) => {
+export default function Toolbar() {
+
+  const { drawerOpen, setDrawerOpen } = useContext(ExplorerContext);
+
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleMenuBookClick = (e) => {
-    e.preventDefault();
-    if (pathname !== '/library') {
-      router.push('/library');
-    }
-    if (onMenuBookClick) {
-      onMenuBookClick();
-    }
+  const [libraries, setLibraries] = useState([]);
+
+  useEffect(() => {
+    getLibraries().then(data => {
+      setLibraries(data);
+    });
+  }, []);  
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
   return (
@@ -74,35 +88,35 @@ const Toolbar = ({ onMenuBookClick }) => {
         </IconContainer>
       </StyledLink>
 
-      {/* Navigation Links */}
-      <Stack flexGrow={1}>
-        <Box
-          onClick={handleMenuBookClick}
-          sx={{
-            cursor: 'pointer',
-            width: '100%',
-            padding: (theme) => theme.spacing(1.5),
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: pathname === '/library' ? (theme) => theme.palette.primary.main : 'transparent',
-            '&:hover': {
-              backgroundColor: pathname === '/library' 
-                ? (theme) => theme.palette.primary.main 
-                : (theme) => theme.palette.primary.light,
-            },
-          }}
-        >
-          <IconContainer active={pathname === '/library' ? 1 : 0}>
-            <IconButton
-              color={pathname === '/library' ? 'primary' : 'default'}
-              size="small"
-            >
-              <MenuBook />
-            </IconButton>
-          </IconContainer>
-        </Box>
-        {navLinks
+       {/* Navigation Links */}
+       <Stack flexGrow={1}>
+        {Object.entries(libraries).map(([key, value]) => (
+          pathname === `/library/${value}` ? (
+            <Box key={value}>
+              <IconContainer active={1}>
+                <IconButton title={key}
+                  active={1}
+                  color="primary"
+                  size="small"
+                  onClick={() => {handleDrawerToggle()}}>
+                  <MenuBook />
+                </IconButton>
+              </IconContainer>
+              {drawerOpen && <ExplorerDrawer open={drawerOpen} name={key} id={value}/>}
+            </Box>
+          ) : (
+            <StyledLink key={value} href={`/library/${value}`} active={pathname === `/library/${value}` ? 1 : 0}>
+              <IconContainer active={0}>
+                <IconButton title={key} color="default" size="small" onClick={() => {setDrawerOpen(true)}}>
+                  <MenuBook />
+                </IconButton>
+              </IconContainer>
+            </StyledLink>
+          )
+        ))}
+      </Stack>
+      <Stack>  
+      {navLinks
           .filter(link => ['comment', 'search'].includes(link.id))
           .map((link) => (
             <StyledLink
@@ -134,5 +148,3 @@ const Toolbar = ({ onMenuBookClick }) => {
     </StyledPaper>
   );
 };
-
-export default Toolbar;
