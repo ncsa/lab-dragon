@@ -86,26 +86,30 @@ export default function StepViewer( { stepEntity, markStepState} ) {
         setIsActive(false);
         markStepState(entity.ID, false);
 
-        // FIXME: Change the user here to use the context of the selected user
-        // FIXME: there is probably a more efficient way of finding the contentBlock but oh well
-        const success = submitContentBlockEdition(
-            entity.ID,
-            "marcos",
-            parsedContentBlocksEnt.find(block => block.ID === activeContentBlockRef.current),
-            contentBlocksRefs.current[activeContentBlockRef.current]
-        ).then( response => {
-            if (success) {
-                activeContentBlockRef.current = null;
-                getEntity(entity.ID).then(entity => {
-                    setEntity(JSON.parse(entity));
-                })
-            } else {
-                console.log("Error: content block edition failed")
-            }
-        }
-    )
-    }
+        const contBlock = parsedContentBlocksEnt.find(block => block.ID === activeContentBlockRef.current)
+        const newContent = contentBlocksRefs.current[activeContentBlockRef.current]
 
+        if (newContent && contBlock) {
+            // FIXME: Change the user here to use the context of the selected user
+            // FIXME: there is probably a more efficient way of finding the contentBlock but oh well
+            const success = submitContentBlockEdition(
+                entity.ID,
+                "marcos",
+                contBlock,
+                newContent,
+            ).then(response => {
+                    if (success) {
+                        activeContentBlockRef.current = null;
+                        getEntity(entity.ID).then(entity => {
+                            setEntity(JSON.parse(entity));
+                        })
+                    } else {
+                        console.log("Error: content block edition failed")
+                    }
+                }
+            )
+        }
+    }
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (stepViewerRef.current && !stepViewerRef.current.contains(event.target)) {
