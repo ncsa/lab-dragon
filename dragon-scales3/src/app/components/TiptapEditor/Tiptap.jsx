@@ -1,6 +1,6 @@
 "use client"
 
-import '../../globals.css';
+// import '../../globals.css';
 
 import React, { useState, useEffect, useRef, useContext } from "react";
 import tippy from "tippy.js";
@@ -20,7 +20,7 @@ import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
 
 import { Box } from "@mui/material";
-
+import { styled } from "@mui/material/styles";
 const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
@@ -32,7 +32,26 @@ const uploadImage = async (file) => {
   return url;
 }
 
-export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
+const StyledFullWidthBox = styled(Box)({
+  backgroundColor: '#ffffff',
+  width: '100%', // Occupy full width
+  '& .ProseMirror': {
+    // minHeight: '150px', // Ensure there's enough space for the placeholder to show
+    padding: '10px', // Add some padding for better appearance
+    '&:focus': {
+      outline: 'none', // Remove default focus outline
+    },
+    '& p.is-editor-empty:first-child::before': {
+      color: '#adb5bd', // Placeholder text color
+      content: 'attr(data-placeholder)', // Use the data-placeholder attribute
+      float: 'left',
+      height: 0,
+      pointerEvents: 'none',
+    },
+  },
+});
+
+export default ({ onContentChange, entID, initialContent, reloadEditor, placeholder="Empty editor", newLineEditor=false }) => {
 
   const [isCursorInTable, setIsCursorInTable] = useState(false);
 
@@ -119,7 +138,7 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
       TableHeader,
       Link,
       Placeholder.configure({
-        placeholder: "Write a comment here..."
+        placeholder: placeholder
       }),
       TiptapImage.configure({inline: true}),
       Iframe,
@@ -266,8 +285,16 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
   if (!editor) {
     return null;
   }
+
+  if (newLineEditor) {
+    return (
+      <StyledFullWidthBox>
+        <EditorContent editor={editor} />
+      </StyledFullWidthBox>
+    )
+  }
   return (
-    <Box sx={{ backgroundColor: '#ffffff' }}>
+    <Box sx={{ backgroundColor: '#ffffff', padding: '5px' }}>
       <EditorContent editor={editor} />
     </Box>
   )

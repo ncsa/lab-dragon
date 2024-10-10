@@ -1,12 +1,14 @@
 "use client"
 
 import {useEffect, useRef, useState} from "react";
-import {Box, Paper, Stack, Typography} from "@mui/material";
+import {Box, Button, Divider, Paper, Stack, Typography} from "@mui/material";
 import {styled} from "@mui/material/styles";
 import parse from "html-react-parser";
 
 import { getEntity } from "@/app/utils";
 import ActiveStepContentBlock from "@/app/components/StepViewerComponents/ActiveStepContentBlock";
+import ViewCompactIcon from "@mui/icons-material/ViewCompact";
+import Tiptap from "@/app/components/TiptapEditor/Tiptap";
 
 
 const StyledStepPaper = styled(Paper)(({ theme }) => ({
@@ -46,6 +48,13 @@ const StyledStepContentBlocksTypography = styled(Typography)(({ theme }) => ({
     fontSize: theme.typography.body1.fontSize,
 }))
 
+const StyledNewContentBox = styled(Box)(({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    paddingTop: "10px"
+
+}))
+
 
 async function submitContentBlockEdition(entID, user, contentBlock, newContent) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + contentBlock.ID + "?HTML=True&username=" + user, {
@@ -60,19 +69,37 @@ async function submitContentBlockEdition(entID, user, contentBlock, newContent) 
 }
 
 
+async function submitNewContentBlock(entID, user, newContent ){
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "?HTML=True" + "&username=" + user, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newContent),
+    });
+
+    return response.status === 201;
+}
+
+
 export default function StepViewer( { stepEntity, markStepState} ) {
 
     const [entity, setEntity] = useState(stepEntity);
     const [isActive, setIsActive] = useState(false);
-    // const [activeContentBlock, setActiveContentBlock] = useState(null);
     const [parsedContentBlocksEnt, setParsedContentBlocksEnt] = useState([]);
+    const [reloadEditor, setReloadEditor] = useState(0);
 
     // Holds as keys the ids of contentBlocks and as values their corresponding refs
     const contentBlocksRefs = useRef({});
     const activeContentBlockRef = useRef(null);
+    const newContentBlockRef = useRef(null);  // Used to keep track of the up-to-date content of tiptap
 
     const stepViewerRef = useRef(null); // used to keep track of active state
-    
+
+    const handleNewContentChange = (content) => {
+        newContentBlockRef.current = content;
+    }
+
     const updateContentBlocksRefs = (id, text) => {
         contentBlocksRefs.current[id] = text;
     }
@@ -110,6 +137,26 @@ export default function StepViewer( { stepEntity, markStepState} ) {
             )
         }
     }
+
+    const handleSubmitNewContent = (e) => {
+        e.preventDefault();
+        const newContent = newContentBlockRef.current;
+        if (newContent) {
+            const success = submitNewContentBlock(entity.ID, "marcos", newContent).then(response => {
+                if (success) {
+                    getEntity(entity.ID).then(entity => {
+                        newContentBlockRef.current = null;
+                        setReloadEditor(prev => prev+1);
+                        setEntity(JSON.parse(entity));
+                    })
+                } else {
+                    console.log("Error: new content block submission failed")
+                }
+            })
+        }
+    }
+
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (stepViewerRef.current && !stepViewerRef.current.contains(event.target)) {
@@ -141,13 +188,39 @@ export default function StepViewer( { stepEntity, markStepState} ) {
             <Box ref={stepViewerRef}>
                 <StyledStepPaperActive>
                     <StyledStepTittleTypography paddingLeft={3}>{entity.name}</StyledStepTittleTypography>
-                    {parsedContentBlocksEnt.map(contentBlock => (
-                       <ActiveStepContentBlock key={contentBlock.ID}
-                                               contentBlock={contentBlock}
-                                               entID={entity.ID}
-                                               activeContentBlockRef={activeContentBlockRef}
-                                               updateContent={updateContentBlocksRefs} />
-                    ))}
+                        {parsedContentBlocksEnt.map(contentBlock => (
+                           <ActiveStepContentBlock key={contentBlock.ID}
+                                                   contentBlock={contentBlock}
+                                                   entID={entity.ID}
+                                                   activeContentBlockRef={activeContentBlockRef}
+                                                   updateContent={updateContentBlocksRefs} />
+                        ))}
+                        <Divider sx={{paddingTop: "5px",}} />
+                        <form noValidate autoComplete="off" onSubmit={handleSubmitNewContent}>
+                            <StyledNewContentBox>
+                                <Box marginRight={2}>
+                                    <ViewCompactIcon />
+                                </Box>
+                            
+                                <Tiptap onContentChange={handleNewContentChange}
+                                        entID={entity.ID}
+                                        initialContent={newContentBlockRef.current}
+                                        reloadEditor={reloadEditor}
+                                        placeholder="Write a new content block here..."
+                                        newLineEditor={true} />
+                                
+                                <Button type="submit"
+                                        variant="contained"
+                                        size="small"
+                                        sx={{ marginLeft: 1,
+                                            marginRight: 1
+                                        }}
+                                        >
+                                    Submit
+                                </Button>
+                            </StyledNewContentBox>
+                        </form>
+                        
                 </StyledStepPaperActive>
             </Box>
         )
