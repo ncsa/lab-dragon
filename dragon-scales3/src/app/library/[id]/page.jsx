@@ -70,7 +70,7 @@ export default function Library() {
     <MainContent marginLeft={drawerOpen ? openDrawerWidth : closedDrawerWidth}>
       <Stack flexGrow={2} spacing={2} direction='column'>
       {topLevelProjects && topLevelProjects.map(project => (
-        <ProjectViewer key={project.id} projectEntity={project} />
+        <ProjectViewer key={project.id} projectEntity={project} notebookName={currentNotebookEnt.name} />
       ))}
       </Stack>
     </MainContent>
