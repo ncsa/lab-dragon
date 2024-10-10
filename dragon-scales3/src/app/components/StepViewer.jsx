@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { Typography, Paper, Stack, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import parse from "html-react-parser";
+import Tiptap from "@/app/components/TiptapEditor/Tiptap";
+import CropSquareIcon from '@mui/icons-material/CropSquare';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
 
 
 const StyledStepPaper = styled(Paper)(({ theme }) => ({
@@ -21,6 +24,19 @@ const StyledStepPaper = styled(Paper)(({ theme }) => ({
     },
 }))
 
+const StyledStepPaperActive = styled(Paper)(({ theme }) => ({
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#e0e9ff',
+    width: '90%',
+    height: '90%',
+    paddingLeft: theme.spacing(2),
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    
+}))
+
 const StyledStepTittleTypography = styled(Typography)(({ theme }) => ({
     fontWeight: 'bold',
     fontSize: theme.typography.h6.fontSize,
@@ -30,17 +46,33 @@ const StyledStepContentBlocksTypography = styled(Typography)(({ theme }) => ({
     fontSize: theme.typography.body1.fontSize,
 }))
 
-export default function StepViewer( { stepEntity} ) {
+export default function StepViewer( { stepEntity, markStepState} ) {
 
     const [isActive, setIsActive] = useState(false);
     const [parsedContentBlocksEnt, setParsedContentBlocksEnt] = useState([]);
 
-    const stepViewerRef = useRef(null);
+    const stepViewerRef = useRef(null); // used to keep track of active state
+    // used to keep track of the current existing text in the tiptap editor
+    const currentEditorText = useRef(null);
+
+    const handleContentChange = (content) => {
+        currentEditorText.current = content;
+    }
+
+    const activateStepViewer = () => {
+        setIsActive(true);
+        markStepState(stepEntity.ID, true);
+    }
+
+    const deactivateStepViewer = () => {
+        setIsActive(false);
+        markStepState(stepEntity.ID, false);
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (stepViewerRef.current && !stepViewerRef.current.contains(event.target)) {
-                setIsActive(false);
+                deactivateStepViewer()
             }
         };
 
@@ -62,14 +94,25 @@ export default function StepViewer( { stepEntity} ) {
     if (isActive) {
         return (
             <Box ref={stepViewerRef}>
-                <Typography>Active baby</Typography>
+                <StyledStepPaperActive>
+                    <StyledStepTittleTypography paddingLeft={3}>{stepEntity.name}</StyledStepTittleTypography>
+                    {parsedContentBlocksEnt.map(contentBlock => (
+                        <Box key={contentBlock.id} display="flex" alignItems="center">
+                            <Box marginRight={2}>
+                                <ViewCompactIcon />
+                            </Box>
+                            <StyledStepContentBlocksTypography key={contentBlock.id}>
+                                {parse(contentBlock.content[0])}
+                            </StyledStepContentBlocksTypography>
+                        </Box>
+                    ))}
+                </StyledStepPaperActive>
             </Box>
         )
     } else {
         return (
-
             <StyledStepPaper
-                onClick={() => setIsActive(true)}>
+                onClick={() => activateStepViewer()}>
                 <StyledStepTittleTypography>{stepEntity.name}</StyledStepTittleTypography>
                 <Stack spacing={1} direction="column" paddingTop={2}>
                     {parsedContentBlocksEnt.map(contentBlock => (
