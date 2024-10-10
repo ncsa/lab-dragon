@@ -52,7 +52,6 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
 
     return (
         <StyledTaskPaper>
-            <Typography>{JSON.stringify(activeSteps)}</Typography>
             <Stack flexGrow={1} spacing={2} direction='column'>
                 <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
                     {breadcrumbsText.map(text => (

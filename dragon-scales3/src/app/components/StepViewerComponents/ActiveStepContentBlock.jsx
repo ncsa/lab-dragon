@@ -27,7 +27,7 @@ export default function ActiveStepContentBlock( { contentBlock, entID, activeCon
     const [isActive, setActive] = useState(false)
 
     const contentBlockRef = useRef(null); // used to track active state
-    const textRef = useRef(contentBlock.content[0]); // used to track editor text
+    const textRef = useRef(contentBlock.content[contentBlock.content.length - 1]); // used to track editor text
 
     const handleContentChange = (content) => {
         updateContent(contentBlock.ID, content)
@@ -76,7 +76,7 @@ export default function ActiveStepContentBlock( { contentBlock, entID, activeCon
                     <ViewCompactIcon cursor="pointer"/>
                 </Box>
                 <StyledStepContentBlocksTypography key={contentBlock.ID}>
-                    {parse(contentBlock.content[0])}
+                    {parse(contentBlock.content[contentBlock.content.length - 1])}
                 </StyledStepContentBlocksTypography>
             </StyledContentBox>
         )

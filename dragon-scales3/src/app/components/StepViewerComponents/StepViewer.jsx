@@ -4,6 +4,8 @@ import {useEffect, useRef, useState} from "react";
 import {Box, Paper, Stack, Typography} from "@mui/material";
 import {styled} from "@mui/material/styles";
 import parse from "html-react-parser";
+
+import { getEntity } from "@/app/utils";
 import ActiveStepContentBlock from "@/app/components/StepViewerComponents/ActiveStepContentBlock";
 
 
@@ -45,6 +47,19 @@ const StyledStepContentBlocksTypography = styled(Typography)(({ theme }) => ({
 }))
 
 
+async function submitContentBlockEdition(entID, user, contentBlock, newContent) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + contentBlock.ID + "?HTML=True&username=" + user, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newContent),
+    });
+
+    return response.status === 201;
+}
+
+
 export default function StepViewer( { stepEntity, markStepState} ) {
 
     const [entity, setEntity] = useState(stepEntity);
@@ -59,22 +74,36 @@ export default function StepViewer( { stepEntity, markStepState} ) {
     const stepViewerRef = useRef(null); // used to keep track of active state
     
     const updateContentBlocksRefs = (id, text) => {
-        contentBlocksRefs[id] = text;
+        contentBlocksRefs.current[id] = text;
     }
     
     const activateStepViewer = () => {
         setIsActive(true);
-        markStepState(stepEntity.ID, true);
+        markStepState(entity.ID, true);
     }
 
     const deactivateStepViewer = () => {
         setIsActive(false);
-        markStepState(stepEntity.ID, false);
-        console.log("here comes the current text at deactivation")
-        console.log(contentBlocksRefs.current)
+        markStepState(entity.ID, false);
 
-        console.log(contentBlocksRefs[activeContentBlockRef])
-        activeContentBlockRef.current = null;
+        // FIXME: Change the user here to use the context of the selected user
+        // FIXME: there is probably a more efficient way of finding the contentBlock but oh well
+        const success = submitContentBlockEdition(
+            entity.ID,
+            "marcos",
+            parsedContentBlocksEnt.find(block => block.ID === activeContentBlockRef.current),
+            contentBlocksRefs.current[activeContentBlockRef.current]
+        ).then( response => {
+            if (success) {
+                activeContentBlockRef.current = null;
+                getEntity(entity.ID).then(entity => {
+                    setEntity(JSON.parse(entity));
+                })
+            } else {
+                console.log("Error: content block edition failed")
+            }
+        }
+    )
     }
 
     useEffect(() => {
@@ -95,24 +124,24 @@ export default function StepViewer( { stepEntity, markStepState} ) {
 
     useEffect(() => {
         // FIXME: Replace the word comments with contentBlocks once the backend is updated
-        const parsedContentBlocksEnt = stepEntity.comments.map(comment => JSON.parse(comment));
+        const parsedContentBlocksEnt = entity.comments.map(comment => JSON.parse(comment));
         setParsedContentBlocksEnt(parsedContentBlocksEnt)
         contentBlocksRefs.current = parsedContentBlocksEnt.reduce((acc, contentBlock) => {
-            acc[contentBlock.ID] = contentBlock.content[0];
+            acc[contentBlock.ID] = contentBlock.content[contentBlock.content.length - 1];
             return acc;
         }, {});
-    }, [stepEntity])
+    }, [entity])
  
     if (isActive) {
         return (
             <Box ref={stepViewerRef}>
                 <StyledStepPaperActive>
-                    <StyledStepTittleTypography paddingLeft={3}>{stepEntity.name}</StyledStepTittleTypography>
+                    <StyledStepTittleTypography paddingLeft={3}>{entity.name}</StyledStepTittleTypography>
                     {parsedContentBlocksEnt.map(contentBlock => (
                        <ActiveStepContentBlock key={contentBlock.ID}
                                                contentBlock={contentBlock}
-                                               entID={stepEntity.ID}
-                                               activeContentBlockRef={contentBlocksRefs}
+                                               entID={entity.ID}
+                                               activeContentBlockRef={activeContentBlockRef}
                                                updateContent={updateContentBlocksRefs} />
                     ))}
                 </StyledStepPaperActive>
@@ -122,11 +151,11 @@ export default function StepViewer( { stepEntity, markStepState} ) {
         return (
             <StyledStepPaper
                 onClick={() => activateStepViewer()}>
-                <StyledStepTittleTypography>{stepEntity.name}</StyledStepTittleTypography>
+                <StyledStepTittleTypography>{entity.name}</StyledStepTittleTypography>
                 <Stack spacing={1} direction="column" paddingTop={2}>
                     {parsedContentBlocksEnt.map(contentBlock => (
                         <StyledStepContentBlocksTypography key={contentBlock.ID}>
-                            {parse(contentBlock.content[0])}
+                            {parse(contentBlock.content[contentBlock.content.length - 1])}
                         </StyledStepContentBlocksTypography>
                     ))}
                 </Stack>

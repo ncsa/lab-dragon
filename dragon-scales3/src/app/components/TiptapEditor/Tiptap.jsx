@@ -19,6 +19,7 @@ import { createGraphicMention } from "./extensions/GraphicMention";
 import { Iframe } from "./extensions/Iframe";
 import {Image as TiptapImage} from "@tiptap/extension-image";
 
+import { Box } from "@mui/material";
 
 const uploadImage = async (file) => {
   const formData = new FormData();
@@ -266,33 +267,38 @@ export default ({ onContentChange, entID, initialContent, reloadEditor }) => {
     return null;
   }
   return (
-    // <div className="tiptap" >
-    <div>
-      {/*<div className="tiptap-buttons">*/}
-      {/*  <button type="button" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>Insert Table</button>*/}
-      {/*  {isCursorInTable && (*/}
-      {/*    <div>*/}
-      {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteTable().run()}}>Delete Table</button>*/}
-      {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addColumnAfter().run()}}>Add Column</button>*/}
-      {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteColumn().run()}}>Delete Column</button>*/}
-      {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addRowAfter().run()}}>Add Row</button>*/}
-      {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteRow().run()}}>Delete Row</button>*/}
-      {/*    </div>*/}
-      {/*  )}*/}
-      {/*</div>*/}
-      {/*<BubbleMenu className="tiptap-bubble-menu" editor={editor} tippyOptions={{ duration: 100 }}>*/}
-      {/*  <button type="button" className={editor.isActive('bold') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>*/}
-      {/*  <button type="button" className={editor.isActive('italic') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>*/}
-      {/*  <button type="button" className={editor.isActive('strike') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleStrike().run()}>Strike</button>*/}
-      {/*</BubbleMenu>*/}
-      {/*{editor && <FloatingMenu className="floating-menu" tippyOptions={{ duration: 100 }} editor={editor}>*/}
-      {/*  <button type="button" className={editor.isActive('bulletList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBulletList().run()} > Bullet List </button>*/}
-      {/*  <button type="button" className={editor.isActive('orderedList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleOrderedList().run()}> Ordered List </button>*/}
-      {/*  <button type="button" className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}> H1 </button>*/}
-      {/*  <button type="button" className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}> H2 </button>*/}
-      {/*  <button type="button" className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}> H3 </button>*/}
-      {/*</FloatingMenu>}*/}
+    <Box sx={{ backgroundColor: '#ffffff' }}>
       <EditorContent editor={editor} />
-    </div>
-  );
+    </Box>
+  )
+  // return (
+  //   // <div className="tiptap" >
+  //   // <div>
+  //     {/*<div className="tiptap-buttons">*/}
+  //     {/*  <button type="button" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>Insert Table</button>*/}
+  //     {/*  {isCursorInTable && (*/}
+  //     {/*    <div>*/}
+  //     {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteTable().run()}}>Delete Table</button>*/}
+  //     {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addColumnAfter().run()}}>Add Column</button>*/}
+  //     {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteColumn().run()}}>Delete Column</button>*/}
+  //     {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().addRowAfter().run()}}>Add Row</button>*/}
+  //     {/*      <button type="button" onClick={(e) => {e.stopPropagation(); editor.chain().focus().deleteRow().run()}}>Delete Row</button>*/}
+  //     {/*    </div>*/}
+  //     {/*  )}*/}
+  //     {/*</div>*/}
+  //     {/*<BubbleMenu className="tiptap-bubble-menu" editor={editor} tippyOptions={{ duration: 100 }}>*/}
+  //     {/*  <button type="button" className={editor.isActive('bold') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>*/}
+  //     {/*  <button type="button" className={editor.isActive('italic') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>*/}
+  //     {/*  <button type="button" className={editor.isActive('strike') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleStrike().run()}>Strike</button>*/}
+  //     {/*</BubbleMenu>*/}
+  //     {/*{editor && <FloatingMenu className="floating-menu" tippyOptions={{ duration: 100 }} editor={editor}>*/}
+  //     {/*  <button type="button" className={editor.isActive('bulletList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleBulletList().run()} > Bullet List </button>*/}
+  //     {/*  <button type="button" className={editor.isActive('orderedList') ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleOrderedList().run()}> Ordered List </button>*/}
+  //     {/*  <button type="button" className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}> H1 </button>*/}
+  //     {/*  <button type="button" className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}> H2 </button>*/}
+  //     {/*  <button type="button" className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}> H3 </button>*/}
+  //     {/*</FloatingMenu>}*/}
+  //     <EditorContent editor={editor} />
+  //   </div>
+  // );
 };
