@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react";
-import { Typography, Paper, Stack } from "@mui/material";
+import { useState, useEffect, useRef } from "react";
+import { Typography, Paper, Stack, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import parse from "html-react-parser";
 
@@ -32,7 +32,25 @@ const StyledStepContentBlocksTypography = styled(Typography)(({ theme }) => ({
 
 export default function StepViewer( { stepEntity} ) {
 
+    const [isActive, setIsActive] = useState(false);
     const [parsedContentBlocksEnt, setParsedContentBlocksEnt] = useState([]);
+
+    const stepViewerRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (stepViewerRef.current && !stepViewerRef.current.contains(event.target)) {
+                setIsActive(false);
+            }
+        };
+
+        if (isActive) {
+            document.addEventListener("click", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        }
+    }, [isActive]);
 
 
     useEffect(() => {
@@ -41,18 +59,28 @@ export default function StepViewer( { stepEntity} ) {
         setParsedContentBlocksEnt(parsedContentBlocksEnt)
     }, [])
  
-    return (
-        <StyledStepPaper>
-            <StyledStepTittleTypography>{stepEntity.name}</StyledStepTittleTypography>
-            <Stack spacing={1} direction="column" paddingTop={2}>
-                {parsedContentBlocksEnt.map(contentBlock => (
-                    <StyledStepContentBlocksTypography key={contentBlock.id}>
-                        {parse(contentBlock.content[0])}
-                    </StyledStepContentBlocksTypography>
-                ))}
-            </Stack>
-        </StyledStepPaper>
-    )
+    if (isActive) {
+        return (
+            <Box ref={stepViewerRef}>
+                <Typography>Active baby</Typography>
+            </Box>
+        )
+    } else {
+        return (
+
+            <StyledStepPaper
+                onClick={() => setIsActive(true)}>
+                <StyledStepTittleTypography>{stepEntity.name}</StyledStepTittleTypography>
+                <Stack spacing={1} direction="column" paddingTop={2}>
+                    {parsedContentBlocksEnt.map(contentBlock => (
+                        <StyledStepContentBlocksTypography key={contentBlock.id}>
+                            {parse(contentBlock.content[0])}
+                        </StyledStepContentBlocksTypography>
+                    ))}
+                </Stack>
+            </StyledStepPaper>
+        )
+    }
 }
 
 
