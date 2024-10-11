@@ -9,10 +9,13 @@ create_testing_environment = false
 # If you don't have a root toml file, follow the instructions in the README to create one.
 notebook_root = "/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/tmp/736625e8_Demo Notebook.toml"
 
+# Path of the directory containg the lair.
+# No one should ever touch it.
+lairs_directory = "/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/tmp"
 
 # Resource path. This is a path to a directory where all of the uploaded images and content will go on disk.
 # It is good practice to have it inside the volume origin to not have any unintended consequences.
-resource_path = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp/resource"
+resource_path = "/Users/marcosf2/Documents/github/lab-dragon/dragon-core/test/tmp/resource"
 
 
 # Specifies the users that will be available to select in the notebook.
@@ -29,6 +32,3 @@ url_host="http://localhost:3000"
 # hostname of erver
 traefik_host="localhost"
 
-# Path of the directory containg the lair.
-# No one should ever touch it.
-lairs_directory = "/Users/smital/Desktop/lab-dragon/dragon-core/test/tmp"

@@ -33,6 +33,10 @@ The following is simply a place to quickly write down known issues as well as ne
 - bookmark feature is broken.
 - Have all of the entity fields be outside the TOML table, there is no point in grouping them in a table.
 
+## new UI
+
+- Have every fetch request handle errors gracefully, at the moment if it crashes we are screwed 
+
 ## bugs
 
 - when deleting an entity it doesn't go away from the sidebar
