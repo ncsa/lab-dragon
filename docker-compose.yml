@@ -33,7 +33,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.connexion.rule=Host(`kaladin.ncsa.illinois.edu`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.connexion.rule=Host(`labdragon.software.ncsa.Illinois.edu`) && PathPrefix(`/api`)"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
 
 
@@ -44,7 +44,7 @@ services:
       context: ./dragon-scales
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`kaladin.ncsa.illinois.edu`)"
+      - "traefik.http.routers.nextjs.rule=Host(`labdragon.software.ncsa.Illinois.edu`)"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
 
 networks:
