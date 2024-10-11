@@ -38,7 +38,7 @@ services:
       USERS: '["Smaug", "Spyro", "Drogon", "Charizard"]'
       API_URL_PREFIX: http://kaladin.ncsa.illinois.edu
       URL_HOST: http://kaladin.ncsa.illinois.edu
-      CREATE_TESTING_ENVIRONMENT: true
+      CREATE_TESTING_ENVIRONMENT: True
 
     labels:
       - "traefik.enable=true"

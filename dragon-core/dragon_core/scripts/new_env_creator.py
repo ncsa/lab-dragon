@@ -291,7 +291,7 @@ def create_simulated_env(target: Path) -> Path:
     if not target.exists():
         target.mkdir(parents=True, exist_ok=True)
 
-    delete_directory_contents(target)
+#    delete_directory_contents(target)
 
     # Creating lair
     lair = DragonLair(target)
@@ -422,7 +422,7 @@ def create_simulated_env(target: Path) -> Path:
 
     time.sleep(0.5)
     finding_resonator_freq_task.add_comment(f'Done with frequency, moving on to optimizing pi-pulse')
-    
+
     power_rabi_path = data_path / 'power_rabi'
     power_rabi_path.mkdir(exist_ok=True)
 
@@ -430,7 +430,7 @@ def create_simulated_env(target: Path) -> Path:
     power_rabi_star_tag_path.touch(exist_ok=True)
 
     data_path_power_rabi, raw_figure_path_power_rabi, fit_figure_path_power_rabi = simulate_power_rabi(t_start=-1.9, t_end=1.9, path=power_rabi_path)
-    
+
     power_rabi_instance = Instance(name='Power Rabi',
                                    user='Smuag',
                                    parent=bucket_path,
