@@ -29,8 +29,8 @@ import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 const drawerWidth = 240;
 
 async function getLibraryStructure(id) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities?ID=${id}`);
-  // const res = await fetch(`/api/entities?ID=${id}`);
+  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities?ID=${id}`);
+  const res = await fetch(`/api/entities?ID=${id}`);
   return await res.json();
 }
 
