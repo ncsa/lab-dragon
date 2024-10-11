@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { styled } from '@mui/material/styles';
 import { Typography, Paper, Stack, TextField, IconButton, InputAdornment, Input } from "@mui/material";
-import TaskViewer from "@/app/components/TaskViewer";
+import TaskViewer from "@/app/components/TaskViewerComponents/TaskViewer";
 import SearchIcon from '@mui/icons-material/Search';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { getEntity } from "@/app/utils";

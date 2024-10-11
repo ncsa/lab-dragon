@@ -185,9 +185,9 @@ export default function StepViewer( { stepEntity, markStepState} ) {
  
     if (isActive) {
         return (
-            <Box ref={stepViewerRef}>
+            <Box ref={stepViewerRef} flexGrow={1} display="flex" alignItems="center">
                 <StyledStepPaperActive>
-                    <StyledStepTittleTypography paddingLeft={3}>{entity.name}</StyledStepTittleTypography>
+                    <StyledStepTittleTypography paddingLeft={5}>{entity.name}</StyledStepTittleTypography>
                         {parsedContentBlocksEnt.map(contentBlock => (
                            <ActiveStepContentBlock key={contentBlock.ID}
                                                    contentBlock={contentBlock}
@@ -228,14 +228,21 @@ export default function StepViewer( { stepEntity, markStepState} ) {
         return (
             <StyledStepPaper
                 onClick={() => activateStepViewer()}>
-                <StyledStepTittleTypography>{entity.name}</StyledStepTittleTypography>
-                <Stack spacing={1} direction="column" paddingTop={2}>
-                    {parsedContentBlocksEnt.map(contentBlock => (
-                        <StyledStepContentBlocksTypography key={contentBlock.ID}>
-                            {parse(contentBlock.content[contentBlock.content.length - 1])}
-                        </StyledStepContentBlocksTypography>
-                    ))}
-                </Stack>
+                <Box flexGrow={1} display="flex" alignItems="center">
+                    <Box marginRight={2}>
+                        <ViewCompactIcon />
+                    </Box>
+                    <Box>
+                        <StyledStepTittleTypography>{entity.name}</StyledStepTittleTypography>
+                        <Stack spacing={1} direction="column" paddingTop={2}>
+                            {parsedContentBlocksEnt.map(contentBlock => (
+                                <StyledStepContentBlocksTypography key={contentBlock.ID}>
+                                    {parse(contentBlock.content[contentBlock.content.length - 1])}
+                                </StyledStepContentBlocksTypography>
+                            ))}
+                        </Stack>
+                    </Box>
+                </Box>
             </StyledStepPaper>
         )
     }
