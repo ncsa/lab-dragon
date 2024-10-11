@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Toolbar from "./components/Toolbar";
-import { ExplorerProvider } from "../app/contexts/explorerContext";
+import { ExplorerProvider } from "@/app/contexts/explorerContext";
 
 
 const geistSans = localFont({
