@@ -29,8 +29,8 @@ import NewEntityDialog from "@/app/components/NewEntityDialog";
 const drawerWidth = 240;
 
 async function getLibraryStructure(id) {
-  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities?ID=${id}`);
-  const res = await fetch(`/api/entities?ID=${id}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities?ID=${id}`);
+  // const res = await fetch(`/api/entities?ID=${id}`);
   return await res.json();
 }
 
@@ -120,16 +120,22 @@ export default function ExplorerDrawer({open, name, id}) {
   const [libraryStructure, setLibraryStructure] = useState([]);
   const [library, setLibrary] = useState({ID: null, name: null, children: null});
   const [newNotebookDialogOpen, setNewNotebookDialogOpen] = useState(false);
-  const [emptyNotebookDialogOpen, setEmptyNotebookDialogOpen] = useState(false);
+  const [newProjectsDialogStates, setNewProjectsDialogStates] = useState({});
   const [topLevelNotebooks, setTopLevelNotebooks] = useState([]);
 
-  const handleOpenEmptyNotebookDialog = () => {
-    setEmptyNotebookDialogOpen(true);
-  }
+  const handleOpenNewProjectsDialog = (childId) => {
+    setNewProjectsDialogStates(prevState => ({
+      ...prevState,
+      [childId]: true
+    }));
+  };
 
-  const handleCloseEmptyNotebookDialog = () => {
-  setEmptyNotebookDialogOpen(false);
-  }
+  const handleCloseNewProjectsDialog = (childId) => {
+    setNewProjectsDialogStates(prevState => ({
+      ...prevState,
+      [childId]: false
+    }));
+  };
 
   const handleOpenNewNotebookDialog = () => {
     setNewNotebookDialogOpen(true);
@@ -218,15 +224,12 @@ export default function ExplorerDrawer({open, name, id}) {
                 <Typography>{child.name}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {createTreeStructure(child).length > 0 ? (
                   <StyledTreeView
                     items={createTreeStructure(child)}
-                    onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)}
-                  />
-                ) : (
+                    onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)} />
                   <Box>
                     <Box display="flex" flexDirection="column" alignItems="center">
-                      <IconButton onClick={handleOpenEmptyNotebookDialog}>
+                      <IconButton onClick={() => handleOpenNewProjectsDialog(child.id)}>
                         <AddBoxOutlinedIcon sx={{color: "black"}} />
                       </IconButton>
                     </Box>
@@ -234,13 +237,12 @@ export default function ExplorerDrawer({open, name, id}) {
                       user="marcos"
                       type="Project"
                       parentName={child.name}
-                      parentID={child.ID}
-                      open={emptyNotebookDialogOpen}
-                      onClose={handleCloseEmptyNotebookDialog}
+                      parentID={child.id}
+                      open={newProjectsDialogStates[child.id] || false}
+                      onClose={() => handleCloseNewProjectsDialog(child.id)}
                       reloadParent={reloadLibrary}
                     />
                   </Box>
-                )}
               </AccordionDetails>
             </StyledAccordion>
           ))}
@@ -265,9 +267,6 @@ export default function ExplorerDrawer({open, name, id}) {
     </Drawer>
   );
 }
-
-
-
 
 
 

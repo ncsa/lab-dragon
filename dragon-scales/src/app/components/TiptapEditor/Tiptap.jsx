@@ -24,8 +24,8 @@ import { styled } from "@mui/material/styles";
 const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
-  // const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image`, {
-  const response = await fetch(`/api/properties/image`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image`, {
+  // const response = await fetch(`/api/properties/image`, {
     method: "POST",
     body: formData,
   });
@@ -65,8 +65,8 @@ export default ({ onContentChange, entID, initialContent, reloadEditor, placehol
   const graphicMentionsOptionsRef = useRef({});
 
   const updateDataMentionsOptions = async (query) => {
-    // let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/data_suggestions/` + entID ;
-    let url = `/api/properties/data_suggestions/` + entID ;
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/data_suggestions/` + entID ;
+    // let url = `/api/properties/data_suggestions/` + entID ;
     if (query) {
       url += "?query_filter=" + query;
     }
@@ -76,8 +76,8 @@ export default ({ onContentChange, entID, initialContent, reloadEditor, placehol
   }
 
   const updateGraphicMentionsOptions = async (query) => {
-    // let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/graphic_suggestions/` + entID ;
-    let url = `/api/properties/data_suggestions/` + entID ;
+    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/graphic_suggestions/` + entID ;
+    // let url = `/api/properties/data_suggestions/` + entID ;
     if (query) {
       url += "?query_filter=" + query;
     }
@@ -97,8 +97,8 @@ export default ({ onContentChange, entID, initialContent, reloadEditor, placehol
       img.onload = function () {
         uploadImage(file).then((url) => {
           let transaction = view.state.tr.insertText(" ", view.state.selection.from, view.state.selection.to); // insert a space at the drop position
-          // let attrs = {src: `${process.env.NEXT_PUBLIC_API_BASE_URL}` + url, alt: file.name}; // set the image attributes
-          let attrs = {src: `` + url, alt: file.name}; // set the image attributes
+          let attrs = {src: `${process.env.NEXT_PUBLIC_API_BASE_URL}` + url, alt: file.name}; // set the image attributes
+          // let attrs = {src: `` + url, alt: file.name}; // set the image attributes
           let node = view.state.schema.nodes.image.createAndFill(attrs); // create the image node
           transaction.replaceSelectionWith(node); // replace the space with the image node
           view.dispatch(transaction); // dispatch the transaction

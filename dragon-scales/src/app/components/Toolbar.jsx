@@ -12,8 +12,8 @@ import { ExplorerContext } from '../contexts/explorerContext';
 
 // FIXME: Handle errors properly
 async function getLibraries() {
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
-  const res = await fetch(`/api/entities/get_all_libraries`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
+  // const res = await fetch(`/api/entities/get_all_libraries`);
     return await res.json();
 }
 
