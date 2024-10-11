@@ -107,17 +107,3 @@ export default function ProjectViewer( { projectEntity, notebookName } ) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
