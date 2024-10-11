@@ -117,8 +117,18 @@ export default function ExplorerDrawer({open, name, id}) {
   const { setDrawerOpen, setCurrentlySelectedItem } = useContext(ExplorerContext);
 
   const [libraryStructure, setLibraryStructure] = useState([]);
-  const [library, setLibrary] = useState({ID: null, name: null});
+  const [library, setLibrary] = useState({ID: null, name: null, children: null});
   const [newNotebookDialogOpen, setNewNotebookDialogOpen] = useState(false);
+  const [emptyNotebookDialogOpen, setEmptyNotebookDialogOpen] = useState(false);
+  const [topLevelNotebooks, setTopLevelNotebooks] = useState([]);
+
+  const handleOpenEmptyNotebookDialog = () => {
+    setEmptyNotebookDialogOpen(true);
+  }
+
+  const handleCloseEmptyNotebookDialog = () => {
+  setEmptyNotebookDialogOpen(false);
+  }
 
   const handleOpenNewNotebookDialog = () => {
     setNewNotebookDialogOpen(true);
@@ -138,6 +148,13 @@ export default function ExplorerDrawer({open, name, id}) {
     getLibraryStructure(library.ID).then(data => {
         setLibraryStructure(data);
     });
+
+    if (library.children) {
+      Promise.all(library.children.map(child => getEntity(child))).then(notebooks => {
+        const newTopLevelNotebooks = notebooks.map(t => JSON.parse(t));
+        setTopLevelNotebooks(newTopLevelNotebooks);
+      })
+    }
   }, [library]);
 
   // initial load
@@ -200,10 +217,29 @@ export default function ExplorerDrawer({open, name, id}) {
                 <Typography>{child.name}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <StyledTreeView
-                  items={createTreeStructure(child)}
-                  onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)}
-                />
+                {createTreeStructure(child).length > 0 ? (
+                  <StyledTreeView
+                    items={createTreeStructure(child)}
+                    onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)}
+                  />
+                ) : (
+                  <Box>
+                    <Box display="flex" flexDirection="column" alignItems="center">
+                      <IconButton onClick={handleOpenEmptyNotebookDialog}>
+                        <AddBoxOutlinedIcon sx={{color: "black"}} />
+                      </IconButton>
+                    </Box>
+                    <NewEntityDialog
+                      user="marcos"
+                      type="Project"
+                      parentName={child.name}
+                      parentID={child.ID}
+                      open={emptyNotebookDialogOpen}
+                      onClose={handleCloseEmptyNotebookDialog}
+                      reloadParent={reloadLibrary}
+                    />
+                  </Box>
+                )}
               </AccordionDetails>
             </StyledAccordion>
           ))}
