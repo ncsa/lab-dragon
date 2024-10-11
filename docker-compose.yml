@@ -1,4 +1,3 @@
-version: '3.10'
 
 services:
   traefik:
@@ -10,36 +9,33 @@ services:
       - "80:80"
       - "8080:8080"
     labels:
-      - "traefik.http.routers.traefik.middlewares=traefik"
       - "traefik.http.routers.traefik.service=traefik-svc"
       - "traefik.http.services.traefik-svc.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.traefik.basicauth.realm=Lab Notebook"
-      - "traefik.http.middlewares.traefik.basicauth.usersfile=/etc/traefik/users.txt"
+
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./users.txt:/etc/traefik/users.txt"
 
   connexion:
     image: marcosf2/dragon-core
     build:
       context: ./dragon-core
-    volumes:
-      # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
-      - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
     container_name: "dragon-core"
-    env_file:
-      - .env
+    environment:
+      COMPOSE_PROJECT_NAME: dev
+      TRAEFIK_HOST: kaladin.ncsa.illinois.edu
+      VOLUME_ORIGIN: ./pytest/tmp
+      LAIRS_DIRECTORY: .
+      RESOURCE_PATH: .
+      USERS: '["Smaug", "Spyro", "Drogon", "Charizard"]'
+      API_URL_PREFIX: http://kaladin.ncsa.illinois.edu
+      URL_HOST: http://kaladin.ncsa.illinois.edu
+      CREATE_TESTING_ENVIRONMENT: True
+
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.connexion.rule=Host(`${TRAEFIK_HOST}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.connexion.middlewares=traefik"
+      - "traefik.http.routers.connexion.rule=Host(`kaladin.ncsa.illinois.edu`) && PathPrefix(`/api`)"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
-      - "traefik.http.middlewares.connexion.basicauth.realm=Lab Notebook"
 
-#    develop:
-#      watch:
-#        - action: rebuild
-#          path: .
 
   nextjs:
     image: marcosf2/dragon-scales
@@ -48,15 +44,8 @@ services:
       context: ./dragon-scales
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.routers.nextjs.rule=Host(`kaladin.ncsa.illinois.edu`)"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
-      - "traefik.http.routers.nextjs.middlewares=traefik"
-      - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
-
-#    develop:
-#      watch:
-#        - action: rebuild
-#          path: ../dragon-core-webapp/
 
 networks:
   monitor:

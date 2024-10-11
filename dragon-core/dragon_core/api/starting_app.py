@@ -11,10 +11,8 @@ from dragon_core.scripts.new_env_creator import create_simulated_env
 
 load_dotenv()
 
-if os.getenv('CREATE_TESTING_ENVIRONMENT') == 'True':
-    target = Path("../test/tmp")
-    ret_root = create_simulated_env(target=Path(os.getenv("NOTEBOOK_ROOT")).parent)
-    os.environ["NOTEBOOK_ROOT"] = str(ret_root)
+target = Path("../test/tmp")
+ret_root = create_simulated_env(target=Path(os.getenv("LAIRS_DIRECTORY")))
 
 app = connexion.App(__name__, specification_dir='./')
 app.add_middleware(
@@ -26,9 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.add_api('API_specification.yaml')
+
 
 if __name__ == '__main__':
     host = os.getenv('TRAEFIK_HOST')
     app.run(host=host, port=8000)
-

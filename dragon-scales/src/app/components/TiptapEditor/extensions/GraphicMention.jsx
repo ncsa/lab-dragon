@@ -12,7 +12,8 @@ export const createGraphicMention = (graphicMentionsOptionsRef) => {
       if (name.endsWith('.html')) {
         return [
           'iframe',
-          mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${graphicMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
+          // mergeAttributes({'data-type': this.name}, {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${graphicMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
+          mergeAttributes({'data-type': this.name}, {'src': `/api/properties/image/${graphicMentionsOptionsRef.current[node.attrs.id][0]}`}, this.options.HTMLAttributes, HTMLAttributes),
           this.options.renderLabel({
             options: this.options,
             node,
@@ -28,7 +29,8 @@ export const createGraphicMention = (graphicMentionsOptionsRef) => {
           ),
           [
             'img',
-            {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${name}`}
+            // {'src': `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/properties/image/${name}`}
+            {'src': `/api/properties/image/${name}`}
           ]
         ];
       } else {

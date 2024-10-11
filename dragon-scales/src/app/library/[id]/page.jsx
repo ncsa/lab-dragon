@@ -1,16 +1,17 @@
 "use client";
 import React, { useContext, useEffect, useState } from 'react';
-import {Box, IconButton, Stack} from '@mui/material';
+import {Box, IconButton, Stack, Typography} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import ProjectViewer from '../../components/ProjectViewer';
 import { ExplorerContext } from '../../contexts/explorerContext';
 import { getEntity } from "@/app/utils";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import NewEntityDialog from "@/app/components/NewEntityDialog";
+import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 
 async function getNotebookParent(id) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
+    const res = await fetch(`/api/entities/${id}/notebook_parent`);
     return res.json();
 }
 
@@ -80,6 +81,11 @@ export default function Library() {
     return(
         // marginLeft is here because it is dynamically set by the drawer state so it needs to be set in the component.
         <MainContent marginLeft={drawerOpen ? openDrawerWidth : closedDrawerWidth}>
+            {notebook.name ? (
+                <Typography variant="h3" paddingTop={-10} marginTop={-5} paddingBottom={2}>Currently Looking at Notebook: <em>{notebook.name}</em></Typography>
+            ) : (
+                <Typography variant="h3" paddingTop={-10} marginTop={-5} paddingBottom={2}>Please select a Notebook</Typography>
+            )}
             <Stack flexGrow={2} spacing={2} direction='column'>
                 {topLevelProjects && topLevelProjects.map(project => (
                     <ProjectViewer key={project.ID} projectEntity={project} notebookName={notebook.name} />

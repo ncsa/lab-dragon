@@ -28,18 +28,36 @@ from dragon_core.modules import Entity, Library, Notebook, Project, Task, Step, 
 
 from dragon_core.generators.meta import read_from_TOML
 from dragon_core.components.comment import SupportedCommentType, Comment
-from .converters import MyMarkdownConverter,  CustomLinkExtension, CustomHeadlessTableExtension
+from .converters import (MyMarkdownConverter,
+                         CustomLinkExtension,
+                         CustomHeadlessTableExtension,
+                         set_api_url_prefix_and_host)
 
 
-# Config coming from starting script.
-CONFIG = current_app.config['API_config']
+LOADING_FROM_ENV = False
 
-ROOTPATH: Path = Path(CONFIG['notebook_root'])
+try:
+    # Config coming from starting script.
+    CONFIG = current_app.config['API_config']
 
-LAIRSPATH: Path = Path(CONFIG['lairs_directory'])
+    ROOTPATH: Path = Path()
 
-RESOURCEPATH: Path = Path(CONFIG['resource_path'])
+    LAIRSPATH: Path = Path(CONFIG['lairs_directory'])
 
+    RESOURCEPATH: Path = Path(CONFIG['resource_path'])
+
+except Exception as e:
+    print(f"Getting config from environment dotenv")
+
+    CONFIG = {}
+    
+    ROOTPATH: Path = Path()
+
+    LAIRSPATH: Path = Path()
+
+    RESOURCEPATH: Path = Path()
+    LOADING_FROM_ENV = True
+    
 
 DRAGONLAIR: Optional[DragonLair] = None
 
@@ -68,10 +86,11 @@ IMAGEINDEX = {}
 INSTANCEIMAGE = {}
 
 # Holds all of the users that exists in the notebook
-USERS: set = CONFIG['users']
+USERS: set = set()
 
 
 def set_initial_indices():
+    global LOADING_FROM_ENV
     global CONFIG
     global ROOTPATH
     global LAIRSPATH
@@ -88,14 +107,39 @@ def set_initial_indices():
     global INSTANCEIMAGE
     global USERS
 
-    ROOTPATH = Path(CONFIG['notebook_root'])
+    if not LOADING_FROM_ENV:
+        ROOTPATH = Path()
 
-    LAIRSPATH = Path(CONFIG['lairs_directory'])
+        LAIRSPATH = Path(CONFIG['lairs_directory'])
 
-    RESOURCEPATH = Path(CONFIG['resource_path'])
+        RESOURCEPATH = Path(CONFIG['resource_path'])
+        
+        # Holds all of the users that exists in the notebook
+        USERS = set(copy.copy(CONFIG['users']))
+
+        # Used for images
+        api_url_prefix = CONFIG['api_url_prefix']
+        url_host = CONFIG['url_host']
+
+    else:
+        ROOTPATH = Path()
+
+        LAIRSPATH = Path(os.getenv("LAIRS_DIRECTORY"))
+
+        RESOURCEPATH = Path(os.getenv("RESOURCE_PATH"))
+        
+        # Holds all of the users that exists in the notebook
+        USERS = set(copy.copy(os.getenv("USERS")))
+        if isinstance(USERS, str):
+            USERS = json.loads(USERS)
+
+        # Used for images
+        api_url_prefix = os.getenv("API_URL_PREFIX")
+        url_host = os.getenv("URL_HOST")
+
+    set_api_url_prefix_and_host(api_url_prefix, url_host)
 
     DRAGONLAIR = DragonLair(LAIRSPATH)
-
     # FIXME: This can be refactored in a way that I don't need 4 different global variables.
 
     # List of classes that can contain children. Only Project and Task can contain children for now.
@@ -128,9 +172,6 @@ def set_initial_indices():
     IMAGEINDEX = {}
 
     INSTANCEIMAGE = {}
-
-    # Holds all of the users that exists in the notebook
-    USERS = set(copy.copy(CONFIG['users']))
 
 
 def reset():

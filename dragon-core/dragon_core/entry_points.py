@@ -22,13 +22,12 @@ def start_server(config_path: Path) -> None:
     config = verify_and_parse_config(config_path)
 
     create_testing_environment = config['create_testing_environment']
-    notebook_root = config['notebook_root']
+    lairs_directory = config['lairs_directory']
     traefik_host = config['traefik_host']
 
     if create_testing_environment:
         # target = Path(resource_path)
-        notebook_root = create_simulated_env(target=Path(notebook_root).parent)
-        config['notebook_root'] = Path(notebook_root)
+        lairs_directory = create_simulated_env(target=Path(lairs_directory))
 
     app = connexion.FlaskApp(__name__, specification_dir='./')
     app.add_middleware(

@@ -1,5 +1,4 @@
 "use client";
-import { useSearchParams } from 'next/navigation';
 import { Box, Typography, Container, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -36,17 +35,16 @@ const WelcomeStack = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Library() {
-  const searchParams = useSearchParams();
 
   return (
     <Container>
       <MainContent>
         <ContentStack>
-          <Typography variant="h4" component="h1">
-            Lab Dragon
+          <Typography variant="h1" component="h1">
+            <b>Lab Dragon</b>
           </Typography>
           <WelcomeStack>
-            <Typography>Welcome!</Typography>
+            <Typography variant="h3">Welcome! The landing page is currently under construction, please select a <em>Library</em> on the toolbar to your left</Typography>
           </WelcomeStack>
         </ContentStack>
       </MainContent>
