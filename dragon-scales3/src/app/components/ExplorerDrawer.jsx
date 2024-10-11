@@ -4,7 +4,17 @@
 
 import { useEffect, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Drawer, Divider, Accordion, AccordionDetails, IconButton, AccordionSummary } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Drawer,
+  Divider,
+  Accordion,
+  AccordionDetails,
+  IconButton,
+  AccordionSummary,
+  Stack
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AddIcon from '@mui/icons-material/Add';
@@ -12,6 +22,9 @@ import SortIcon from '@mui/icons-material/Sort';
 import SearchIcon from '@mui/icons-material/Search';
 import { ExplorerContext } from '../contexts/explorerContext';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import {getEntity} from "@/app/utils";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import NewEntityDialog from "@/app/components/NewEntityDialog";
 
 const drawerWidth = 240;
 
@@ -73,8 +86,8 @@ const DrawerContent = styled('div')(({ theme }) => ({
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   backgroundColor: '#FFFFFF',
   color: 'black',
-  // boxShadow: 'none',
-  // border: "1px solid white",
+  boxShadow: 'none',
+  borderRadius: '4px',
   '&:before': {
     display: 'none',
   },
@@ -102,12 +115,42 @@ const StyledTreeView = styled(RichTreeView)(({ theme }) => ({
 
 export default function ExplorerDrawer({open, name, id}) {
   const { setDrawerOpen, setCurrentlySelectedItem } = useContext(ExplorerContext);
-  const [libraryStructure, setLibraryStructure] = useState([]);
 
+  const [libraryStructure, setLibraryStructure] = useState([]);
+  const [library, setLibrary] = useState({ID: null, name: null});
+  const [newNotebookDialogOpen, setNewNotebookDialogOpen] = useState(false);
+
+  const handleOpenNewNotebookDialog = () => {
+    setNewNotebookDialogOpen(true);
+  }
+
+  const handleCloseNewNotebookDialog = () => {
+    setNewNotebookDialogOpen(false);
+  }
+
+  const reloadLibrary = () => {
+    getEntity(id).then(data => {
+      setLibrary(JSON.parse(data));
+    });
+  }
+
+  useEffect(() => {
+    getLibraryStructure(library.ID).then(data => {
+        setLibraryStructure(data);
+    });
+  }, [library]);
+
+  // initial load
   useEffect(() => {
     getLibraryStructure(id).then(data => {
       setLibraryStructure(data);
     });
+
+    getEntity(id).then(data => {
+        setLibrary(JSON.parse(data));
+
+    });
+
   }, [id]);
 
   return (
@@ -145,24 +188,64 @@ export default function ExplorerDrawer({open, name, id}) {
         </IconContainer>
       </DrawerHeader>
       <DrawerContent>
-        <Typography variant="h4" sx={{ fontWeight: 500, mb: 2 }}>
-          {name}
+        <Typography variant="h4" sx={{ fontWeight: 500, mb: 2, }}>
+          <b>{name}</b>
         </Typography>
         <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.2)', mb: 2 }} />
-        {libraryStructure.children && libraryStructure.children.map(child => (
-          <StyledAccordion key={child.id} TransitionProps={{ timeout: 300 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{child.name}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <StyledTreeView
-                items={createTreeStructure(child)}
-                onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)}
-              />
-            </AccordionDetails>
-          </StyledAccordion>
-        ))}
+        <Stack flexGrow={1} spacing={2} flexDirection="column">
+          {libraryStructure.children && libraryStructure.children.map(child => (
+            <StyledAccordion key={child.id} TransitionProps={{ timeout: 300 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}
+                                sx={{backgroundColor: "#CEE5FF", color: "#005BC7", borderRadius: "4px"}}>
+                <Typography>{child.name}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StyledTreeView
+                  items={createTreeStructure(child)}
+                  onItemClick={(event, itemId) => setCurrentlySelectedItem(itemId)}
+                />
+              </AccordionDetails>
+            </StyledAccordion>
+          ))}
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <IconButton onClick={handleOpenNewNotebookDialog}>
+              <AddBoxOutlinedIcon sx={{color: "white"}} />
+            </IconButton>
+          </Box>
+        </Stack>
       </DrawerContent>
+      {library.name && library.ID && (
+        <NewEntityDialog
+            user="marcos"
+            type="Notebook"
+            parentName={library.name}
+            parentID={library.ID}
+            open={newNotebookDialogOpen}
+            onClose={handleCloseNewNotebookDialog}
+            reloadParent={reloadLibrary}
+        />
+      )}
     </Drawer>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
