@@ -2,10 +2,21 @@
 
 
 import {useState} from "react";
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
+import Draggable from 'react-draggable';
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Paper} from "@mui/material";
 
 import {createEntity} from "@/app/utils";
 
+function PaperComponent(props) {
+    return (
+      <Draggable
+        handle="#draggable-dialog-title"
+        cancel={'[class*="MuiDialogContent-root"]'}
+      >
+        <Paper {...props} />
+      </Draggable>
+    );
+  }
 
 export default function NewEntityDialog({ user, type, parentName, parentID,  open, onClose, reloadParent }) {
 
@@ -14,6 +25,8 @@ export default function NewEntityDialog({ user, type, parentName, parentID,  ope
             fullWidth
             open={open}
             onClose={onClose}
+            PaperComponent={PaperComponent}
+            aria-labelledby="draggable-dialog-title"
             PaperProps={{
                 component: 'form',
                 onSubmit: (e) => {
