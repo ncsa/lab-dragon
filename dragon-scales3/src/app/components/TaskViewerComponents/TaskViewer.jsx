@@ -10,6 +10,7 @@ import Tiptap from "@/app/components/TiptapEditor/Tiptap";
 import StepViewer from "../StepViewerComponents/StepViewer";
 import TaskContentViewer from "./TaskContentViewer";
 import {getEntity, sortAndFilterChildren, submitNewContentBlock} from "@/app/utils";
+import NewEntityDialog from "@/app/components/NewEntityDialog";
 
 
 const StyledTaskPaper = styled(Paper)(({ theme }) => ({
@@ -47,8 +48,17 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     const [activeSteps, setActiveSteps] = useState({});
     const [sortedStepsAndContent, setSortedStepsAndContent] = useState([]);
     const [reloadEditor, setReloadEditor] = useState(0);
+    const [newEntityDialogOpen, setNewEntityDialogOpen] = useState(false);
 
     const newContentBlockRef = useRef(null);
+
+    const handleOpenNewEntityDialog = () => {
+        setNewEntityDialogOpen(true);
+    }
+
+    const handleCloseNewEntityDialog = () => {
+        setNewEntityDialogOpen(false);
+    }
 
     const handleNewContentBlockChange = (content) => {
         newContentBlockRef.current = content;
@@ -111,69 +121,82 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     }, [task, steps])
 
     return (
-        <StyledTaskPaper>
-            <Stack flexGrow={1} spacing={2} direction='column'>
-                <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
-                    {breadcrumbsText.map(text => (
-                        <Typography key={text} color="#000000">
-                            {text}
-                        </Typography>
-                    ))}
-                </Breadcrumbs>
-                <StyledTaskTittleTypography>
-                    {task.name}
-                </StyledTaskTittleTypography>
-                <Stack flexGrow={1} spacing={2} direction='column' paddingLeft={2}>
-                    {sortedStepsAndContent.map(item => (
-                        <Box key={item.id} display="flex" alignItems="center">
-                            {item.type ? (
-                                <StepViewer
-                                    stepEntity={item}
-                                    markStepState={updateStepActiveStatus}/>
-                            ) : (
-                                <Box marginLeft={2}>
-                                    <TaskContentViewer
-                                        contentBlock={item}
-                                        entID={task.ID}
-                                        reloadTask={reloadTask}
-                                    />
-                                </Box>
-                            )}
-                        </Box>
-                    ))}
-                </Stack>
-                <form noValidate autoComplete="off" onSubmit={handleSubmitNewContent}>
-                    <StyledNewContentBox marginBottom={1}>
-                        <Box marginRight={2}>
-                            <ViewCompactIcon/>
-                        </Box>
-                        <Tiptap onContentChange={handleNewContentBlockChange}
-                                entID={task.ID}
-                                initialContent={newContentBlockRef.current}
-                                reloadEditor={reloadEditor}
-                                placeholder={`Add content block to "${task.name}" here...`}
-                                newLineEditor={true}/>
+        <Box>
+            <StyledTaskPaper>
+                <Stack flexGrow={1} spacing={2} direction='column'>
+                    <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
+                        {breadcrumbsText.map(text => (
+                            <Typography key={text} color="#000000">
+                                {text}
+                            </Typography>
+                        ))}
+                    </Breadcrumbs>
+                    <StyledTaskTittleTypography>
+                        {task.name}
+                    </StyledTaskTittleTypography>
+                    <Stack flexGrow={1} spacing={2} direction='column' paddingLeft={2}>
+                        {sortedStepsAndContent.map(item => (
+                            <Box key={item.ID} display="flex" alignItems="center">
+                                {item.type ? (
+                                    <StepViewer
+                                        stepEntity={item}
+                                        markStepState={updateStepActiveStatus}/>
+                                ) : (
+                                    <Box marginLeft={2}>
+                                        <TaskContentViewer
+                                            contentBlock={item}
+                                            entID={task.ID}
+                                            reloadTask={reloadTask}
+                                        />
+                                    </Box>
+                                )}
+                            </Box>
+                        ))}
+                    </Stack>
+                    <form noValidate autoComplete="off" onSubmit={handleSubmitNewContent}>
+                        <StyledNewContentBox marginBottom={1}>
+                            <Box marginRight={2}>
+                                <ViewCompactIcon/>
+                            </Box>
+                            <Tiptap onContentChange={handleNewContentBlockChange}
+                                    entID={task.ID}
+                                    initialContent={newContentBlockRef.current}
+                                    reloadEditor={reloadEditor}
+                                    placeholder={`Add content block to "${task.name}" here...`}
+                                    newLineEditor={true}/>
 
-                        <Button type="submit"
-                                variant="contained"
-                                size="small"
-                                sx={{
-                                    marginLeft: 1,
-                                    marginRight: 1
-                                }}
-                        >
-                            Submit
-                        </Button>
-                    </StyledNewContentBox>
-                </form>
-                <Box display="flex" flexDirection="column" alignItems="center">
-                    <Divider sx={{width: "90%", margin: "auto",}}/>
-                    <IconButton aria-label="add new entity" sx={{paddingTop: 1}}>
-                        <AddBoxOutlinedIcon titleAccess="Add new entity"/>
-                    </IconButton>
-                </Box>
-            </Stack>
-        </StyledTaskPaper>
+                            <Button type="submit"
+                                    variant="contained"
+                                    size="small"
+                                    sx={{
+                                        marginLeft: 1,
+                                        marginRight: 1
+                                    }}
+                            >
+                                Submit
+                            </Button>
+                        </StyledNewContentBox>
+                    </form>
+                    <Box display="flex" flexDirection="column" alignItems="center">
+                        <Divider sx={{width: "90%", margin: "auto",}}/>
+                        <IconButton aria-label="add new entity"
+                                    sx={{paddingTop: 1}}
+                                    onClick={handleOpenNewEntityDialog}>
+                            <AddBoxOutlinedIcon titleAccess="Add new entity"/>
+                        </IconButton>
+                    </Box>
+                </Stack>
+            </StyledTaskPaper>
+            <NewEntityDialog
+                user="marcos"
+                type="Step"
+                parentName={task.name}
+                parentID={task.ID}
+                open={newEntityDialogOpen}
+                onClose={handleCloseNewEntityDialog}
+                reloadParent={reloadTask}
+            />
+        </Box>
     )
 }
 

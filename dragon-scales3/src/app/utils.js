@@ -47,3 +47,31 @@ export async function submitNewContentBlock(entID, user, newContent) {
 
     return response.status === 201;
 }
+
+export async function createEntity(name, user, type, parent) {
+    const newEntity = {
+        name, user, type, parent
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newEntity)
+    });
+
+    return response.status === 201;
+}
+
+
+
+
+
+
+
+
+
+
+
+
