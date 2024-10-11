@@ -35,3 +35,15 @@ export async function submitContentBlockEdition(entID, user, contentBlock, newCo
 
     return response.status === 201;
 }
+
+export async function submitNewContentBlock(entID, user, newContent) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "?HTML=True" + "&username=" + user, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newContent),
+    });
+
+    return response.status === 201;
+}

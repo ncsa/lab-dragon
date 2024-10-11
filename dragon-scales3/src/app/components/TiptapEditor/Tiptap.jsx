@@ -35,6 +35,11 @@ const uploadImage = async (file) => {
 const StyledFullWidthBox = styled(Box)({
   backgroundColor: '#ffffff',
   width: '100%', // Occupy full width
+  borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
+  transition: 'box-shadow 0.2s ease',
+  '&:hover': {
+    boxShadow: '0 1px 0 0 #000 ',
+  },
   '& .ProseMirror': {
     // minHeight: '150px', // Ensure there's enough space for the placeholder to show
     padding: '10px', // Add some padding for better appearance
@@ -294,7 +299,14 @@ export default ({ onContentChange, entID, initialContent, reloadEditor, placehol
     )
   }
   return (
-    <Box sx={{ backgroundColor: '#ffffff', padding: '5px' }}>
+    <Box sx={{ 
+        backgroundColor: '#ffffff', 
+        padding: '5px', 
+        border: '1px solid #e0e0e0',
+        '&:hover': {
+            border: '2px solid #D6E4FF' // Makes the border thicker on hover
+        }
+    }}>
       <EditorContent editor={editor} />
     </Box>
   )

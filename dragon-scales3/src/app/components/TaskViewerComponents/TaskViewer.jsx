@@ -1,13 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { styled } from "@mui/material/styles";
-import {Typography, Paper, Stack, Breadcrumbs, Box} from "@mui/material";
-import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import {Typography, Paper, Stack, Breadcrumbs, Box, Divider, IconButton, Button} from "@mui/material";
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import ViewCompactIcon from "@mui/icons-material/ViewCompact";
+import Tiptap from "@/app/components/TiptapEditor/Tiptap";
 
 import StepViewer from "../StepViewerComponents/StepViewer";
 import TaskContentViewer from "./TaskContentViewer";
-import {getEntity, sortAndFilterChildren} from "@/app/utils";
+import {getEntity, sortAndFilterChildren, submitNewContentBlock} from "@/app/utils";
 
 
 const StyledTaskPaper = styled(Paper)(({ theme }) => ({
@@ -28,6 +30,15 @@ const StyledTaskTittleTypography  = styled(Typography)(({ theme }) => ({
     paddingLeft: theme.spacing(2),
 }))
 
+const StyledNewContentBox = styled(Box)(({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    paddingTop: "10px",
+    width: "90%",
+    paddingLeft: theme.spacing(2),
+    marginLeft: theme.spacing(2)
+
+}))
 
 export default function TaskViewer({ taskEntity, breadcrumbsText }) {
 
@@ -35,7 +46,29 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     const [steps, setSteps] = useState([]);
     const [activeSteps, setActiveSteps] = useState({});
     const [sortedStepsAndContent, setSortedStepsAndContent] = useState([]);
+    const [reloadEditor, setReloadEditor] = useState(0);
 
+    const newContentBlockRef = useRef(null);
+
+    const handleNewContentBlockChange = (content) => {
+        newContentBlockRef.current = content;
+    }
+
+    const handleSubmitNewContent = (e) => {
+        e.preventDefault()
+        const newContent = newContentBlockRef.current;
+        if (newContent) {
+            const success = submitNewContentBlock(task.ID, "marcos", newContent).then(() => {
+                if (success) {
+                    newContentBlockRef.current = null;
+                    setReloadEditor(reloadEditor + 1);
+                    reloadTask();
+                } else {
+                    console.error("Error submitting content block edition");
+                }
+            })
+        }
+    }
 
     const updateStepActiveStatus = (stepId, isActive) => {
         setActiveSteps(prevState => ({
@@ -68,7 +101,6 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
         const parsedComments = task.comments.map(comment => typeof comment === 'string' ? JSON.parse(comment) : comment);
         // using a new variables instead of state because I cannot guarantee that state updates in time
         const parsedCommentsTask = {...task, comments: parsedComments};
-        // setTask(parsedCommentsTask);
 
         if (parsedCommentsTask.comments && steps) {
             const sortedAndFiltered = sortAndFilterChildren(parsedCommentsTask, steps, false);
@@ -94,22 +126,52 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                 <Stack flexGrow={1} spacing={2} direction='column' paddingLeft={2}>
                     {sortedStepsAndContent.map(item => (
                         <Box key={item.id} display="flex" alignItems="center">
-                                {item.type ? (
-                                    <StepViewer
-                                        stepEntity={item}
-                                        markStepState={updateStepActiveStatus}/>
-                                ) : (
-                                    <Box marginLeft={2}>
-                                        <TaskContentViewer
-                                            contentBlock={item}
-                                            entID={task.ID}
-                                            reloadTask={reloadTask}
-                                        />
-                                    </Box>
-                                )}
+                            {item.type ? (
+                                <StepViewer
+                                    stepEntity={item}
+                                    markStepState={updateStepActiveStatus}/>
+                            ) : (
+                                <Box marginLeft={2}>
+                                    <TaskContentViewer
+                                        contentBlock={item}
+                                        entID={task.ID}
+                                        reloadTask={reloadTask}
+                                    />
+                                </Box>
+                            )}
                         </Box>
                     ))}
                 </Stack>
+                <form noValidate autoComplete="off" onSubmit={handleSubmitNewContent}>
+                    <StyledNewContentBox marginBottom={1}>
+                        <Box marginRight={2}>
+                            <ViewCompactIcon/>
+                        </Box>
+                        <Tiptap onContentChange={handleNewContentBlockChange}
+                                entID={task.ID}
+                                initialContent={newContentBlockRef.current}
+                                reloadEditor={reloadEditor}
+                                placeholder={`Add content block to "${task.name}" here...`}
+                                newLineEditor={true}/>
+
+                        <Button type="submit"
+                                variant="contained"
+                                size="small"
+                                sx={{
+                                    marginLeft: 1,
+                                    marginRight: 1
+                                }}
+                        >
+                            Submit
+                        </Button>
+                    </StyledNewContentBox>
+                </form>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                    <Divider sx={{width: "90%", margin: "auto",}}/>
+                    <IconButton aria-label="add new entity" sx={{paddingTop: 1}}>
+                        <AddBoxOutlinedIcon titleAccess="Add new entity"/>
+                    </IconButton>
+                </Box>
             </Stack>
         </StyledTaskPaper>
     )
