@@ -18,8 +18,8 @@ const StyledTaskPaper = styled(Paper)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: "#FFFFFF",
-    width: '90%',
-    height: '90%',
+    width: '96%',
+    height: '96%',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
 }))
@@ -121,7 +121,7 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     }, [task, steps])
 
     return (
-        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <StyledTaskPaper>
                 <Stack flexGrow={1} spacing={2} direction='column'>
                     <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
