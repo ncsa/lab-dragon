@@ -279,7 +279,7 @@ def simulate_t2(A, of, f, phi, tau, t_start, t_end, path) -> Tuple[Path, Path, P
     return data_path, raw_figure_path, fit_figure_path
 
 
-def create_simulated_env(target: Path) -> None:
+def create_simulated_env(target: Path) -> Path:
     """
     Creates a demo notebook with fake data generated on the fly.
 

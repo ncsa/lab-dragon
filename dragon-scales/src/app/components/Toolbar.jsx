@@ -113,32 +113,6 @@ export default function Toolbar() {
         })}
       </Stack>
 
-      {/* Other Navigation Links */}
-      <Stack>  
-        {navLinks
-          .filter(link => ['comment', 'search'].includes(link.id))
-          .map((link) => {
-            const isActive = pathname === `/${link.id}`;
-            return (
-              <StyledLink
-                key={link.id}
-                href={`/${link.id}`}
-                active={isActive ? 1 : 0}
-              >
-                <IconContainer active={isActive ? 1 : 0}>
-                  <IconButton
-                    color={isActive ? 'primary' : 'default'}
-                    size="small"
-                  >
-                    {link.id === 'comment' && <Comment />}
-                    {link.id === 'search' && <Search />}
-                  </IconButton>
-                </IconContainer>
-              </StyledLink>
-            );
-          })}
-      </Stack>
-
       {/* Profile */}
       <Box p={1.5} display="flex" justifyContent="center">
         <IconContainer>

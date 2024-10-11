@@ -1,5 +1,4 @@
 "use client";
-import { useSearchParams } from 'next/navigation';
 import { Box, Typography, Container, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -36,7 +35,6 @@ const WelcomeStack = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Library() {
-  const searchParams = useSearchParams();
 
   return (
     <Container>
