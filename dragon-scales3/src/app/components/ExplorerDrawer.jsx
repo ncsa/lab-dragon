@@ -71,9 +71,10 @@ const DrawerContent = styled('div')(({ theme }) => ({
 }));
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
-  backgroundColor: 'transparent',
-  color: 'white',
-  boxShadow: 'none',
+  backgroundColor: '#FFFFFF',
+  color: 'black',
+  // boxShadow: 'none',
+  // border: "1px solid white",
   '&:before': {
     display: 'none',
   },
@@ -81,7 +82,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
     padding: theme.spacing(0, 1),
     minHeight: 48,
     '& .MuiAccordionSummary-expandIconWrapper': {
-      color: 'white',
+      color: 'black',
     },
   },
   '& .MuiAccordionDetails-root': {
@@ -90,7 +91,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 }));
 
 const StyledTreeView = styled(RichTreeView)(({ theme }) => ({
-  color: 'white',
+  color: 'black',
   '& .MuiTreeItem-content': {
     padding: theme.spacing(0.5, 0),
   },
