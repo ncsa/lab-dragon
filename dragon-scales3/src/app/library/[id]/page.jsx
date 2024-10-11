@@ -1,11 +1,13 @@
 "use client";
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Stack } from '@mui/material';
+import {Box, IconButton, Stack} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import ProjectViewer from '../../components/ProjectViewer';
 import { ExplorerContext } from '../../contexts/explorerContext';
 import { getEntity } from "@/app/utils";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import NewEntityDialog from "@/app/components/NewEntityDialog";
 
 async function getNotebookParent(id) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
@@ -31,47 +33,75 @@ const MainContent = styled(Box)(({ theme }) => ({
 
 export default function Library() {
 
-    const { drawerOpen, currentlySelectedItem } = useContext(ExplorerContext);
-    const [ currentNotebookId, setCurrentNotebookId ] = useState("");
-    const [ currentNotebookEnt, setCurrentNotebookEnt ] = useState(null);
-    const [ topLevelProjects, setTopLevelProjects ] = useState(null);
-
     const openDrawerWidth = 24;
     const closedDrawerWidth = -8;
+
+    const { drawerOpen, currentlySelectedItem } = useContext(ExplorerContext);
+    const [ notebook, setNotebook ] = useState({ID: null});
+    const [ topLevelProjects, setTopLevelProjects ] = useState(null);
+    const [ newProjectDialogOpen, setNewProjectDialogOpen ] = useState(false);
+
+    const handleOpenNewProjectDialog = () => {
+        setNewProjectDialogOpen(true);
+    }
+
+    const handleCloseNewProjectDialog = () => {
+        setNewProjectDialogOpen(false);
+    }
+
+    const reloadNotebook = () => {
+        getEntity(notebook.ID).then(newNotebook => {
+            setNotebook(JSON.parse(newNotebook));
+        });
+    }
 
     useEffect(() => {
         if (currentlySelectedItem) {
             getNotebookParent(currentlySelectedItem).then(data => {
-                if (data && data !== currentNotebookId) {
-                    setCurrentNotebookId(data);
+                if (data && data !== notebook.ID) {
+                    getEntity(data).then(notebookData => {
+                        setNotebook(JSON.parse(notebookData));
+                    })
                 }
             });
         }
     }, [currentlySelectedItem]);
 
-    useEffect(() => {
-        if (currentNotebookId) {
-            getEntity(currentNotebookId).then(data => {
-                const parsedData = JSON.parse(data);
-                setCurrentNotebookEnt(parsedData);
-
-                // Use Promise.all to wait for all getEntity calls to complete
-                Promise.all(parsedData.children.map(child => getEntity(child)))
-                    .then(projects => {
-                      const newTopLevelProjects = projects.map(project => JSON.parse(project));
-                      setTopLevelProjects(newTopLevelProjects);
-                    });
-              });
+  useEffect(() => {
+        if (notebook.ID) {
+          Promise.all(notebook.children.map(child => getEntity(child))).then(projects => {
+            const newTopLevelProjects = projects.map(project => JSON.parse(project));
+            setTopLevelProjects(newTopLevelProjects);
+          })
         }
-    }, [currentNotebookId]);
+      }, [notebook]);
+
 
     return(
-      // marginLeft is here because it is dynamically set by the drawer state so it needs to be set in the component.
+        // marginLeft is here because it is dynamically set by the drawer state so it needs to be set in the component.
         <MainContent marginLeft={drawerOpen ? openDrawerWidth : closedDrawerWidth}>
             <Stack flexGrow={2} spacing={2} direction='column'>
-            {topLevelProjects && topLevelProjects.map(project => (
-                <ProjectViewer key={project.id} projectEntity={project} notebookName={currentNotebookEnt.name} />
-            ))}
+                {topLevelProjects && topLevelProjects.map(project => (
+                    <ProjectViewer key={project.ID} projectEntity={project} notebookName={notebook.name} />
+                ))}
+                {notebook.ID && (
+                    <Box>
+                        <Box display="flex" flexDirection="column" alignItems="center" paddingTop={2}>
+                            <IconButton onClick={handleOpenNewProjectDialog}>
+                                <AddBoxOutlinedIcon sx={{color: "white"}} />
+                            </IconButton>
+                        </Box>
+                        <NewEntityDialog
+                            user="marcos"
+                            type="Project"
+                            parentName={notebook.name}
+                            parentID={notebook.ID}
+                            open={newProjectDialogOpen}
+                            onClose={handleCloseNewProjectDialog}
+                            reloadParent={reloadNotebook}
+                        />
+                    </Box>
+                )}
             </Stack>
         </MainContent>
     )
