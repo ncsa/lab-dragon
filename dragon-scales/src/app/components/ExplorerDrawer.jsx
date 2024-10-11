@@ -24,7 +24,7 @@ import { ExplorerContext } from '../contexts/explorerContext';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import {getEntity} from "@/app/utils";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import NewEntityDialog from "@/app/components/NewEntityDialog";
+import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 
 const drawerWidth = 240;
 

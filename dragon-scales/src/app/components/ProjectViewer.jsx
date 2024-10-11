@@ -7,7 +7,7 @@ import TaskViewer from "@/app/components/TaskViewerComponents/TaskViewer";
 import SearchIcon from '@mui/icons-material/Search';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { getEntity } from "@/app/utils";
-import NewEntityDialog from "@/app/components/NewEntityDialog";
+import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 
 

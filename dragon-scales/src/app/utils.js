@@ -69,6 +69,24 @@ export async function createEntity(name, user, type, parent) {
 }
 
 
+export async function createLibrary(name, user) {
+    const newLibrary = {
+        name, user
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/add_library`, {
+    // const response = await fetch(`/api/entities/add_library`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newLibrary)
+    });
+
+    return response.status === 201;
+}
+
+
 
 
 

@@ -10,7 +10,7 @@ import Tiptap from "@/app/components/TiptapEditor/Tiptap";
 import StepViewer from "../StepViewerComponents/StepViewer";
 import TaskContentViewer from "./TaskContentViewer";
 import {getEntity, sortAndFilterChildren, submitNewContentBlock} from "@/app/utils";
-import NewEntityDialog from "@/app/components/NewEntityDialog";
+import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 
 
 const StyledTaskPaper = styled(Paper)(({ theme }) => ({

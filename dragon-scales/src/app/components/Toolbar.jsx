@@ -9,6 +9,8 @@ import { Box, IconButton, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExplorerDrawer from './ExplorerDrawer';
 import { ExplorerContext } from '../contexts/explorerContext';
+import NewLibraryDialog from './dialogs/NewLibraryDialog';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
 // FIXME: Handle errors properly
 async function getLibraries() {
@@ -62,12 +64,26 @@ export default function Toolbar() {
   const { drawerOpen, setDrawerOpen } = useContext(ExplorerContext);
   const pathname = usePathname();
   const [libraries, setLibraries] = useState([]);
+  const [newLibraryDialogOpen, setNewLibraryDialogOpen] = useState(false);
+  const [triggerReload, setTriggerReload] = useState(0);
+
+  const handleOpenNewLibraryDialog = () => {
+    setNewLibraryDialogOpen(true)
+  }
+
+  const handleCloseNewLibraryDialog = () => {
+    setNewLibraryDialogOpen(false);
+  }
+
+  const reloadLibraries = () => {
+    setTriggerReload(triggerReload + 1);
+  }
 
   useEffect(() => {
     getLibraries().then(data => {
       setLibraries(data);
     });
-  }, []);  
+  }, [triggerReload]);  
 
   return (
     <StyledPaper elevation={3}>
@@ -112,6 +128,33 @@ export default function Toolbar() {
             </Box>
           );
         })}
+        <Box sx={{width: '100%',
+          padding: 1.5,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'transparent',
+          '&:hover': {
+            backgroundColor: '#42a5f5',
+          },}}>
+          <IconContainer active={0}>
+            <IconButton
+                title="Add new Library"
+                color={'default'}
+                size="small"
+                onClick={handleOpenNewLibraryDialog}
+            >
+              <AddBoxOutlinedIcon />
+            </IconButton>
+          </IconContainer>
+          <NewLibraryDialog
+            user="marcos"
+            open={newLibraryDialogOpen}
+            onClose={handleCloseNewLibraryDialog}
+            reloadParent={reloadLibraries}
+          />
+        </Box>
+
       </Stack>
 
       {/* Profile */}
