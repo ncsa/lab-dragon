@@ -23,14 +23,26 @@ services:
     image: marcosf2/dragon-core
     build:
       context: ./dragon-core
-    volumes:
+#    volumes:
       # For simplicity all of the data is stored in a mounted volume. The source of the mount is defined in .env
-      - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
+#      - "${VOLUME_ORIGIN}:/home/pfafflab/nas"
     container_name: "dragon-core"
-    env_file:
-      - .env
+#    env_file:
+#      - .env
+    environment:
+      COMPOSE_PROJECT_NAME: dev
+      TRAEFIK_HOST: localhost
+      VOLUME_ORIGIN: ./pytest/tmp
+      LAIRS_DIRECTORY: ./test/tmp
+      RESOURCE_PATH: ./test/tmp
+      USERS: '["Smaug", "Spyro", "Drogon", "Charizard"]'
+      API_URL_PREFIX: http://kaladin.ncsa.illinois.edu
+      URL_HOST: http://kaladin.ncsa.illinois.edu
+      CREATE_TESTING_ENVIRONMENT: true
+
     labels:
       - "traefik.enable=true"
+      # REMEMBER TO CHANGE THE TRAEFIK_HOST TO THE DOMAIN NAME
       - "traefik.http.routers.connexion.rule=Host(`${TRAEFIK_HOST}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.connexion.middlewares=traefik"
       - "traefik.http.services.connexion.loadbalancer.server.port=8000"
@@ -48,11 +60,13 @@ services:
       context: ./dragon-scales
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs.rule=Host(`${TRAEFIK_HOST}`)"
+      - # REMEMBER TO CHANGE THE TRAEFIK_HOST TO THE DOMAIN NAME
+      - "traefik.http.routers.nextjs.rule=Host(`http://kaladin.ncsa.illinois.edu`)"
       - "traefik.http.services.nextjs.loadbalancer.server.port=3000"
       - "traefik.http.routers.nextjs.middlewares=traefik"
       - "traefik.http.middlewares.nextjs.basicauth.realm=Lab Notebook"
-
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://kaladin.ncsa.illinois.edu
 #    develop:
 #      watch:
 #        - action: rebuild
