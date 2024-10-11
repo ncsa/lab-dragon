@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState, useContext } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { navLinks } from '../constants/index';
 import { MenuBook, Comment, Search, AccountCircle } from '@mui/icons-material';
 import Image from 'next/image';
@@ -10,9 +10,10 @@ import { styled } from '@mui/material/styles';
 import ExplorerDrawer from './ExplorerDrawer';
 import { ExplorerContext } from '../contexts/explorerContext';
 
+// FIXME: Handle errors properly
 async function getLibraries() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
-  return await res.json();
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/get_all_libraries`);
+    return await res.json();
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -29,8 +30,12 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
 
+
+
+
 const StyledLink = styled(Link)(({ theme, active }) => ({
-  width: '100%',
+    width: '100%',
+
   padding: theme.spacing(1.5),
   display: 'flex',
   justifyContent: 'center',

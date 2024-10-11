@@ -1,4 +1,7 @@
 "use client";
+
+// TODO: Only 1 thing across all of the trees should be selected at a time. If an item is not selected and the user clicks it once, it should not expand but instead scroll there
+
 import { useEffect, useState, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Drawer, Divider, Accordion, AccordionDetails, IconButton, AccordionSummary } from '@mui/material';
@@ -18,6 +21,7 @@ async function getLibraryStructure(id) {
 }
 
 function createTreeStructure(item) {
+  // The first item sent to this function will not be included in the return
   let ret = [];
   if (item.children && item.children.length > 0) {
     ret = item.children.map(child => ({
