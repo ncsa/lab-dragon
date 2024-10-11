@@ -23,6 +23,7 @@ const StyledStepPaper = styled(Paper)(({ theme }) => ({
     paddingBottom: theme.spacing(1),
     '&:hover': {
         backgroundColor: '#D6E4FF',
+        cursor: 'pointer',
     },
 }))
 

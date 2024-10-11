@@ -19,6 +19,7 @@ const StyledContentBox = styled(Box)(({ theme }) => ({
     alignItems: "center",
     '&:hover': {
         backgroundColor: '#bec1ca',
+        cursor: 'pointer',
     }
 
 }))

@@ -87,9 +87,9 @@ export default function ProjectViewer( { projectEntity, notebookName } ) {
                         </Box>
                     ))}
                 </Stack>
-                <Box display="flex" flexDirection="column" alignItems="center">
+                <Box display="flex" flexDirection="column" alignItems="center" paddingTop={2}>
                     <IconButton onClick={handleOpenNewEntityDialog}>
-                        <AddBoxOutlinedIcon />
+                        <AddBoxOutlinedIcon sx={{color: "#4C9DFC"}} />
                     </IconButton>
                 </Box>
             </StyledProjectPaper>
