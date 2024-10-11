@@ -22,3 +22,16 @@ export const sortAndFilterChildren = (entity, displayChildren, onlyShowBookmarke
     }
     return combinedArray
 };
+
+export async function submitContentBlockEdition(entID, user, contentBlock, newContent) {
+
+    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + contentBlock.ID + "?HTML=True&username=" + user, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newContent),
+    });
+
+    return response.status === 201;
+}

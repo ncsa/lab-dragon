@@ -44,6 +44,12 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
         }));
     };
 
+    const reloadTask = () => {
+        getEntity(task.ID).then(t => {
+            setTask(JSON.parse(t));
+        })
+    }
+
     // Loads the children
     useEffect(() => {
         Promise.all(task.children.map(child => getEntity(child))).then(steps => {
@@ -53,9 +59,6 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                 updateStepActiveStatus(step.ID, false);
             })
         })
-
-
-
     }, [task])
 
     // Sorts the children with content blocks
@@ -75,8 +78,6 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
 
     }, [task, steps])
 
-    console.log("final version of sortedStepsAndContent", typeof sortedStepsAndContent)
-    console.log(sortedStepsAndContent);
     return (
         <StyledTaskPaper>
             <Stack flexGrow={1} spacing={2} direction='column'>
@@ -94,17 +95,15 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                     {sortedStepsAndContent.map(item => (
                         <Box key={item.id} display="flex" alignItems="center">
                                 {item.type ? (
-                                    // <Box flexGrow={1} display="flex" alignItems="center" paddingLeft={!activeSteps[item.ID] ? 2 : 0}> {/* Adjust padding based on icon presence */}
-                                    //     {!activeSteps[item.ID] && <ViewCompactIcon />} {/* Conditionally render the icon */}
                                     <StepViewer
                                         stepEntity={item}
                                         markStepState={updateStepActiveStatus}/>
-                                    // </Box>
                                 ) : (
                                     <Box marginLeft={2}>
                                         <TaskContentViewer
                                             contentBlock={item}
                                             entID={task.ID}
+                                            reloadTask={reloadTask}
                                         />
                                     </Box>
                                 )}

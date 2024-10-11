@@ -5,7 +5,7 @@ import {Box, Button, Divider, Paper, Stack, Typography} from "@mui/material";
 import {styled} from "@mui/material/styles";
 import parse from "html-react-parser";
 
-import { getEntity } from "@/app/utils";
+import {getEntity, submitContentBlockEdition} from "@/app/utils";
 import ActiveStepContentBlock from "@/app/components/StepViewerComponents/ActiveStepContentBlock";
 import ViewCompactIcon from "@mui/icons-material/ViewCompact";
 import Tiptap from "@/app/components/TiptapEditor/Tiptap";
@@ -54,19 +54,6 @@ const StyledNewContentBox = styled(Box)(({ theme }) => ({
     paddingTop: "10px"
 
 }))
-
-
-async function submitContentBlockEdition(entID, user, contentBlock, newContent) {
-    let response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/` + entID + "/" + contentBlock.ID + "?HTML=True&username=" + user, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newContent),
-    });
-
-    return response.status === 201;
-}
 
 
 async function submitNewContentBlock(entID, user, newContent ){
