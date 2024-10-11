@@ -21,7 +21,7 @@ from labcore.data.datadict import DataDict
 from labcore.analysis.fitfuncs.generic import Cosine
 from labcore.data.datadict_storage import datadict_to_hdf5
 
-from dragon_core.modules import Bucket, Project, Task, Step, Instance
+from dragon_core.modules import Bucket, Project, Task, Step, Instance, DragonLair, Library, Notebook
 from dragon_core.utils import delete_directory_contents
 
 
@@ -293,6 +293,9 @@ def create_simulated_env(target: Path) -> Path:
 
     delete_directory_contents(target)
 
+    # Creating lair
+    lair = DragonLair(target)
+
     # Creating data bucket
     data_path = target / 'data'
     data_path.mkdir(exist_ok=True)
@@ -302,37 +305,51 @@ def create_simulated_env(target: Path) -> Path:
     bucket_path = data_path / f"{bucket.ID[:8]}_Measurements.toml"
     pages_to_create.append((bucket, bucket_path))
 
-    root = Project(name='Demo Notebook',
-                   user='Smuag',
-                   data_buckets=[str(bucket_path)],
-                   comments=[
-                       'The following is a demo notebook written by the superconductor dragon called Smuag (any similarities with other dragons is merely a coincidence). \n'
-                       'Please feel free to edit as much as you want. Instructions on how to reset this notebook are in the quickstart section of the README'])
+    # root = Project(name='Demo Notebook',
+    #                user='Smuag',
+    #                data_buckets=[str(bucket_path)],
+    #                comments=[
+    #                    'The following is a demo notebook written by the superconductor dragon called Smuag (any similarities with other dragons is merely a coincidence). \n'
+    #                    'Please feel free to edit as much as you want. Instructions on how to reset this notebook are in the quickstart section of the README'])
+    #
+    # root_path = Path(target, f"{root.ID[:8]}_Demo Notebook.toml").resolve()
+    # pages_to_create.append((root, root_path))
 
-    root_path = Path(target, f"{root.ID[:8]}_Demo Notebook.toml").resolve()
-    pages_to_create.append((root, root_path))
+    library_1 = Library(name='Chocolate mk3 I',
+                        user='Smuag',
+                        data_buckets=[str(bucket_path)],)
+    library_1_path = target / f"{library_1.ID[:8]}_Chocolate mk3 I.toml"
+    pages_to_create.append((library_1, library_1_path))
+
+    notebook_1 = Notebook(name='Chocolate mk3 I Tune-up',
+                          user='Smuag',
+                          parent=library_1_path,)
+
+    notebook_1_path = Path(target, f"{notebook_1.ID[:8]}_Chocolate mk3 I Tune-up.toml").resolve()
+    library_1.add_child(notebook_1_path)
+    pages_to_create.append((notebook_1, notebook_1_path))
 
     qubit_characterization_project = Project(name='Chocolate mk3 I Tune-up',
                                              user='Smuag',
-                                             parent=root_path,
-                                             comments=['Summary of findings from the Chocolate mk3 I Tune-up: \n \n'
-                                                       '| Property | Value | Notes |\n'
-                                                       '|----------|----------|----------|\n'
-                                                       '| Resonator Freq | 7.1294GHz |  |\n'
-                                                       '| Readout amp | 0.035 |  |\n'
-                                                       '| Readout length | 1000 |  |\n'
-                                                       '| Qubit Freq | 5.025GHz |  |\n'
-                                                       '| Pi pulse amp | 0.065 |  |\n'
-                                                       '| Pi pulse sigma | 40 ns | 6 sigma |\n'
-                                                       '| T1 | 31.2 us |  |\n'
-                                                       '| T2 Ramsey | 28.7 us |  |\n'
-                                                       '| T2 Echo | 37 us |  |\n',
-                                                       'Calling this one qA'],
+                                             parent=notebook_1_path,
+                                             # comments=['Summary of findings from the Chocolate mk3 I Tune-up:']# \n \n'
+                                                       # '| Property | Value | Notes |\n'
+                                                       # '|----------|----------|----------|\n'
+                                                       # '| Resonator Freq | 7.1294GHz |  |\n'
+                                                       # '| Readout amp | 0.035 |  |\n'
+                                                       # '| Readout length | 1000 |  |\n'
+                                                       # '| Qubit Freq | 5.025GHz |  |\n'
+                                                       # '| Pi pulse amp | 0.065 |  |\n'
+                                                       # '| Pi pulse sigma | 40 ns | 6 sigma |\n'
+                                                       # '| T1 | 31.2 us |  |\n'
+                                                       # '| T2 Ramsey | 28.7 us |  |\n'
+                                                       # '| T2 Echo | 37 us |  |\n',
+                                                       # 'Calling this one qA'],
                                              )
 
     qubit_characterization_project_path = Path(target,
                                                f"{qubit_characterization_project.ID[:8]}_Chocolate mk3 I Tune-up.toml").resolve()
-    root.add_child(qubit_characterization_project_path)
+    notebook_1.add_child(qubit_characterization_project_path)
     pages_to_create.append((qubit_characterization_project, qubit_characterization_project_path))
 
     finding_resonator_freq_task = Task(name='Finding Resonator Frequency',
@@ -423,17 +440,17 @@ def create_simulated_env(target: Path) -> Path:
     pages_to_create.append((power_rabi_instance, power_rabi_instance_path))
     bucket.add_instance(power_rabi_instance_path, power_rabi_instance.ID)
 
-    calibrating_power_rabi_step = Step(name='Calibrating Power Rabi',
-                                       user='Smuag',
-                                       parent=qubit_characterization_project_path,
-                                       comments=[f"![]({fit_figure_path_power_rabi}) \n"
-                                                 f"Looks good. Pi pulse amp at 0.065 a,p. With pi pulse sigma of 40 "
-                                                 f"ns for 6 sigma."],)
+    # calibrating_power_rabi_step = Step(name='Calibrating Power Rabi',
+    #                                    user='Smuag',
+    #                                    parent=qubit_characterization_project_path,
+    #                                    comments=[f"![]({fit_figure_path_power_rabi}) \n"
+    #                                              f"Looks good. Pi pulse amp at 0.065 a,p. With pi pulse sigma of 40 "
+    #                                              f"ns for 6 sigma."],)
 
-    calibrating_power_rabi_step_path = Path(target,
-                                            f"{calibrating_power_rabi_step.ID[:8]}_Calibrating Power Rabi.toml").resolve()
-    qubit_characterization_project.add_child(calibrating_power_rabi_step_path)
-    pages_to_create.append((calibrating_power_rabi_step, calibrating_power_rabi_step_path))
+    # calibrating_power_rabi_step_path = Path(target,
+    #                                         f"{calibrating_power_rabi_step.ID[:8]}_Calibrating Power Rabi.toml").resolve()
+    # qubit_characterization_project.add_child(calibrating_power_rabi_step_path)
+    # pages_to_create.append((calibrating_power_rabi_step, calibrating_power_rabi_step_path))
 
     coherence_times_measurements_task = Task(name='Doing coherence measurements now',
                                              user='Smuag',
@@ -547,4 +564,6 @@ def create_simulated_env(target: Path) -> Path:
     for item, item_path in pages_to_create:
         item.to_TOML(item_path)
 
-    return root_path
+    lair.add_library(library_1, library_1_path)
+
+    return lair.file_path

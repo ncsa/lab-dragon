@@ -13,8 +13,7 @@ load_dotenv()
 
 if os.getenv('CREATE_TESTING_ENVIRONMENT') == 'True':
     target = Path("../test/tmp")
-    ret_root = create_simulated_env(target=Path(os.getenv("NOTEBOOK_ROOT")).parent)
-    os.environ["NOTEBOOK_ROOT"] = str(ret_root)
+    ret_root = create_simulated_env(target=Path(os.getenv("LAIRS_DIRECTORY")))
 
 app = connexion.App(__name__, specification_dir='./')
 app.add_middleware(

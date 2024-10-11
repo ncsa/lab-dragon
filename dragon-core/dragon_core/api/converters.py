@@ -10,8 +10,16 @@ from markdown.inlinepatterns import LinkInlineProcessor, Pattern
 from markdown.blockprocessors import BlockProcessor
 
 
-API_URL_PREFIX = os.getenv('API_URL_PREFIX', '')
-URL_HOST = os.getenv('URL_HOST', '')
+API_URL_PREFIX = None
+URL_HOST = None
+
+
+def set_api_url_prefix_and_host(prefix, host):
+    global API_URL_PREFIX
+    global URL_HOST
+    API_URL_PREFIX = prefix
+    URL_HOST = host
+
 
 
 # HTML to markdown
@@ -57,6 +65,9 @@ class MyMarkdownConverter(MarkdownConverter):
         """
         Handles the incoming html images and converts the link from html into the markdown pointing to the path of the image.
         """
+        assert API_URL_PREFIX is not None, "API_URL_PREFIX is not set"
+        assert URL_HOST is not None, "URL_HOST is not set"
+
         src = el.attrs['src']
         # Remove the 'http://localhost:8000/api/properties/image/' part from the src
         src = src.replace(f'{API_URL_PREFIX}/api/properties/image/', '')
@@ -112,6 +123,9 @@ class CustomLinkProcessor(LinkInlineProcessor):
         super().__init__(*args, **kwargs)
 
     def handleMatch(self, m, data):
+
+        assert API_URL_PREFIX is not None, "API_URL_PREFIX is not set"
+        assert URL_HOST is not None, "URL_HOST is not set"
 
         # group(2) is the text that it is linking too. If this is uuid and it is in the uuid index, it means it is
         # mention, if not assuming it is a link to an image

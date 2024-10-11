@@ -19,10 +19,6 @@ def verify_and_parse_config(config_path: Path) -> None:
     else:
         ret['create_testing_environment'] = False
 
-    if 'notebook_root' not in config:
-        raise ValueError("notebook_root not found in config file")
-    ret['notebook_root'] = config['notebook_root']
-
     if 'lairs_directory' not in config:
         raise ValueError("dragon_lair not found in config file")
     ret['lairs_directory'] = config['lairs_directory']
@@ -39,6 +35,10 @@ def verify_and_parse_config(config_path: Path) -> None:
     if 'url_host' not in config:
         raise ValueError("url_host not found in config file")
     ret['url_host'] = config['url_host']
+
+    if 'api_url_prefix' not in config:
+        raise ValueError("api_url_prefix not found in config file")
+    ret['api_url_prefix'] = config['api_url_prefix']
 
     if 'traefik_host' not in config:
         raise ValueError("traefik_host not found in config file")
