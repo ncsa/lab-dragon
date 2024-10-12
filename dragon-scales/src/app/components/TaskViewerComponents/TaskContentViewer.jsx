@@ -17,6 +17,7 @@ const StyledStepContentBlocksTypography = styled(Typography)(({ theme }) => ({
 const StyledContentBox = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
+    width: '96%',
     '&:hover': {
         backgroundColor: '#bec1ca',
         cursor: 'pointer',

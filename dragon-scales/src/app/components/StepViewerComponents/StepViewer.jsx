@@ -18,7 +18,7 @@ const StyledStepPaper = styled(Paper)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#F1F8FF',
-    width: '90%',
+    width: '96%',
     height: '90%',
     paddingLeft: theme.spacing(2),
     paddingTop: theme.spacing(1),
@@ -34,7 +34,7 @@ const StyledStepPaperActive = styled(Paper)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#e0e9ff',
-    width: '90%',
+    width: '96%',
     height: '90%',
     paddingLeft: theme.spacing(2),
     paddingTop: theme.spacing(1),
@@ -166,7 +166,7 @@ export default function StepViewer( { stepEntity, markStepState} ) {
  
     if (isActive) {
         return (
-            <div ref={stepRef}>
+            <Box ref={stepRef} flexGrow={1}>
             <Box ref={stepViewerRef} flexGrow={1} display="flex" alignItems="center">
                 <StyledStepPaperActive>
                     <StyledStepTittleTypography paddingLeft={5}>{step.name}</StyledStepTittleTypography>
@@ -183,14 +183,14 @@ export default function StepViewer( { stepEntity, markStepState} ) {
                                 <Box marginRight={2}>
                                     <ViewCompactIcon />
                                 </Box>
-                            
+
                                 <Tiptap onContentChange={handleNewContentChange}
                                         entID={step.ID}
                                         initialContent={newContentBlockRef.current}
                                         reloadEditor={reloadEditor}
                                         placeholder="Write a new content block here..."
                                         newLineEditor={true} />
-                                
+
                                 <Button type="submit"
                                         variant="contained"
                                         size="small"
@@ -202,14 +202,14 @@ export default function StepViewer( { stepEntity, markStepState} ) {
                                 </Button>
                             </StyledNewContentBox>
                         </form>
-                        
+
                     </StyledStepPaperActive>
                 </Box>
-            </div>
+            </Box>
         )
     } else {
         return (
-            <div ref={stepRef}>
+            <Box ref={stepRef} flexGrow={1}>
                 <StyledStepPaper
                     onClick={() => activateStepViewer()}>
                     <Box flexGrow={1} display="flex" alignItems="center">
@@ -228,7 +228,7 @@ export default function StepViewer( { stepEntity, markStepState} ) {
                         </Box>
                     </Box>
                 </StyledStepPaper>
-            </div>
+            </Box>
         )
     }
 }

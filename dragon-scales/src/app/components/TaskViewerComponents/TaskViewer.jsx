@@ -35,7 +35,7 @@ const StyledNewContentBox = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     paddingTop: "10px",
-    width: "90%",
+    width: "96%",
     paddingLeft: theme.spacing(2),
     marginLeft: theme.spacing(2)
 
@@ -141,13 +141,13 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                     </StyledTaskTittleTypography>
                     <Stack flexGrow={1} spacing={2} direction='column' paddingLeft={2}>
                         {sortedStepsAndContent.map(item => (
-                            <Box key={item.ID} display="flex" alignItems="center">
+                            <Box key={item.ID} display="flex" alignItems="center" width="100%" flexGrow={1}>
                                 {item.type ? (
-                                    <StepViewer
+                                    <StepViewer style={{ flexGrow: 1 }}
                                         stepEntity={item}
                                         markStepState={updateStepActiveStatus}/>
                                 ) : (
-                                    <Box marginLeft={2}>
+                                    <Box marginLeft={2} flexGrow={1}>
                                         <TaskContentViewer
                                             contentBlock={item}
                                             entID={task.ID}
