@@ -64,9 +64,9 @@ export default function Library() {
                     })
                 }
             });
-
             if (entitySectionIdRef.current[currentlySelectedItem]) {
-                entitySectionIdRef.current[currentlySelectedItem].scrollIntoView({ behavior: 'smooth' });
+                const itemRef = entitySectionIdRef.current[currentlySelectedItem];
+                if (itemRef.current) itemRef.current.scrollIntoView({ behavior: 'smooth' });
             }
 
         }
@@ -92,9 +92,7 @@ export default function Library() {
             )}
             <Stack flexGrow={2} spacing={2} direction='column'>
                 {topLevelProjects && topLevelProjects.map(project => (
-                    <div key={project.ID} ref={entitySectionIdRef.current[project.ID]}>
-                        <ProjectViewer projectEntity={project} notebookName={notebook.name} />
-                    </div>
+                    <ProjectViewer key={project.ID} projectEntity={project} notebookName={notebook.name} />
                 ))}
                 {notebook.ID && (
                     <Box>

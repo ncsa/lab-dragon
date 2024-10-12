@@ -52,7 +52,10 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     const [reloadEditor, setReloadEditor] = useState(0);
     const [newEntityDialogOpen, setNewEntityDialogOpen] = useState(false);
 
+    const taskRef = useRef(null);
     const newContentBlockRef = useRef(null);
+
+    entitySectionIdRef.current[task.ID] = taskRef;
 
     const handleOpenNewEntityDialog = () => {
         setNewEntityDialogOpen(true);
@@ -123,7 +126,7 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     }, [task, steps])
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box ref={taskRef} sx={{ display: 'flex', justifyContent: 'center' }}>
             <StyledTaskPaper>
                 <Stack flexGrow={1} spacing={2} direction='column'>
                     <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
@@ -140,11 +143,9 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                         {sortedStepsAndContent.map(item => (
                             <Box key={item.ID} display="flex" alignItems="center">
                                 {item.type ? (
-                                    <div ref={entitySectionIdRef.current[item.ID]}>
-                                        <StepViewer
-                                            stepEntity={item}
-                                            markStepState={updateStepActiveStatus}/>
-                                    </div>
+                                    <StepViewer
+                                        stepEntity={item}
+                                        markStepState={updateStepActiveStatus}/>
                                 ) : (
                                     <Box marginLeft={2}>
                                         <TaskContentViewer
