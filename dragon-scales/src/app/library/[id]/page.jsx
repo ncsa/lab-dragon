@@ -11,7 +11,6 @@ import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 
 async function getNotebookParent(id) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/entities/${id}/notebook_parent`);
-    // const res = await fetch(`/api/entities/${id}/notebook_parent`);
     return res.json();
 }
 
