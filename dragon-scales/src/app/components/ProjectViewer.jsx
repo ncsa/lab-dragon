@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { styled } from '@mui/material/styles';
 import { Typography, Paper, Stack, IconButton, InputAdornment, Input, Box } from "@mui/material";
 import TaskViewer from "@/app/components/TaskViewerComponents/TaskViewer";
@@ -9,7 +9,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { getEntity } from "@/app/utils";
 import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-
+import { ExplorerContext } from "@/app/contexts/explorerContext";
 
 const StyledProjectPaper = styled(Paper)(({ theme }) => ({
     position: 'relative',
@@ -32,6 +32,8 @@ const StyledProjectName = styled(Typography)(({ theme }) => ({
 }));
 
 export default function ProjectViewer( { projectEntity, notebookName } ) {
+
+    const { entitySectionIdRef } = useContext(ExplorerContext);
 
     const [project, setProject] = useState(projectEntity);
     const [topLevelTasks, setTopLevelTasks] = useState([]);
@@ -82,7 +84,7 @@ export default function ProjectViewer( { projectEntity, notebookName } ) {
                 </Stack>
                 <Stack flexGrow={1} spacing={2} direction='column' alignItems="center" width="100%">
                     {topLevelTasks.map(task => (
-                        <Box key={task.ID}  width="100%">
+                        <Box key={task.ID}  width="100%" ref={entitySectionIdRef.current[task.ID]}>
                             <TaskViewer taskEntity={task} breadcrumbsText={[notebookName, project.name, task.name]} />
                         </Box>
                     ))}

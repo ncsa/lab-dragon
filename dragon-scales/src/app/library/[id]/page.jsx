@@ -10,8 +10,8 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
 
 async function getNotebookParent(id) {
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}/notebook_parent`);
-    const res = await fetch(`/api/entities/${id}/notebook_parent`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/entities/${id}/notebook_parent`);
+    // const res = await fetch(`/api/entities/${id}/notebook_parent`);
     return res.json();
 }
 
@@ -37,7 +37,7 @@ export default function Library() {
     const openDrawerWidth = 24;
     const closedDrawerWidth = -8;
 
-    const { drawerOpen, currentlySelectedItem } = useContext(ExplorerContext);
+    const { drawerOpen, currentlySelectedItem, entitySectionIdRef } = useContext(ExplorerContext);
     const [ notebook, setNotebook ] = useState({ID: null});
     const [ topLevelProjects, setTopLevelProjects ] = useState(null);
     const [ newProjectDialogOpen, setNewProjectDialogOpen ] = useState(false);
@@ -65,6 +65,11 @@ export default function Library() {
                     })
                 }
             });
+
+            if (entitySectionIdRef.current[currentlySelectedItem]) {
+                entitySectionIdRef.current[currentlySelectedItem].scrollIntoView({ behavior: 'smooth' });
+            }
+
         }
     }, [currentlySelectedItem]);
 
@@ -88,7 +93,9 @@ export default function Library() {
             )}
             <Stack flexGrow={2} spacing={2} direction='column'>
                 {topLevelProjects && topLevelProjects.map(project => (
-                    <ProjectViewer key={project.ID} projectEntity={project} notebookName={notebook.name} />
+                    <div key={project.ID} ref={entitySectionIdRef.current[project.ID]}>
+                        <ProjectViewer projectEntity={project} notebookName={notebook.name} />
+                    </div>
                 ))}
                 {notebook.ID && (
                     <Box>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { styled } from "@mui/material/styles";
 import {Typography, Paper, Stack, Breadcrumbs, Box, Divider, IconButton, Button} from "@mui/material";
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
@@ -11,7 +11,7 @@ import StepViewer from "../StepViewerComponents/StepViewer";
 import TaskContentViewer from "./TaskContentViewer";
 import {getEntity, sortAndFilterChildren, submitNewContentBlock} from "@/app/utils";
 import NewEntityDialog from "@/app/components/dialogs/NewEntityDialog";
-
+import {ExplorerContext} from "@/app/contexts/explorerContext";
 
 const StyledTaskPaper = styled(Paper)(({ theme }) => ({
     position: 'relative',
@@ -42,6 +42,8 @@ const StyledNewContentBox = styled(Box)(({ theme }) => ({
 }))
 
 export default function TaskViewer({ taskEntity, breadcrumbsText }) {
+
+    const { entitySectionIdRef } = useContext(ExplorerContext);
 
     const [task, setTask] = useState(taskEntity);
     const [steps, setSteps] = useState([]);
@@ -138,9 +140,11 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                         {sortedStepsAndContent.map(item => (
                             <Box key={item.ID} display="flex" alignItems="center">
                                 {item.type ? (
-                                    <StepViewer
-                                        stepEntity={item}
-                                        markStepState={updateStepActiveStatus}/>
+                                    <div ref={entitySectionIdRef.current[item.ID]}>
+                                        <StepViewer
+                                            stepEntity={item}
+                                            markStepState={updateStepActiveStatus}/>
+                                    </div>
                                 ) : (
                                     <Box marginLeft={2}>
                                         <TaskContentViewer
