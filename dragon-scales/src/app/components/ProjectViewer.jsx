@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { styled } from '@mui/material/styles';
 import { Typography, Paper, Stack, IconButton, InputAdornment, Input, Box } from "@mui/material";
 import TaskViewer from "@/app/components/TaskViewerComponents/TaskViewer";
@@ -39,6 +39,9 @@ export default function ProjectViewer( { projectEntity, notebookName } ) {
     const [topLevelTasks, setTopLevelTasks] = useState([]);
     const [newEntityDialogOpen, setNewEntityDialogOpen] = useState(false);
 
+    const projectRef = useRef(null);
+    entitySectionIdRef.current[project.ID] = projectRef;
+
     const handleOpenNewEntityDialog = () => {
         setNewEntityDialogOpen(true);
     }
@@ -61,7 +64,7 @@ export default function ProjectViewer( { projectEntity, notebookName } ) {
     }, [project])
 
     return (
-        <Box>
+        <Box ref={projectRef}>
             <StyledProjectPaper>
                  <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <StyledProjectName fontWeight="bold" fontSize="1.5rem">{project.name}</StyledProjectName>

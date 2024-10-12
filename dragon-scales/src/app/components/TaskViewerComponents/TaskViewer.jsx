@@ -35,7 +35,7 @@ const StyledNewContentBox = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     paddingTop: "10px",
-    width: "90%",
+    width: "96%",
     paddingLeft: theme.spacing(2),
     marginLeft: theme.spacing(2)
 
@@ -52,7 +52,10 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     const [reloadEditor, setReloadEditor] = useState(0);
     const [newEntityDialogOpen, setNewEntityDialogOpen] = useState(false);
 
+    const taskRef = useRef(null);
     const newContentBlockRef = useRef(null);
+
+    entitySectionIdRef.current[task.ID] = taskRef;
 
     const handleOpenNewEntityDialog = () => {
         setNewEntityDialogOpen(true);
@@ -123,7 +126,7 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
     }, [task, steps])
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box ref={taskRef} sx={{ display: 'flex', justifyContent: 'center' }}>
             <StyledTaskPaper>
                 <Stack flexGrow={1} spacing={2} direction='column'>
                     <Breadcrumbs separator=">" color="#4C9DFC" paddingLeft={2} paddingTop={1}>
@@ -138,15 +141,13 @@ export default function TaskViewer({ taskEntity, breadcrumbsText }) {
                     </StyledTaskTittleTypography>
                     <Stack flexGrow={1} spacing={2} direction='column' paddingLeft={2}>
                         {sortedStepsAndContent.map(item => (
-                            <Box key={item.ID} display="flex" alignItems="center">
+                            <Box key={item.ID} display="flex" alignItems="center" width="100%" flexGrow={1}>
                                 {item.type ? (
-                                    <div ref={entitySectionIdRef.current[item.ID]}>
-                                        <StepViewer
-                                            stepEntity={item}
-                                            markStepState={updateStepActiveStatus}/>
-                                    </div>
+                                    <StepViewer style={{ flexGrow: 1 }}
+                                        stepEntity={item}
+                                        markStepState={updateStepActiveStatus}/>
                                 ) : (
-                                    <Box marginLeft={2}>
+                                    <Box marginLeft={2} flexGrow={1}>
                                         <TaskContentViewer
                                             contentBlock={item}
                                             entID={task.ID}
