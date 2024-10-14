@@ -66,6 +66,20 @@ export async function createEntity(name, user, type, parent) {
 }
 
 
+export async function deleteEntity(entID) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/entities/${entID}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+    });
+
+    return response.status === 201;
+}
+
+
+
 export async function createLibrary(name, user) {
     const newLibrary = {
         name, user

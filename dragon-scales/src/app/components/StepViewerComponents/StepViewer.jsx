@@ -1,17 +1,18 @@
 "use client"
 
 import {useEffect, useRef, useState, useContext} from "react";
-import {Box, Button, Divider, Paper, Stack, Typography} from "@mui/material";
+import {Box, Button, Divider, Paper, Stack, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton} from "@mui/material";
 import {styled} from "@mui/material/styles";
 import parse from "html-react-parser";
 import ViewCompactIcon from "@mui/icons-material/ViewCompact";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import ActiveStepContentBlock from "@/app/components/StepViewerComponents/ActiveStepContentBlock";
 import Tiptap from "@/app/components/TiptapEditor/Tiptap";
 import {ExplorerContext} from "@/app/contexts/explorerContext";
 
 
-import {getEntity, submitContentBlockEdition, submitNewContentBlock} from "@/app/utils";
+import {getEntity, submitContentBlockEdition, submitNewContentBlock, deleteEntity} from "@/app/utils";
 
 const StyledStepPaper = styled(Paper)(({ theme }) => ({
     position: 'relative',
@@ -29,6 +30,13 @@ const StyledStepPaper = styled(Paper)(({ theme }) => ({
     },
 }))
 
+const StyledDeleteButton = styled(IconButton)(({ theme }) => ({
+    position: 'absolute',
+    top: theme.spacing(1),
+    right: theme.spacing(1),
+    color: theme.palette.error.main,
+}));
+
 const StyledStepPaperActive = styled(Paper)(({ theme }) => ({
     position: 'relative',
     display: 'flex',
@@ -39,7 +47,7 @@ const StyledStepPaperActive = styled(Paper)(({ theme }) => ({
     paddingLeft: theme.spacing(2),
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
-    
+
 }))
 
 const StyledStepTittleTypography = styled(Typography)(({ theme }) => ({
@@ -59,7 +67,9 @@ const StyledNewContentBox = styled(Box)(({ theme }) => ({
 }))
 
 
-export default function StepViewer( { stepEntity, markStepState} ) {
+
+
+export default function StepViewer( { stepEntity, markStepState, reloadTask } ) {
 
     const { entitySectionIdRef } = useContext(ExplorerContext);
 
@@ -67,6 +77,8 @@ export default function StepViewer( { stepEntity, markStepState} ) {
     const [isActive, setIsActive] = useState(false);
     const [parsedContentBlocksEnt, setParsedContentBlocksEnt] = useState([]);
     const [reloadEditor, setReloadEditor] = useState(0);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
 
     // Holds as keys the ids of contentBlocks and as values their corresponding refs
     const contentBlocksRefs = useRef({});
@@ -84,7 +96,7 @@ export default function StepViewer( { stepEntity, markStepState} ) {
     const updateContentBlocksRefs = (id, text) => {
         contentBlocksRefs.current[id] = text;
     }
-    
+
     const activateStepViewer = () => {
         setIsActive(true);
         markStepState(step.ID, true);
@@ -137,7 +149,26 @@ export default function StepViewer( { stepEntity, markStepState} ) {
         }
     }
 
+    const handleOpenDeleteDialog = (event) => {
+        event.stopPropagation();
+        setDeleteDialogOpen(true);
+    };
 
+    const handleCloseDeleteDialog = () => {
+        setDeleteDialogOpen(false);
+    };
+
+    const handleDeleteStep = async () => {
+        try {
+            const success = await deleteEntity(step.ID);
+            handleCloseDeleteDialog();
+            if (success) {
+                reloadTask();
+            }
+        } catch (error) {
+            console.error("Error deleting step:", error);
+        }
+    };
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (stepViewerRef.current && !stepViewerRef.current.contains(event.target)) {
@@ -163,19 +194,22 @@ export default function StepViewer( { stepEntity, markStepState} ) {
             return acc;
         }, {});
     }, [step])
- 
+
     if (isActive) {
         return (
             <Box ref={stepRef} flexGrow={1}>
-            <Box ref={stepViewerRef} flexGrow={1} display="flex" alignItems="center">
-                <StyledStepPaperActive>
-                    <StyledStepTittleTypography paddingLeft={5}>{step.name}</StyledStepTittleTypography>
+                <Box ref={stepViewerRef} flexGrow={1} display="flex" alignItems="center">
+                    <StyledStepPaperActive>
+                        <StyledDeleteButton onClick={handleOpenDeleteDialog} aria-label="delete step">
+                            <DeleteIcon />
+                        </StyledDeleteButton>
+                        <StyledStepTittleTypography paddingLeft={5}>{step.name}</StyledStepTittleTypography>
                         {parsedContentBlocksEnt.map(contentBlock => (
-                           <ActiveStepContentBlock key={contentBlock.ID}
-                                                   contentBlock={contentBlock}
-                                                   entID={step.ID}
-                                                   activeContentBlockRef={activeContentBlockRef}
-                                                   updateContent={updateContentBlocksRefs} />
+                            <ActiveStepContentBlock key={contentBlock.ID}
+                                                    contentBlock={contentBlock}
+                                                    entID={step.ID}
+                                                    activeContentBlockRef={activeContentBlockRef}
+                                                    updateContent={updateContentBlocksRefs} />
                         ))}
                         <Divider sx={{paddingTop: "5px",}} />
                         <form noValidate autoComplete="off" onSubmit={handleSubmitNewContent}>
@@ -197,7 +231,7 @@ export default function StepViewer( { stepEntity, markStepState} ) {
                                         sx={{ marginLeft: 1,
                                             marginRight: 1
                                         }}
-                                        >
+                                >
                                     Submit
                                 </Button>
                             </StyledNewContentBox>
@@ -205,6 +239,25 @@ export default function StepViewer( { stepEntity, markStepState} ) {
 
                     </StyledStepPaperActive>
                 </Box>
+                <Dialog
+                    open={deleteDialogOpen}
+                    onClose={handleCloseDeleteDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{"Confirm Step Deletion"}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to delete this step?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+                        <Button onClick={handleDeleteStep} color="error" autoFocus>
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         )
     } else {
@@ -232,27 +285,3 @@ export default function StepViewer( { stepEntity, markStepState} ) {
         )
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
