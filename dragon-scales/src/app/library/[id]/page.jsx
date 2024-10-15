@@ -92,7 +92,10 @@ export default function Library() {
             )}
             <Stack flexGrow={2} spacing={2} direction='column'>
                 {topLevelProjects && topLevelProjects.map(project => (
-                    <ProjectViewer key={project.ID} projectEntity={project} notebookName={notebook.name} />
+                    <ProjectViewer key={project.ID}
+                                   projectEntity={project}
+                                   notebookName={notebook.name}
+                                    reloadNotebook={reloadNotebook}/>
                 ))}
                 {notebook.ID && (
                     <Box>
