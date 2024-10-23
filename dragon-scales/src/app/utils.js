@@ -96,8 +96,44 @@ export async function createLibrary(name, user) {
     return response.status === 201;
 }
 
+export async function changeEntityName(entID, newName) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/entities/${entID}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                new_name: newName
+            })
+        });
+        
+        // Log the response for debugging
+        console.log("Change name response:", response.status);
+        
+        if (response.status === 201 || response.status === 200) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error("Error in changeEntityName:", error);
+        return false;
+    }
+}
 
+// In ProjectViewer.jsx, update the handleEditProject function:
 
+export async function updateEntity(id, updatedData) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/entities/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedData),
+    });
+
+    return response.ok;
+}
 
 
 
