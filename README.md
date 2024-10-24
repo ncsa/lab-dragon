@@ -1,3 +1,8 @@
+# Repository Moved
+
+We have moved! The new home for Lab Dragon is ![https://github.com/toolsforexperiments/lab-dragon](https://github.com/toolsforexperiments/lab-dragon). 
+This repository is now in archive mode and left for reference.
+
 # Lab Dragon
 
 Lab Dragon is an Electronic Lab Notebook (ELN) for scientists. It is a web application that allows you to create, edit, and share your lab notes. It is designed to be easy to use and to help you keep track of your experiments while also integrating deeply with your lab software.
